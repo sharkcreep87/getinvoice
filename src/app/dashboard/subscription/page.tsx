@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useState } from "react"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Check } from "lucide-react"
+import { Check, CreditCard, Loader2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -81,12 +82,23 @@ const plans = [
 export default function SubscriptionPage() {
   const [currentTier, setCurrentTier] = useState<SubscriptionTier>('free')
   const [loading, setLoading] = useState(true)
-  const [updating, setUpdating] = useState(false)
+  const [processingTier, setProcessingTier] = useState<SubscriptionTier | null>(null)
+  const [cancelingSubscription, setCancelingSubscription] = useState(false)
   const { toast } = useToast()
   const supabase = createClient()
+  const searchParams = useSearchParams()
 
   useEffect(() => {
     loadSubscription()
+
+    // Check for canceled payment
+    if (searchParams.get('canceled') === 'true') {
+      toast({
+        title: "Payment Canceled",
+        description: "Your payment was canceled. No charges were made.",
+        variant: "destructive",
+      })
+    }
   }, [])
 
   const loadSubscription = async () => {
@@ -114,32 +126,88 @@ export default function SubscriptionPage() {
   }
 
   const handleUpgrade = async (tier: SubscriptionTier) => {
-    setUpdating(true)
+    setProcessingTier(tier)
 
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error("Not authenticated")
+      // Free tier - direct downgrade
+      if (tier === 'free') {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) throw new Error("Not authenticated")
 
-      const { error } = await supabase
-        .from('profiles')
-        .update({ subscription_tier: tier })
-        .eq('id', user.id)
+        const { error } = await supabase
+          .from('profiles')
+          .update({ subscription_tier: tier })
+          .eq('id', user.id)
 
-      if (error) throw error
+        if (error) throw error
 
-      setCurrentTier(tier)
+        setCurrentTier(tier)
+        toast({
+          title: "Success",
+          description: "Downgraded to Free plan",
+        })
+        return
+      }
+
+      // Paid tiers - redirect to Stripe checkout
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tier }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create checkout session')
+      }
+
+      // Redirect to Stripe checkout
+      if (data.url) {
+        window.location.href = data.url
+      }
+    } catch (error: any) {
       toast({
-        title: "Success",
-        description: `Successfully ${tier === 'free' ? 'downgraded' : 'upgraded'} to ${tier} plan`,
+        title: "Error",
+        description: error.message || "Failed to process upgrade",
+        variant: "destructive",
+      })
+      setProcessingTier(null)
+    }
+  }
+
+  const handleCancelSubscription = async () => {
+    if (!confirm("Are you sure you want to cancel your subscription? You'll be downgraded to the Free plan at the end of your billing period.")) {
+      return
+    }
+
+    setCancelingSubscription(true)
+
+    try {
+      const response = await fetch('/api/cancel-subscription', {
+        method: 'POST',
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to cancel subscription')
+      }
+
+      toast({
+        title: "Subscription Canceled",
+        description: "Your subscription will be canceled at the end of the billing period.",
       })
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to update subscription",
+        description: error.message || "Failed to cancel subscription",
         variant: "destructive",
       })
     } finally {
-      setUpdating(false)
+      setCancelingSubscription(false)
     }
   }
 
@@ -162,11 +230,30 @@ export default function SubscriptionPage() {
             <span className="font-bold text-blue-600 capitalize">{currentTier}</span> plan
           </CardDescription>
         </CardHeader>
+        {currentTier !== 'free' && (
+          <CardContent>
+            <Button
+              variant="outline"
+              onClick={handleCancelSubscription}
+              disabled={cancelingSubscription}
+            >
+              {cancelingSubscription ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Canceling...
+                </>
+              ) : (
+                'Cancel Subscription'
+              )}
+            </Button>
+          </CardContent>
+        )}
       </Card>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {plans.map((plan) => {
           const isCurrentPlan = plan.tier === currentTier
+          const isProcessing = processingTier === plan.tier
           const canUpgrade = plans.findIndex(p => p.tier === currentTier) < plans.findIndex(p => p.tier === plan.tier)
           const canDowngrade = plans.findIndex(p => p.tier === currentTier) > plans.findIndex(p => p.tier === plan.tier)
 
@@ -216,18 +303,35 @@ export default function SubscriptionPage() {
                   <Button
                     className="w-full"
                     onClick={() => handleUpgrade(plan.tier)}
-                    disabled={updating}
+                    disabled={isProcessing}
                   >
-                    {updating ? 'Updating...' : 'Upgrade'}
+                    {isProcessing ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="mr-2 h-4 w-4" />
+                        Upgrade
+                      </>
+                    )}
                   </Button>
                 ) : canDowngrade ? (
                   <Button
                     className="w-full"
                     variant="outline"
                     onClick={() => handleUpgrade(plan.tier)}
-                    disabled={updating}
+                    disabled={isProcessing}
                   >
-                    {updating ? 'Updating...' : 'Downgrade'}
+                    {isProcessing ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      'Downgrade'
+                    )}
                   </Button>
                 ) : null}
               </CardContent>
@@ -235,6 +339,35 @@ export default function SubscriptionPage() {
           )
         })}
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Payment Information</CardTitle>
+          <CardDescription>
+            All payments are securely processed through Stripe
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <Check className="h-5 w-5 text-green-600" />
+              <span>Secure payment processing with Stripe</span>
+            </div>
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <Check className="h-5 w-5 text-green-600" />
+              <span>Cancel anytime - no long-term contracts</span>
+            </div>
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <Check className="h-5 w-5 text-green-600" />
+              <span>Automatic billing on monthly basis</span>
+            </div>
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <Check className="h-5 w-5 text-green-600" />
+              <span>Instant plan activation</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

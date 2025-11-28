@@ -23,8 +23,11 @@ A modern, full-featured CRM system with powerful invoice generation capabilities
 
 - **Subscription Management**
   - Multiple subscription tiers (Free, Basic, Pro, Enterprise)
+  - Stripe payment integration for secure transactions
+  - Automatic subscription billing and management
   - Usage limits based on subscription
   - Easy upgrade/downgrade functionality
+  - Subscription cancellation support
 
 - **Modern Dashboard**
   - Real-time analytics and statistics
@@ -41,6 +44,7 @@ A modern, full-featured CRM system with powerful invoice generation capabilities
 - **Frontend**: Next.js 14 (App Router), React 18, TypeScript
 - **Styling**: Tailwind CSS, Radix UI Components
 - **Backend**: Supabase (PostgreSQL, Authentication, Row Level Security)
+- **Payment Processing**: Stripe for subscription payments
 - **PDF Generation**: jsPDF with autoTable
 - **Deployment**: Docker, Docker Compose
 
@@ -49,6 +53,7 @@ A modern, full-featured CRM system with powerful invoice generation capabilities
 - Node.js 20+ and npm
 - Docker and Docker Compose (for containerized deployment)
 - Supabase account (free tier available at https://supabase.com)
+- Stripe account (for payment processing - https://stripe.com)
 
 ## Quick Start
 
@@ -80,6 +85,11 @@ NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Stripe Configuration (for payment processing)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
+STRIPE_SECRET_KEY=your_stripe_secret_key
+STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
 ```
 
 ### 5. Set Up the Database
@@ -88,8 +98,18 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 2. Navigate to SQL Editor
 3. Copy the contents of `supabase/schema.sql`
 4. Run the SQL script to create tables and policies
+5. Run `supabase/schema_payments.sql` to create payment tracking tables
 
-### 6. Run Development Server
+### 6. Set Up Stripe (Optional but recommended)
+
+For full subscription payment functionality:
+
+1. Create a Stripe account at https://stripe.com
+2. Get your API keys from the Stripe Dashboard
+3. Set up webhooks for payment notifications
+4. See [STRIPE_SETUP.md](STRIPE_SETUP.md) for detailed instructions
+
+### 7. Run Development Server
 
 ```bash
 npm run dev
@@ -261,6 +281,11 @@ The application follows Next.js 14 App Router conventions:
 | NEXT_PUBLIC_SUPABASE_ANON_KEY | Supabase anonymous key | Yes |
 | SUPABASE_SERVICE_ROLE_KEY | Supabase service role key | Yes |
 | NEXT_PUBLIC_APP_URL | Application URL | No |
+| NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY | Stripe publishable key | Yes* |
+| STRIPE_SECRET_KEY | Stripe secret key | Yes* |
+| STRIPE_WEBHOOK_SECRET | Stripe webhook secret | Yes* |
+
+*Required for payment processing. The app will work without Stripe but subscription payments will be disabled.
 
 ## Troubleshooting
 
