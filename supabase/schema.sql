@@ -189,11 +189,11 @@ CREATE TRIGGER update_invoices_updated_at BEFORE UPDATE ON public.invoices
 CREATE TRIGGER update_subscription_plans_updated_at BEFORE UPDATE ON public.subscription_plans
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Insert default subscription plans
+-- Insert default subscription plans (prices in MYR)
 INSERT INTO public.subscription_plans (name, tier, price, billing_period, features, max_customers, max_invoices_per_month)
 VALUES
     ('Free', 'free', 0, 'monthly', '["5 customers", "10 invoices per month", "Basic support", "Email notifications"]'::jsonb, 5, 10),
-    ('Basic', 'basic', 19, 'monthly', '["50 customers", "100 invoices per month", "Email support", "Custom branding", "PDF export", "Advanced analytics"]'::jsonb, 50, 100),
-    ('Pro', 'pro', 49, 'monthly', '["Unlimited customers", "Unlimited invoices", "Priority support", "Advanced analytics", "API access", "Custom integrations", "Multi-currency support"]'::jsonb, -1, -1),
-    ('Enterprise', 'enterprise', 199, 'monthly', '["Everything in Pro", "Dedicated support", "Custom integrations", "SLA guarantee", "Multi-user access", "Advanced security", "Custom reporting", "White-label solution"]'::jsonb, -1, -1)
+    ('Basic', 'basic', 79, 'monthly', '["50 customers", "100 invoices per month", "Email support", "Custom branding", "PDF export", "Advanced analytics"]'::jsonb, 50, 100),
+    ('Pro', 'pro', 199, 'monthly', '["Unlimited customers", "Unlimited invoices", "Priority support", "Advanced analytics", "API access", "Custom integrations", "Multi-currency support"]'::jsonb, -1, -1),
+    ('Enterprise', 'enterprise', 799, 'monthly', '["Everything in Pro", "Dedicated support", "Custom integrations", "SLA guarantee", "Multi-user access", "Advanced security", "Custom reporting", "White-label solution"]'::jsonb, -1, -1)
 ON CONFLICT (tier) DO NOTHING;

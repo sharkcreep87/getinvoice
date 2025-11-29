@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -12,15 +12,45 @@ import { FileText } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 
+type SubscriptionPlan = {
+  id: string
+  name: string
+  tier: string
+  price: number
+  billing_period: string
+}
+
 export default function RegisterPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [fullName, setFullName] = useState("")
   const [subscriptionTier, setSubscriptionTier] = useState<'free' | 'basic' | 'pro' | 'enterprise'>('free')
   const [loading, setLoading] = useState(false)
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([])
+  const [plansLoading, setPlansLoading] = useState(true)
   const router = useRouter()
   const { toast } = useToast()
   const supabase = createClient()
+
+  useEffect(() => {
+    loadPlans()
+  }, [])
+
+  const loadPlans = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('subscription_plans')
+        .select('id, name, tier, price, billing_period')
+        .order('price', { ascending: true })
+
+      if (error) throw error
+      setPlans(data || [])
+    } catch (error) {
+      console.error('Failed to load plans:', error)
+    } finally {
+      setPlansLoading(false)
+    }
+  }
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -123,15 +153,16 @@ export default function RegisterPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="plan">Select Plan</Label>
-                <Select value={subscriptionTier} onValueChange={(value: any) => setSubscriptionTier(value)}>
+                <Select value={subscriptionTier} onValueChange={(value: any) => setSubscriptionTier(value)} disabled={plansLoading}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Choose a plan" />
+                    <SelectValue placeholder={plansLoading ? "Loading plans..." : "Choose a plan"} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="free">Free - RM0/month</SelectItem>
-                    <SelectItem value="basic">Basic - RM79/month</SelectItem>
-                    <SelectItem value="pro">Pro - RM199/month</SelectItem>
-                    <SelectItem value="enterprise">Enterprise - RM799/month</SelectItem>
+                    {plans.map((plan) => (
+                      <SelectItem key={plan.id} value={plan.tier}>
+                        {plan.name} - RM{plan.price}/{plan.billing_period === 'monthly' ? 'month' : 'year'}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

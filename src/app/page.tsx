@@ -1,13 +1,48 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowRight, BarChart3, FileText, Users, Zap, Menu, X } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
+
+type SubscriptionPlan = {
+  id: string
+  name: string
+  tier: string
+  price: number
+  billing_period: string
+  features: string[]
+  max_customers: number
+  max_invoices_per_month: number
+}
 
 export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([])
+  const [loading, setLoading] = useState(true)
+  const supabase = createClient()
+
+  useEffect(() => {
+    loadPlans()
+  }, [])
+
+  const loadPlans = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('subscription_plans')
+        .select('*')
+        .order('price', { ascending: true })
+
+      if (error) throw error
+      setPlans(data || [])
+    } catch (error) {
+      console.error('Failed to load plans:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 via-purple-50 to-white">
@@ -239,96 +274,64 @@ export default function HomePage() {
           <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-pink-600 bg-clip-text text-transparent mb-4">Simple Pricing</h2>
           <p className="text-sm sm:text-base text-gray-700">Choose the plan that fits your business</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto">
-          <Card className="border-2 border-gray-200 hover:border-gray-300 transition-all hover:shadow-lg">
-            <CardHeader>
-              <CardTitle>Free</CardTitle>
-              <CardDescription>For getting started</CardDescription>
-              <div className="mt-4">
-                <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">RM0</span>
-                <span className="text-sm sm:text-base text-gray-600">/month</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li>✓ 5 customers</li>
-                <li>✓ 10 invoices/month</li>
-                <li>✓ Basic support</li>
-              </ul>
-              <Link href="/register">
-                <Button className="w-full mt-4" variant="outline">Get Started</Button>
-              </Link>
-            </CardContent>
-          </Card>
-          <Card className="border-2 border-primary shadow-xl shadow-primary/20 relative overflow-hidden">
-            <div className="absolute top-0 right-0 bg-gradient-to-r from-primary to-pink-500 text-white text-xs px-3 py-1 rounded-bl-lg font-semibold">
-              POPULAR
-            </div>
-            <CardHeader>
-              <CardTitle className="text-primary">Basic</CardTitle>
-              <CardDescription>For small businesses</CardDescription>
-              <div className="mt-4">
-                <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-pink-600 bg-clip-text text-transparent">RM79</span>
-                <span className="text-sm sm:text-base text-gray-600">/month</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li>✓ 50 customers</li>
-                <li>✓ 100 invoices/month</li>
-                <li>✓ Email support</li>
-                <li>✓ Custom branding</li>
-              </ul>
-              <Link href="/register">
-                <Button className="w-full mt-4 bg-gradient-to-r from-primary to-pink-500 hover:from-primary/90 hover:to-pink-500/90">Get Started</Button>
-              </Link>
-            </CardContent>
-          </Card>
-          <Card className="border-2 border-pink-200/50 hover:border-pink-300 transition-all hover:shadow-lg hover:shadow-pink-500/20">
-            <CardHeader>
-              <CardTitle className="text-pink-600">Pro</CardTitle>
-              <CardDescription>For growing teams</CardDescription>
-              <div className="mt-4">
-                <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">RM199</span>
-                <span className="text-sm sm:text-base text-gray-600">/month</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li>✓ Unlimited customers</li>
-                <li>✓ Unlimited invoices</li>
-                <li>✓ Priority support</li>
-                <li>✓ Advanced analytics</li>
-                <li>✓ API access</li>
-              </ul>
-              <Link href="/register">
-                <Button className="w-full mt-4" variant="outline">Get Started</Button>
-              </Link>
-            </CardContent>
-          </Card>
-          <Card className="border-2 border-purple-200/50 hover:border-purple-300 transition-all hover:shadow-lg hover:shadow-purple-500/20">
-            <CardHeader>
-              <CardTitle className="text-purple-600">Enterprise</CardTitle>
-              <CardDescription>For large organizations</CardDescription>
-              <div className="mt-4">
-                <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-500 to-indigo-600 bg-clip-text text-transparent">RM799</span>
-                <span className="text-sm sm:text-base text-gray-600">/month</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li>✓ Everything in Pro</li>
-                <li>✓ Dedicated support</li>
-                <li>✓ Custom integrations</li>
-                <li>✓ SLA guarantee</li>
-                <li>✓ Multi-user access</li>
-              </ul>
-              <Link href="/register">
-                <Button className="w-full mt-4" variant="outline">Contact Sales</Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600">Loading pricing...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto">
+            {plans.map((plan, index) => {
+              const isPopular = plan.tier === 'basic'
+              const cardColors = [
+                { border: 'border-gray-200 hover:border-gray-300', title: 'text-gray-900', price: 'from-gray-700 to-gray-900' },
+                { border: 'border-primary shadow-xl shadow-primary/20', title: 'text-primary', price: 'from-primary to-pink-600' },
+                { border: 'border-pink-200/50 hover:border-pink-300 hover:shadow-pink-500/20', title: 'text-pink-600', price: 'from-pink-500 to-purple-600' },
+                { border: 'border-purple-200/50 hover:border-purple-300 hover:shadow-purple-500/20', title: 'text-purple-600', price: 'from-purple-500 to-indigo-600' },
+              ]
+              const colors = cardColors[index] || cardColors[0]
+
+              return (
+                <Card key={plan.id} className={`border-2 ${colors.border} transition-all hover:shadow-lg relative overflow-hidden`}>
+                  {isPopular && (
+                    <div className="absolute top-0 right-0 bg-gradient-to-r from-primary to-pink-500 text-white text-xs px-3 py-1 rounded-bl-lg font-semibold">
+                      POPULAR
+                    </div>
+                  )}
+                  <CardHeader>
+                    <CardTitle className={colors.title}>{plan.name}</CardTitle>
+                    <CardDescription>
+                      {plan.tier === 'free' && 'For getting started'}
+                      {plan.tier === 'basic' && 'For small businesses'}
+                      {plan.tier === 'pro' && 'For growing teams'}
+                      {plan.tier === 'enterprise' && 'For large organizations'}
+                    </CardDescription>
+                    <div className="mt-4">
+                      <span className={`text-3xl sm:text-4xl font-bold bg-gradient-to-r ${colors.price} bg-clip-text text-transparent`}>
+                        RM{plan.price}
+                      </span>
+                      <span className="text-sm sm:text-base text-gray-600">/month</span>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2 text-sm text-gray-600">
+                      {plan.features.map((feature, i) => (
+                        <li key={i}>✓ {feature}</li>
+                      ))}
+                    </ul>
+                    <Link href="/register">
+                      <Button
+                        className={`w-full mt-4 ${isPopular ? 'bg-gradient-to-r from-primary to-pink-500 hover:from-primary/90 hover:to-pink-500/90' : ''}`}
+                        variant={isPopular ? 'default' : 'outline'}
+                      >
+                        {plan.tier === 'enterprise' ? 'Contact Sales' : 'Get Started'}
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              )
+            })}
+          </div>
+        )}
       </section>
 
       {/* Footer */}

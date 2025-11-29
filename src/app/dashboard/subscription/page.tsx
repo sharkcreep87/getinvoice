@@ -10,86 +10,38 @@ import { useToast } from "@/components/ui/use-toast"
 
 type SubscriptionTier = 'free' | 'basic' | 'pro' | 'enterprise'
 
-const plans = [
-  {
-    tier: 'free' as SubscriptionTier,
-    name: 'Free',
-    price: 0,
-    description: 'For getting started',
-    features: [
-      '5 customers',
-      '10 invoices per month',
-      'Basic support',
-      'Email notifications',
-    ],
-    maxCustomers: 5,
-    maxInvoicesPerMonth: 10,
-  },
-  {
-    tier: 'basic' as SubscriptionTier,
-    name: 'Basic',
-    price: 19,
-    description: 'For small businesses',
-    features: [
-      '50 customers',
-      '100 invoices per month',
-      'Email support',
-      'Custom branding',
-      'PDF export',
-      'Advanced analytics',
-    ],
-    maxCustomers: 50,
-    maxInvoicesPerMonth: 100,
-    popular: true,
-  },
-  {
-    tier: 'pro' as SubscriptionTier,
-    name: 'Pro',
-    price: 49,
-    description: 'For growing teams',
-    features: [
-      'Unlimited customers',
-      'Unlimited invoices',
-      'Priority support',
-      'Advanced analytics',
-      'API access',
-      'Custom integrations',
-      'Multi-currency support',
-    ],
-    maxCustomers: -1,
-    maxInvoicesPerMonth: -1,
-  },
-  {
-    tier: 'enterprise' as SubscriptionTier,
-    name: 'Enterprise',
-    price: 199,
-    description: 'For large organizations',
-    features: [
-      'Everything in Pro',
-      'Dedicated support',
-      'Custom integrations',
-      'SLA guarantee',
-      'Multi-user access',
-      'Advanced security',
-      'Custom reporting',
-      'White-label solution',
-    ],
-    maxCustomers: -1,
-    maxInvoicesPerMonth: -1,
-  },
-]
+type SubscriptionPlan = {
+  id: string
+  name: string
+  tier: string
+  price: number
+  billing_period: string
+  features: string[]
+  max_customers: number
+  max_invoices_per_month: number
+  popular?: boolean
+}
+
+const planDescriptions: Record<string, string> = {
+  free: 'For getting started',
+  basic: 'For small businesses',
+  pro: 'For growing teams',
+  enterprise: 'For large organizations',
+}
 
 export default function SubscriptionPage() {
   const [currentTier, setCurrentTier] = useState<SubscriptionTier>('free')
   const [loading, setLoading] = useState(true)
   const [processingTier, setProcessingTier] = useState<SubscriptionTier | null>(null)
   const [cancelingSubscription, setCancelingSubscription] = useState(false)
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([])
   const { toast } = useToast()
   const supabase = createClient()
   const searchParams = useSearchParams()
 
   useEffect(() => {
     loadSubscription()
+    loadPlans()
 
     // Check for canceled payment
     if (searchParams.get('canceled') === 'true') {
@@ -100,6 +52,27 @@ export default function SubscriptionPage() {
       })
     }
   }, [])
+
+  const loadPlans = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('subscription_plans')
+        .select('*')
+        .order('price', { ascending: true })
+
+      if (error) throw error
+
+      // Add popular flag to basic tier
+      const plansWithPopular = (data || []).map((plan: any) => ({
+        ...plan,
+        popular: plan.tier === 'basic',
+      }))
+
+      setPlans(plansWithPopular)
+    } catch (error) {
+      console.error('Failed to load plans:', error)
+    }
+  }
 
   const loadSubscription = async () => {
     try {
@@ -282,10 +255,10 @@ export default function SubscriptionPage() {
               )}
               <CardHeader>
                 <CardTitle>{plan.name}</CardTitle>
-                <CardDescription>{plan.description}</CardDescription>
+                <CardDescription>{planDescriptions[plan.tier] || plan.tier}</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">${plan.price}</span>
-                  <span className="text-gray-600">/month</span>
+                  <span className="text-4xl font-bold">RM{plan.price}</span>
+                  <span className="text-gray-600">/{plan.billing_period === 'monthly' ? 'month' : 'year'}</span>
                 </div>
               </CardHeader>
               <CardContent>
