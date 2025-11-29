@@ -376,7 +376,7 @@ export default function InvoicesPage() {
         invoice_footer: companySettings?.invoice_footer,
       }
 
-      const pdf = generateInvoicePDF(invoiceData, companyInfo, userCurrency)
+      const pdf = await generateInvoicePDF(invoiceData, companyInfo, userCurrency)
       pdf.save(`invoice-${invoice.invoice_number}.pdf`)
 
       toast({

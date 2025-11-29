@@ -2,6 +2,28 @@ import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { formatCurrency, formatDate } from './utils'
 
+// Helper function to load image as data URL
+async function loadImageAsDataURL(url: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = img.width
+      canvas.height = img.height
+      const ctx = canvas.getContext('2d')
+      if (!ctx) {
+        reject(new Error('Failed to get canvas context'))
+        return
+      }
+      ctx.drawImage(img, 0, 0)
+      resolve(canvas.toDataURL('image/png'))
+    }
+    img.onerror = () => reject(new Error('Failed to load image'))
+    img.src = url
+  })
+}
+
 type InvoiceData = {
   invoice_number: string
   issue_date: string
@@ -50,7 +72,7 @@ type CompanyInfo = {
   invoice_footer?: string
 }
 
-export function generateInvoicePDF(invoice: InvoiceData, companyInfo: CompanyInfo, currency?: string) {
+export async function generateInvoicePDF(invoice: InvoiceData, companyInfo: CompanyInfo, currency?: string) {
   const invoiceCurrency = currency || invoice.currency || 'MYR'
   const doc = new jsPDF()
 
@@ -58,11 +80,19 @@ export function generateInvoicePDF(invoice: InvoiceData, companyInfo: CompanyInf
   let logoHeight = 0
   if (companyInfo.company_logo_url) {
     try {
-      // Note: In a real implementation, you'd need to load the image properly
-      // This is a placeholder for the logo functionality
-      logoHeight = 20
+      const logoData = await loadImageAsDataURL(companyInfo.company_logo_url)
+      // Add logo in top right corner
+      const maxLogoWidth = 45
+      const maxLogoHeight = 25
+      const logoX = 145
+      const logoY = 10
+
+      // Add logo image (PDF will maintain aspect ratio)
+      doc.addImage(logoData, 'PNG', logoX, logoY, maxLogoWidth, maxLogoHeight, undefined, 'FAST')
+      logoHeight = maxLogoHeight + 5
     } catch (error) {
-      console.error('Failed to load logo:', error)
+      console.error('Failed to load company logo:', error)
+      // Continue without logo if it fails to load
     }
   }
 

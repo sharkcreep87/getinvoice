@@ -47,16 +47,45 @@ Before you begin, ensure you have:
 ### Step 3: Set Up Database Schema
 
 1. In your Supabase dashboard, click on "SQL Editor" in the sidebar
-2. Click "New Query"
-3. Open the file `supabase/schema.sql` from this project
-4. Copy and paste the entire contents into the SQL editor
-5. Click "Run" or press Cmd/Ctrl + Enter
-6. Wait for the script to complete (you should see "Success" message)
-7. Verify tables were created:
+2. Run the main schema:
+   - Click "New Query"
+   - Open the file `supabase/schema.sql` from this project
+   - Copy and paste the entire contents into the SQL editor
+   - Click "Run" or press Cmd/Ctrl + Enter
+   - Wait for the script to complete (you should see "Success" message)
+3. Run the currency schema:
+   - Click "New Query" again
+   - Open the file `supabase/schema_currency.sql` from this project
+   - Copy and paste the contents into the SQL editor
+   - Click "Run"
+4. Run the payments schema (for Stripe integration):
+   - Click "New Query"
+   - Open the file `supabase/schema_payments.sql` from this project
+   - Copy and paste the contents into the SQL editor
+   - Click "Run"
+5. Verify tables were created:
    - Go to "Table Editor" in the sidebar
-   - You should see: profiles, customers, invoices, invoice_items, subscription_plans
+   - You should see: profiles, customers, invoices, invoice_items, subscription_plans, currency_settings, payments, company_settings
 
-### Step 4: Enable Email Authentication
+### Step 4: Set Up Storage for Company Logos
+
+1. In your Supabase dashboard, click on "Storage" in the sidebar
+2. Click "Create a new bucket"
+3. Enter bucket details:
+   - Name: `company-assets`
+   - Public bucket: **Yes** (check this box)
+   - File size limit: 2MB (recommended)
+   - Allowed MIME types: `image/*`
+4. Click "Create bucket"
+5. Set up storage policies:
+   - Go to "SQL Editor" in the sidebar
+   - Open the file `supabase/storage_setup.sql` from this project
+   - Copy and paste the contents into the SQL editor
+   - Click "Run" to create the storage policies
+
+**Note:** The storage bucket is used for company logos that appear on invoices. Making it public allows invoice PDFs to load the logos properly.
+
+### Step 5: Enable Email Authentication
 
 1. Go to Authentication > Providers
 2. Make sure "Email" is enabled
@@ -64,7 +93,7 @@ Before you begin, ensure you have:
    - Go to Authentication > Email Templates
    - Customize confirmation, password reset emails
 
-### Step 5: Configure Site URL (Important!)
+### Step 6: Configure Site URL (Important!)
 
 1. Go to Authentication > URL Configuration
 2. Add your site URLs:
