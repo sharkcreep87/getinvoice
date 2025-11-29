@@ -69,9 +69,9 @@ export function generateInvoicePDF(invoice: InvoiceData, companyInfo: any) {
 
   // Bill To
   doc.setFontSize(12)
-  doc.setFont(undefined, 'bold')
+  doc.setFont('helvetica', 'bold')
   doc.text('Bill To:', 20, 50)
-  doc.setFont(undefined, 'normal')
+  doc.setFont('helvetica', 'normal')
   doc.setFontSize(10)
   doc.text(invoice.customer.name, 20, 56)
   if (invoice.customer.company) doc.text(invoice.customer.company, 20, 61)
@@ -140,7 +140,7 @@ export function generateInvoicePDF(invoice: InvoiceData, companyInfo: any) {
   })
 
   // Total
-  doc.setFont(undefined, 'bold')
+  doc.setFont('helvetica', 'bold')
   doc.setFontSize(12)
   doc.text('Total:', totalsX, finalY + 20)
   doc.text(formatCurrency(invoice.total), 180, finalY + 20, { align: 'right' })
@@ -148,10 +148,10 @@ export function generateInvoicePDF(invoice: InvoiceData, companyInfo: any) {
   // Notes and Terms
   let currentY = finalY + 35
   if (invoice.notes) {
-    doc.setFont(undefined, 'bold')
+    doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
     doc.text('Notes:', 20, currentY)
-    doc.setFont(undefined, 'normal')
+    doc.setFont('helvetica', 'normal')
     doc.setFontSize(9)
     const splitNotes = doc.splitTextToSize(invoice.notes, 170)
     doc.text(splitNotes, 20, currentY + 5)
@@ -159,10 +159,10 @@ export function generateInvoicePDF(invoice: InvoiceData, companyInfo: any) {
   }
 
   if (invoice.terms) {
-    doc.setFont(undefined, 'bold')
+    doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
     doc.text('Terms & Conditions:', 20, currentY)
-    doc.setFont(undefined, 'normal')
+    doc.setFont('helvetica', 'normal')
     doc.setFontSize(9)
     const splitTerms = doc.splitTextToSize(invoice.terms, 170)
     doc.text(splitTerms, 20, currentY + 5)

@@ -2,6 +2,8 @@ import { createServerClient } from "@/lib/supabase/server"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DollarSign, FileText, Users, TrendingUp } from "lucide-react"
 
+export const dynamic = 'force-dynamic'
+
 async function getDashboardStats(userId: string) {
   const supabase = createServerClient()
 
