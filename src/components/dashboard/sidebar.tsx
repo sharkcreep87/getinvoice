@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -11,7 +12,8 @@ import {
   Settings,
   LogOut,
   CreditCard,
-  Building2
+  Building2,
+  Shield
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
@@ -25,11 +27,39 @@ const navigation = [
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
 
+const adminNavigation = [
+  { name: "Admin Dashboard", href: "/dashboard/admin", icon: Shield },
+]
+
 export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const { toast } = useToast()
   const supabase = createClient()
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    checkAdminRole()
+  }, [])
+
+  const checkAdminRole = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      if (profile?.role === 'admin') {
+        setIsAdmin(true)
+      }
+    } catch (error) {
+      console.error('Failed to check admin role:', error)
+    }
+  }
 
   const handleLogout = async () => {
     try {
@@ -79,6 +109,32 @@ export function Sidebar() {
             </Link>
           )
         })}
+
+        {/* Admin Navigation */}
+        {isAdmin && (
+          <>
+            <div className="my-4 border-t border-white/10" />
+            {adminNavigation.map((item) => {
+              const Icon = item.icon
+              const isActive = pathname.startsWith(item.href)
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200",
+                    isActive
+                      ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/50"
+                      : "text-gray-300 hover:bg-white/10 hover:text-white"
+                  )}
+                >
+                  <Icon className={cn("mr-3 h-5 w-5", isActive && "animate-pulse")} />
+                  {item.name}
+                </Link>
+              )
+            })}
+          </>
+        )}
       </nav>
       <div className="p-4 border-t border-primary/20 bg-black/20">
         <Button

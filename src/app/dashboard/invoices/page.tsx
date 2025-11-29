@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Download, Eye, Trash2, Edit, Share2 } from "lucide-react"
+import { Plus, Download, Eye, Trash2, Edit, Share2, MoreVertical } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 import { generateInvoiceNumber, formatCurrency } from "@/lib/utils"
@@ -481,17 +481,29 @@ export default function InvoicesPage() {
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 
       if (isMobile) {
-        // For mobile devices, open PDF in a new tab
+        // For mobile devices, force download using blob and anchor
         const pdfBlob = pdf.output('blob')
         const pdfUrl = URL.createObjectURL(pdfBlob)
-        window.open(pdfUrl, '_blank')
 
-        // Clean up the URL after a delay
+        // Create temporary anchor element to trigger download
+        const link = document.createElement('a')
+        link.href = pdfUrl
+        link.download = filename
+        link.style.display = 'none'
+
+        // Append to body, click, and remove
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+
+        // Clean up the URL after download starts
         setTimeout(() => URL.revokeObjectURL(pdfUrl), 100)
 
         toast({
           title: "Success",
-          description: "Invoice PDF opened in new tab",
+          description: "Invoice PDF download started",
+          // @ts-ignore
+          variant: "success",
         })
       } else {
         // For desktop, use normal download
@@ -1037,7 +1049,36 @@ export default function InvoicesPage() {
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex justify-end gap-1 flex-wrap">
+                      {/* Mobile: Show only essential actions */}
+                      <div className="flex md:hidden justify-end gap-0.5">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleView(invoice)}
+                          className="h-8 px-2"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEdit(invoice)}
+                          className="h-8 px-2"
+                        >
+                          <Edit className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDownloadPDF(invoice)}
+                          className="h-8 px-2"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+
+                      {/* Desktop: Show all actions */}
+                      <div className="hidden md:flex justify-end gap-1">
                         <Button
                           variant="ghost"
                           size="icon"
