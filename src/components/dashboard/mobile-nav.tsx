@@ -1,0 +1,131 @@
+'use client'
+
+import { useState } from "react"
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  Settings,
+  LogOut,
+  CreditCard,
+  Building2,
+  Menu,
+} from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
+import { useToast } from "@/components/ui/use-toast"
+
+const navigation = [
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Customers", href: "/dashboard/customers", icon: Users },
+  { name: "Invoices", href: "/dashboard/invoices", icon: FileText },
+  { name: "Company", href: "/dashboard/company", icon: Building2 },
+  { name: "Subscription", href: "/dashboard/subscription", icon: CreditCard },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings },
+]
+
+export function MobileNav() {
+  const [open, setOpen] = useState(false)
+  const pathname = usePathname()
+  const router = useRouter()
+  const { toast } = useToast()
+  const supabase = createClient()
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut()
+      toast({
+        title: "Logged out",
+        description: "You have been logged out successfully",
+      })
+      router.push("/login")
+      router.refresh()
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to logout",
+        variant: "destructive",
+      })
+    }
+  }
+
+  return (
+    <div className="md:hidden border-b bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 text-white">
+      <div className="flex items-center justify-between p-4">
+        <div className="flex items-center">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-pink-500">
+            <FileText className="h-5 w-5 text-white" />
+          </div>
+          <span className="ml-2 text-lg font-bold bg-gradient-to-r from-primary via-pink-400 to-purple-400 bg-clip-text text-transparent">
+            GetInvoice
+          </span>
+        </div>
+
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+              <Menu className="h-6 w-6" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-64 p-0 bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 text-white border-primary/20">
+            <SheetHeader className="p-6 border-b border-primary/20 bg-black/20">
+              <SheetTitle className="flex items-center text-white">
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-pink-500">
+                  <FileText className="h-6 w-6 text-white" />
+                </div>
+                <span className="ml-3 text-xl font-bold bg-gradient-to-r from-primary via-pink-400 to-purple-400 bg-clip-text text-transparent">
+                  GetInvoice
+                </span>
+              </SheetTitle>
+            </SheetHeader>
+
+            <nav className="flex-1 space-y-1 px-3 py-4">
+              {navigation.map((item) => {
+                const Icon = item.icon
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className={cn(
+                      "flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200",
+                      isActive
+                        ? "bg-gradient-to-r from-primary/90 to-pink-500/90 text-white shadow-lg shadow-primary/50"
+                        : "text-gray-300 hover:bg-white/10 hover:text-white"
+                    )}
+                  >
+                    <Icon className={cn("mr-3 h-5 w-5", isActive && "animate-pulse")} />
+                    {item.name}
+                  </Link>
+                )
+              })}
+            </nav>
+
+            <div className="p-4 border-t border-primary/20 bg-black/20">
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-gray-300 hover:bg-white/10 hover:text-white transition-all duration-200"
+                onClick={handleLogout}
+              >
+                <LogOut className="mr-3 h-5 w-5" />
+                Logout
+              </Button>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+    </div>
+  )
+}
