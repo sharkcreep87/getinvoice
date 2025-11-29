@@ -1067,14 +1067,6 @@ export default function InvoicesPage() {
                         >
                           <Edit className="h-3.5 w-3.5" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDownloadPDF(invoice)}
-                          className="h-8 px-2"
-                        >
-                          <Download className="h-3.5 w-3.5" />
-                        </Button>
                       </div>
 
                       {/* Desktop: Show all actions */}
@@ -1096,15 +1088,6 @@ export default function InvoicesPage() {
                           className="shrink-0"
                         >
                           <Edit className="h-4 w-4 text-blue-600" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDownloadPDF(invoice)}
-                          title="Download PDF"
-                          className="shrink-0"
-                        >
-                          <Download className="h-4 w-4 text-green-600" />
                         </Button>
                         {canSharePDF() && (
                           <Button
@@ -1249,18 +1232,18 @@ export default function InvoicesPage() {
               )}
             </div>
           )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setViewDialogOpen(false)}>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => setViewDialogOpen(false)} className="w-full sm:w-auto">
               Close
             </Button>
             {selectedInvoice && (
               <>
-                <Button onClick={() => handleDownloadPDF(selectedInvoice)}>
+                <Button onClick={() => handleDownloadPDF(selectedInvoice)} className="w-full sm:w-auto">
                   <Download className="mr-2 h-4 w-4" />
                   Download PDF
                 </Button>
                 {canSharePDF() && (
-                  <Button onClick={() => handleSharePDF(selectedInvoice)} variant="default">
+                  <Button onClick={() => handleSharePDF(selectedInvoice)} variant="default" className="w-full sm:w-auto">
                     <Share2 className="mr-2 h-4 w-4" />
                     Share PDF
                   </Button>
