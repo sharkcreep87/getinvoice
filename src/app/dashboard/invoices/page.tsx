@@ -477,37 +477,54 @@ export default function InvoicesPage() {
       const pdf = await generateInvoicePDF(invoiceData, companyInfo, userCurrency)
       const filename = `invoice-${invoice.invoice_number}.pdf`
 
-      // Check if it's a mobile device (Android/iOS)
+      // Generate blob for both mobile and desktop
+      const pdfBlob = pdf.output('blob')
+      const pdfUrl = URL.createObjectURL(pdfBlob)
+
+      // Check if it's iOS (Safari has special restrictions)
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 
       if (isMobile) {
-        // For mobile devices, force download using blob and anchor
-        const pdfBlob = pdf.output('blob')
-        const pdfUrl = URL.createObjectURL(pdfBlob)
+        if (isIOS) {
+          // For iOS: Open in new window (Safari blocks downloads)
+          const newWindow = window.open(pdfUrl, '_blank')
+          if (newWindow) {
+            toast({
+              title: "PDF Ready",
+              description: "Tap the share icon in Safari to download",
+              // @ts-ignore
+              variant: "success",
+            })
+          } else {
+            // Fallback if popup blocked
+            window.location.href = pdfUrl
+          }
+        } else {
+          // For Android: Try download with fallback to open
+          const link = document.createElement('a')
+          link.href = pdfUrl
+          link.download = filename
+          link.target = '_blank'
 
-        // Create temporary anchor element to trigger download
-        const link = document.createElement('a')
-        link.href = pdfUrl
-        link.download = filename
-        link.style.display = 'none'
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
 
-        // Append to body, click, and remove
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
+          toast({
+            title: "Success",
+            description: "PDF download started",
+            // @ts-ignore
+            variant: "success",
+          })
+        }
 
-        // Clean up the URL after download starts
-        setTimeout(() => URL.revokeObjectURL(pdfUrl), 100)
-
-        toast({
-          title: "Success",
-          description: "Invoice PDF download started",
-          // @ts-ignore
-          variant: "success",
-        })
+        // Clean up URL after a delay
+        setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000)
       } else {
         // For desktop, use normal download
         pdf.save(filename)
+        URL.revokeObjectURL(pdfUrl)
 
         toast({
           title: "Success",
