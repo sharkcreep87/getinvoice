@@ -162,10 +162,11 @@ export default function AdminDashboard() {
 
   const handleRoleChange = async (userId: string, newRole: 'admin' | 'user') => {
     try {
-      const { error } = await (supabase
+      const { error } = await supabase
         .from('profiles')
-        .update({ role: newRole } as any)
-        .eq('id', userId))
+        // @ts-expect-error - Supabase type issue with update
+        .update({ role: newRole })
+        .eq('id', userId)
 
       if (error) throw error
 
