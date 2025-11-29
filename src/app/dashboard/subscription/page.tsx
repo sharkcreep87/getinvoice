@@ -13,7 +13,7 @@ type SubscriptionTier = 'free' | 'basic' | 'pro' | 'enterprise'
 type SubscriptionPlan = {
   id: string
   name: string
-  tier: string
+  tier: SubscriptionTier
   price: number
   billing_period: string
   features: string[]
@@ -65,6 +65,7 @@ export default function SubscriptionPage() {
       // Add popular flag to basic tier
       const plansWithPopular = (data || []).map((plan: any) => ({
         ...plan,
+        tier: plan.tier as SubscriptionTier,
         popular: plan.tier === 'basic',
       }))
 
