@@ -58,18 +58,20 @@ export async function getSupportedCurrencies(): Promise<Currency[]> {
     return getDefaultCurrencies()
   }
 
-  return data || getDefaultCurrencies()
+  return (data as Currency[]) || getDefaultCurrencies()
 }
 
 // Fallback currencies if database fetch fails
 function getDefaultCurrencies(): Currency[] {
   return [
+    { code: 'MYR', name: 'Malaysian Ringgit', symbol: 'RM', decimal_digits: 2, enabled: true },
     { code: 'USD', name: 'US Dollar', symbol: '$', decimal_digits: 2, enabled: true },
     { code: 'EUR', name: 'Euro', symbol: '€', decimal_digits: 2, enabled: true },
     { code: 'GBP', name: 'British Pound', symbol: '£', decimal_digits: 2, enabled: true },
     { code: 'JPY', name: 'Japanese Yen', symbol: '¥', decimal_digits: 0, enabled: true },
     { code: 'AUD', name: 'Australian Dollar', symbol: 'A$', decimal_digits: 2, enabled: true },
     { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$', decimal_digits: 2, enabled: true },
+    { code: 'SGD', name: 'Singapore Dollar', symbol: 'S$', decimal_digits: 2, enabled: true },
     { code: 'INR', name: 'Indian Rupee', symbol: '₹', decimal_digits: 2, enabled: true },
   ]
 }
@@ -79,7 +81,7 @@ export async function getUserCurrency(): Promise<CurrencyCode> {
   const supabase = createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return 'USD'
+  if (!user) return 'MYR'
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -87,7 +89,7 @@ export async function getUserCurrency(): Promise<CurrencyCode> {
     .eq('id', user.id)
     .single()
 
-  return (profile?.currency as CurrencyCode) || 'USD'
+  return ((profile as any)?.currency as CurrencyCode) || 'MYR'
 }
 
 // Update user's preferred currency
