@@ -26,6 +26,7 @@ type Invoice = {
   tax_amount: number
   discount_amount: number
   total: number
+  currency?: string
   notes: string | null
   terms: string | null
   created_at: string
