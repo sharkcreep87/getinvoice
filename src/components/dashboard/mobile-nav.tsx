@@ -62,22 +62,21 @@ export function MobileNav() {
   return (
     <div className="md:hidden border-b bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-900 text-white">
       <div className="flex items-center justify-between p-4">
-        <div className="flex items-center">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-indigo-600">
-            <FileText className="h-5 w-5 text-white" />
-          </div>
-          <span className="ml-2 text-lg font-bold bg-gradient-to-r from-primary via-indigo-400 to-indigo-700 bg-clip-text text-transparent">
-            GetInvoice
-          </span>
-        </div>
-
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
-              <Menu className="h-6 w-6" />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </SheetTrigger>
+          <div className="flex items-center">
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 mr-2">
+                <Menu className="h-6 w-6" />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </SheetTrigger>
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-indigo-600">
+              <FileText className="h-5 w-5 text-white" />
+            </div>
+            <span className="ml-2 text-lg font-bold bg-gradient-to-r from-primary via-indigo-400 to-indigo-700 bg-clip-text text-transparent">
+              GetInvoice
+            </span>
+          </div>
             <SheetContent side="left" className="w-64 p-0 bg-gradient-to-b from-slate-900 via-indigo-900 to-slate-900 text-white border-primary/20">
             <SheetHeader className="p-6 border-b border-primary/20 bg-black/20">
               <SheetTitle className="flex items-center text-white">
