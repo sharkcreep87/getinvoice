@@ -1,6 +1,7 @@
+import Link from "next/link"
+import { FileText, DollarSign, Users, TrendingUp } from "lucide-react"
 import { createServerClient } from "@/lib/supabase/server"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { DollarSign, FileText, Users, TrendingUp } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 
 export const dynamic = 'force-dynamic'
@@ -149,12 +150,13 @@ export default async function DashboardPage() {
           ) : (
             <div className="space-y-3">
               {stats.recentInvoices.map((invoice) => (
+                  <Link key={invoice.id} href={`/dashboard/invoices?view=${invoice.id}`} className="block">
                 <div
                   key={invoice.id}
-                  className="flex items-center justify-between p-4 rounded-lg border-2 border-primary/10 hover:border-primary/30 transition-all hover:shadow-md bg-gradient-to-r from-white to-primary/5"
+                    className="flex items-center justify-between p-4 rounded-lg border-2 border-primary/10 hover:border-primary/30 transition-all hover:shadow-md bg-gradient-to-r from-white to-primary/5 cursor-pointer"
                 >
                   <div>
-                    <p className="font-semibold text-lg">{invoice.invoice_number}</p>
+                    <p className="font-semibold text-sm md:text-lg">{invoice.invoice_number}</p>
                     <p className="text-sm text-muted-foreground">
                       {new Date(invoice.issue_date).toLocaleDateString()}
                     </p>
@@ -176,6 +178,7 @@ export default async function DashboardPage() {
                     </span>
                   </div>
                 </div>
+                  </Link>
               ))}
             </div>
           )}

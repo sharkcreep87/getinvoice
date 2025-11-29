@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -87,11 +88,56 @@ export default function InvoicesPage() {
   })
   const { toast } = useToast()
   const supabase = createClient()
+  const searchParams = useSearchParams()
+  const router = useRouter()
 
   useEffect(() => {
     loadData()
     loadUserCurrency()
+    // if ?view=<invoice_id> present we open that invoice automatically
+    const viewId = searchParams.get('view')
+    if (viewId) {
+      // fetch invoice by id and open view dialog
+      ;(async () => {
+        try {
+          const { data: invoiceData } = await supabase
+            .from('invoices')
+            .select('*')
+            .eq('id', viewId)
+            .single()
+
+          if (!invoiceData) return
+
+          const { data: invoiceItems } = await supabase
+            .from('invoice_items')
+            .select('*')
+            .eq('invoice_id', viewId)
+
+          const { data: customer } = await supabase
+            .from('customers')
+            .select('*')
+            .eq('id', invoiceData.customer_id)
+            .single()
+
+          setSelectedInvoice({ ...(invoiceData as any), customer, items: invoiceItems })
+          setViewDialogOpen(true)
+        } catch (err) {
+          console.error('Failed to open invoice from URL param', err)
+        }
+      })()
+    }
   }, [])
+
+  // clear the query param when the dialog is closed
+  useEffect(() => {
+    if (!viewDialogOpen) {
+      const viewId = searchParams.get('view')
+      if (viewId) {
+        // replace URL without the view param
+        router.replace('/dashboard/invoices')
+      }
+    }
+  }, [viewDialogOpen])
 
   const loadUserCurrency = async () => {
     try {
