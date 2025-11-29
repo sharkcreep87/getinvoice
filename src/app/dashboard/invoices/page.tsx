@@ -59,6 +59,9 @@ export default function InvoicesPage() {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [checkModalOpen, setCheckModalOpen] = useState(false)
+  const [missingCompany, setMissingCompany] = useState(false)
+  const [missingCustomers, setMissingCustomers] = useState(false)
   const [viewDialogOpen, setViewDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
@@ -198,6 +201,52 @@ export default function InvoicesPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  // Verify company & customers exist before opening the "Create Invoice" dialog
+  const checkBeforeCreate = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        toast({ title: 'Not authenticated', description: 'Please login to continue', variant: 'destructive' })
+        return
+      }
+
+      // customers are loaded into state already
+      const hasCustomers = customers.length > 0
+
+      // check for company settings
+      const { data: companySettings } = await supabase
+        .from('company_settings')
+        .select('id, company_name')
+        .eq('user_id', user.id)
+        .single()
+
+      const hasCompany = !!companySettings
+
+      if (!hasCompany || !hasCustomers) {
+        setMissingCompany(!hasCompany)
+        setMissingCustomers(!hasCustomers)
+        setCheckModalOpen(true)
+        return
+      }
+
+      // All good — open the create dialog
+      setDialogOpen(true)
+    } catch (error: any) {
+      console.error('Error checking prerequisites for creating invoice', error)
+      toast({ title: 'Error', description: error.message || 'Failed to check prerequisites', variant: 'destructive' })
+    }
+  }
+
+  const goToCompany = () => {
+    setCheckModalOpen(false)
+    router.push('/dashboard/company')
+  }
+
+  const goToCustomers = () => {
+    setCheckModalOpen(false)
+    router.push('/dashboard/customers')
   }
 
   const calculateTotals = () => {
@@ -571,12 +620,10 @@ export default function InvoicesPage() {
           setDialogOpen(open)
           if (!open) resetForm()
         }}>
-          <DialogTrigger asChild>
-            <Button disabled={customers.length === 0}>
-              <Plus className="mr-2 h-4 w-4" />
-              New Invoice
-            </Button>
-          </DialogTrigger>
+              <Button onClick={checkBeforeCreate}>
+                <Plus className="mr-2 h-4 w-4" />
+                New Invoice
+              </Button>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create New Invoice</DialogTitle>
@@ -772,6 +819,43 @@ export default function InvoicesPage() {
             </form>
           </DialogContent>
         </Dialog>
+
+        {/* Prerequisite check modal — informs user that Company or Customers are missing */}
+        <Dialog open={checkModalOpen} onOpenChange={setCheckModalOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Setup Required</DialogTitle>
+              <DialogDescription>
+                {missingCompany && missingCustomers && (
+                  <span>
+                    You need to set up your company details and add at least one customer before creating invoices.
+                  </span>
+                )}
+                {missingCompany && !missingCustomers && (
+                  <span>Please set up your company details before creating invoices.</span>
+                )}
+                {!missingCompany && missingCustomers && (
+                  <span>Please add at least one customer before creating invoices.</span>
+                )}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex gap-2 justify-end mt-4">
+              {missingCompany && (
+                <Button variant="outline" onClick={goToCompany}>
+                  Create Company
+                </Button>
+              )}
+              {missingCustomers && (
+                <Button onClick={goToCustomers}>
+                  Add Customer
+                </Button>
+              )}
+              <Button variant="ghost" onClick={() => setCheckModalOpen(false)}>
+                Cancel
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {customers.length === 0 && (
@@ -798,7 +882,7 @@ export default function InvoicesPage() {
             <div className="text-center py-12">
               <p className="text-gray-600 mb-4">No invoices yet</p>
               {customers.length > 0 && (
-                <Button onClick={() => setDialogOpen(true)}>
+                <Button onClick={() => checkBeforeCreate()}>
                   <Plus className="mr-2 h-4 w-4" />
                   Create Your First Invoice
                 </Button>
