@@ -475,8 +475,10 @@ export default function InvoicesPage() {
       }
 
       const pdf = await generateInvoicePDF(invoiceData, companyInfo, userCurrency)
-      const timestamp = new Date().getTime()
-      const filename = `invoice-${invoice.invoice_number}-${timestamp}.pdf`
+
+      // Generate 4-digit random number for unique filename
+      const randomNum = Math.floor(1000 + Math.random() * 9000)
+      const filename = `invoice-${invoice.invoice_number}-${randomNum}.pdf`
 
       // Check if mobile device
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
@@ -636,7 +638,10 @@ export default function InvoicesPage() {
       }
 
       const pdf = await generateInvoicePDF(invoiceData, companyInfo, userCurrency)
-      await sharePDF(pdf, `invoice-${invoice.invoice_number}.pdf`)
+
+      // Generate 4-digit random number for unique filename
+      const randomNum = Math.floor(1000 + Math.random() * 9000)
+      await sharePDF(pdf, `invoice-${invoice.invoice_number}-${randomNum}.pdf`)
 
       toast({
         title: "Success",

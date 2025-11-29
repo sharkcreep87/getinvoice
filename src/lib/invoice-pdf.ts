@@ -80,8 +80,12 @@ export async function generateInvoicePDF(invoice: InvoiceData, companyInfo: Comp
   // Set white background for the entire page (fixes black background on mobile/dark mode)
   const pageWidth = doc.internal.pageSize.getWidth()
   const pageHeight = doc.internal.pageSize.getHeight()
-  doc.setFillColor(255, 255, 255)
+  doc.setFillColor(255, 255, 255) // White
   doc.rect(0, 0, pageWidth, pageHeight, 'F')
+
+  // Reset colors to black for text and borders
+  doc.setDrawColor(0, 0, 0) // Black for lines
+  doc.setTextColor(0, 0, 0) // Black for text
 
   // Add company logo if available (top left, smaller size)
   let logoHeight = 0
