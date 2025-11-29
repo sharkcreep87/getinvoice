@@ -76,27 +76,14 @@ export default function RegisterPage() {
           data: {
             full_name: fullName,
             subscription_tier: subscriptionTier,
+            currency: currency,
           },
-          // ensure the confirmation link directs to the friendly verify page
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/verify`,
+          // redirect to callback handler which processes confirmation and redirects to login
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
         },
       })
 
       if (authError) throw authError
-
-      if (authData.user) {
-        const { error: profileError } = await (supabase as any)
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            email: authData.user.email!,
-            full_name: fullName,
-            subscription_tier: subscriptionTier,
-            role: 'user',
-          })
-
-        if (profileError) throw profileError
-      }
 
       toast({
         title: "Success",
