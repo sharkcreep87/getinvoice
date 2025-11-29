@@ -76,45 +76,48 @@ export async function generateInvoicePDF(invoice: InvoiceData, companyInfo: Comp
   const invoiceCurrency = currency || invoice.currency || 'MYR'
   const doc = new jsPDF()
 
-  // Add company logo if available
+  // Add company logo if available (top left, smaller size)
   let logoHeight = 0
+  let contentStartY = 20 // Default starting Y for content
+
   if (companyInfo.company_logo_url) {
     try {
       const logoData = await loadImageAsDataURL(companyInfo.company_logo_url)
-      // Add logo in top right corner
-      const maxLogoWidth = 45
-      const maxLogoHeight = 25
-      const logoX = 145
-      const logoY = 10
+      // Add logo in top left corner - smaller size
+      const maxLogoWidth = 30
+      const maxLogoHeight = 15
+      const logoX = 20
+      const logoY = 15
 
       // Add logo image (PDF will maintain aspect ratio)
       doc.addImage(logoData, 'PNG', logoX, logoY, maxLogoWidth, maxLogoHeight, undefined, 'FAST')
-      logoHeight = maxLogoHeight + 5
+      logoHeight = maxLogoHeight
+      contentStartY = logoY + logoHeight + 5 // Content starts below logo with spacing
     } catch (error) {
       console.error('Failed to load company logo:', error)
       // Continue without logo if it fails to load
     }
   }
 
-  // Header with magenta theme
+  // Header with magenta theme - right side
   doc.setFontSize(28)
   doc.setTextColor(219, 39, 119) // Magenta color
-  doc.text('INVOICE', 20, 25)
+  doc.text('INVOICE', 140, 20, { align: 'right' })
 
-  // Add decorative line
+  // Add decorative line under INVOICE
   doc.setDrawColor(219, 39, 119)
   doc.setLineWidth(0.5)
-  doc.line(20, 28, 80, 28)
+  doc.line(110, 23, 140, 23)
 
-  // Company Info
+  // Company Info - starts below logo
   doc.setFontSize(11)
   doc.setTextColor(0, 0, 0)
   doc.setFont('helvetica', 'bold')
-  doc.text(companyInfo.company_name || companyInfo.name || 'Your Company', 20, 38)
+  doc.text(companyInfo.company_name || companyInfo.name || 'Your Company', 20, contentStartY)
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(9)
 
-  let companyY = 43
+  let companyY = contentStartY + 5
   if (companyInfo.company_email) {
     doc.text(companyInfo.company_email, 20, companyY)
     companyY += 4
@@ -137,19 +140,21 @@ export async function generateInvoicePDF(invoice: InvoiceData, companyInfo: Comp
     }
     if (companyInfo.company_country) {
       doc.text(companyInfo.company_country, 20, companyY)
+      companyY += 4
     }
   }
   if (companyInfo.tax_id) {
-    doc.text(`Tax ID: ${companyInfo.tax_id}`, 20, companyY + 4)
+    doc.text(`Tax ID: ${companyInfo.tax_id}`, 20, companyY)
   }
 
-  // Invoice Details
+  // Invoice Details - right side
   doc.setFontSize(10)
-  doc.text(`Invoice #: ${invoice.invoice_number}`, 140, 20)
-  doc.text(`Issue Date: ${formatDate(invoice.issue_date)}`, 140, 25)
-  doc.text(`Due Date: ${formatDate(invoice.due_date)}`, 140, 30)
+  doc.setTextColor(0, 0, 0)
+  doc.text(`Invoice #: ${invoice.invoice_number}`, 190, 30, { align: 'right' })
+  doc.text(`Issue Date: ${formatDate(invoice.issue_date)}`, 190, 35, { align: 'right' })
+  doc.text(`Due Date: ${formatDate(invoice.due_date)}`, 190, 40, { align: 'right' })
 
-  // Status badge
+  // Status badge - right side
   const statusColors: any = {
     draft: [156, 163, 175],
     sent: [219, 39, 119], // Magenta for sent
@@ -160,21 +165,33 @@ export async function generateInvoicePDF(invoice: InvoiceData, companyInfo: Comp
   const color = statusColors[invoice.status] || [156, 163, 175]
   doc.setFillColor(color[0], color[1], color[2])
   doc.setTextColor(255, 255, 255)
-  doc.roundedRect(140, 33, 30, 6, 2, 2, 'F')
-  doc.text(invoice.status.toUpperCase(), 142, 37)
+  doc.roundedRect(160, 44, 30, 6, 2, 2, 'F')
+  doc.text(invoice.status.toUpperCase(), 162, 48)
   doc.setTextColor(0, 0, 0)
 
-  // Bill To
+  // Bill To - ensure it starts after company info
+  const billToY = Math.max(companyY + 10, 60)
   doc.setFontSize(12)
   doc.setFont('helvetica', 'bold')
-  doc.text('Bill To:', 20, 50)
+  doc.text('Bill To:', 20, billToY)
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(10)
-  doc.text(invoice.customer.name, 20, 56)
-  if (invoice.customer.company) doc.text(invoice.customer.company, 20, 61)
-  if (invoice.customer.email) doc.text(invoice.customer.email, 20, 66)
+
+  let customerY = billToY + 6
+  doc.text(invoice.customer.name, 20, customerY)
+  customerY += 5
+
+  if (invoice.customer.company) {
+    doc.text(invoice.customer.company, 20, customerY)
+    customerY += 5
+  }
+  if (invoice.customer.email) {
+    doc.text(invoice.customer.email, 20, customerY)
+    customerY += 5
+  }
   if (invoice.customer.address) {
-    doc.text(invoice.customer.address, 20, 71)
+    doc.text(invoice.customer.address, 20, customerY)
+    customerY += 5
     const cityStateZip = [
       invoice.customer.city,
       invoice.customer.state,
@@ -182,12 +199,18 @@ export async function generateInvoicePDF(invoice: InvoiceData, companyInfo: Comp
     ]
       .filter(Boolean)
       .join(', ')
-    if (cityStateZip) doc.text(cityStateZip, 20, 76)
-    if (invoice.customer.country) doc.text(invoice.customer.country, 20, 81)
+    if (cityStateZip) {
+      doc.text(cityStateZip, 20, customerY)
+      customerY += 5
+    }
+    if (invoice.customer.country) {
+      doc.text(invoice.customer.country, 20, customerY)
+      customerY += 5
+    }
   }
 
-  // Items Table
-  const tableStartY = 95
+  // Items Table - starts after customer info with spacing
+  const tableStartY = customerY + 10
   const tableData = invoice.items.map(item => [
     item.description,
     item.quantity.toString(),
