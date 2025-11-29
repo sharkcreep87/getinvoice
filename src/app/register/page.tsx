@@ -128,10 +128,10 @@ export default function RegisterPage() {
                     <SelectValue placeholder="Choose a plan" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="free">Free - $0/month</SelectItem>
-                    <SelectItem value="basic">Basic - $19/month</SelectItem>
-                    <SelectItem value="pro">Pro - $49/month</SelectItem>
-                    <SelectItem value="enterprise">Enterprise - $199/month</SelectItem>
+                    <SelectItem value="free">Free - RM0/month</SelectItem>
+                    <SelectItem value="basic">Basic - RM79/month</SelectItem>
+                    <SelectItem value="pro">Pro - RM199/month</SelectItem>
+                    <SelectItem value="enterprise">Enterprise - RM799/month</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
