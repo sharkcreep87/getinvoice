@@ -53,7 +53,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary via-pink-500 to-purple-600 p-8 text-white shadow-2xl">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary via-blue-600 to-violet-600 p-8 text-white shadow-2xl">
         <div className="absolute top-0 right-0 -mt-4 -mr-16 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 -mb-8 -ml-8 h-48 w-48 rounded-full bg-white/10 blur-2xl"></div>
         <div className="relative">
@@ -68,63 +68,63 @@ export default async function DashboardPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Total Customers
             </CardTitle>
-            <div className="p-2 bg-gradient-to-br from-primary to-pink-500 rounded-lg">
+            <div className="p-2 bg-gradient-to-br from-primary to-blue-600 rounded-lg">
               <Users className="h-5 w-5 text-white" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold bg-gradient-to-r from-primary to-pink-600 bg-clip-text text-transparent">
+            <div className="text-3xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
               {stats.totalCustomers}
             </div>
             <p className="text-xs text-muted-foreground mt-1">Active customer base</p>
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-pink-200/50 hover:border-pink-300 transition-all hover:shadow-xl hover:shadow-pink-500/20">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 bg-gradient-to-br from-pink-50 to-transparent">
+        <Card className="border-2 border-violet-200/50 hover:border-violet-300 transition-all hover:shadow-xl hover:shadow-violet-500/20">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 bg-gradient-to-br from-violet-50 to-transparent">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Total Invoices
             </CardTitle>
-            <div className="p-2 bg-gradient-to-br from-pink-500 to-purple-500 rounded-lg">
+            <div className="p-2 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg">
               <FileText className="h-5 w-5 text-white" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+            <div className="text-3xl font-bold bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent">
               {stats.totalInvoices}
             </div>
             <p className="text-xs text-muted-foreground mt-1">Total invoices created</p>
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-green-200/50 hover:border-green-300 transition-all hover:shadow-xl hover:shadow-green-500/20">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 bg-gradient-to-br from-green-50 to-transparent">
+        <Card className="border-2 border-teal-200/50 hover:border-teal-300 transition-all hover:shadow-xl hover:shadow-teal-500/20">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 bg-gradient-to-br from-teal-50 to-transparent">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Total Revenue
             </CardTitle>
-            <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg">
+            <div className="p-2 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-lg">
               <DollarSign className="h-5 w-5 text-white" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+            <div className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
               {formatCurrency(stats.totalRevenue, stats.currency)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">Paid invoices</p>
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-orange-200/50 hover:border-orange-300 transition-all hover:shadow-xl hover:shadow-orange-500/20">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 bg-gradient-to-br from-orange-50 to-transparent">
+        <Card className="border-2 border-sky-200/50 hover:border-sky-300 transition-all hover:shadow-xl hover:shadow-sky-500/20">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 bg-gradient-to-br from-sky-50 to-transparent">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Pending Amount
             </CardTitle>
-            <div className="p-2 bg-gradient-to-br from-orange-500 to-amber-500 rounded-lg">
+            <div className="p-2 bg-gradient-to-br from-sky-500 to-blue-500 rounded-lg">
               <TrendingUp className="h-5 w-5 text-white" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+            <div className="text-3xl font-bold bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
               {formatCurrency(stats.pendingAmount, stats.currency)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">Awaiting payment</p>
@@ -133,8 +133,8 @@ export default async function DashboardPage() {
       </div>
 
       <Card className="border-2 border-primary/20 shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-primary/10 to-pink-50">
-          <CardTitle className="text-xl bg-gradient-to-r from-primary to-pink-600 bg-clip-text text-transparent">
+        <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-50">
+          <CardTitle className="text-xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
             Recent Invoices
           </CardTitle>
         </CardHeader>
@@ -160,7 +160,7 @@ export default async function DashboardPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-lg bg-gradient-to-r from-primary to-pink-600 bg-clip-text text-transparent">
+                    <p className="font-bold text-lg bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
                       {formatCurrency(invoice.total, invoice.currency || stats.currency)}
                     </p>
                     <span
@@ -183,8 +183,8 @@ export default async function DashboardPage() {
       </Card>
 
       <Card className="border-2 border-primary/20 shadow-lg overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-primary/10 to-pink-50">
-          <CardTitle className="text-xl bg-gradient-to-r from-primary to-pink-600 bg-clip-text text-transparent">
+        <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-50">
+          <CardTitle className="text-xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
             Quick Actions
           </CardTitle>
         </CardHeader>
@@ -196,7 +196,7 @@ export default async function DashboardPage() {
             >
               <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-primary/10 blur-2xl group-hover:bg-primary/20 transition-all"></div>
               <div className="relative">
-                <div className="p-3 bg-gradient-to-br from-primary to-pink-500 rounded-xl inline-block mb-3">
+                <div className="p-3 bg-gradient-to-br from-primary to-blue-600 rounded-xl inline-block mb-3">
                   <Users className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="font-bold text-lg mb-1">Add Customer</h3>
@@ -205,11 +205,11 @@ export default async function DashboardPage() {
             </a>
             <a
               href="/dashboard/invoices"
-              className="group relative overflow-hidden p-6 border-2 border-pink-200/50 rounded-xl hover:border-pink-400 transition-all hover:shadow-lg hover:shadow-pink-500/20 bg-gradient-to-br from-white to-pink-50"
+              className="group relative overflow-hidden p-6 border-2 border-violet-200/50 rounded-xl hover:border-violet-400 transition-all hover:shadow-lg hover:shadow-violet-500/20 bg-gradient-to-br from-white to-violet-50"
             >
-              <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-pink-200/50 blur-2xl group-hover:bg-pink-300/50 transition-all"></div>
+              <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-violet-200/50 blur-2xl group-hover:bg-violet-300/50 transition-all"></div>
               <div className="relative">
-                <div className="p-3 bg-gradient-to-br from-pink-500 to-purple-500 rounded-xl inline-block mb-3">
+                <div className="p-3 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl inline-block mb-3">
                   <FileText className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="font-bold text-lg mb-1">New Invoice</h3>
@@ -218,11 +218,11 @@ export default async function DashboardPage() {
             </a>
             <a
               href="/dashboard/subscription"
-              className="group relative overflow-hidden p-6 border-2 border-purple-200/50 rounded-xl hover:border-purple-400 transition-all hover:shadow-lg hover:shadow-purple-500/20 bg-gradient-to-br from-white to-purple-50"
+              className="group relative overflow-hidden p-6 border-2 border-teal-200/50 rounded-xl hover:border-teal-400 transition-all hover:shadow-lg hover:shadow-teal-500/20 bg-gradient-to-br from-white to-teal-50"
             >
-              <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-purple-200/50 blur-2xl group-hover:bg-purple-300/50 transition-all"></div>
+              <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-teal-200/50 blur-2xl group-hover:bg-teal-300/50 transition-all"></div>
               <div className="relative">
-                <div className="p-3 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-xl inline-block mb-3">
+                <div className="p-3 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl inline-block mb-3">
                   <TrendingUp className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="font-bold text-lg mb-1">Upgrade Plan</h3>

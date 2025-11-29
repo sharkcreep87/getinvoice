@@ -845,7 +845,7 @@ export default function InvoicesPage() {
           </DialogHeader>
           {selectedInvoice && (
             <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4 p-4 bg-gradient-to-r from-primary/5 to-pink-50 rounded-lg">
+              <div className="grid grid-cols-2 gap-4 p-4 bg-gradient-to-r from-primary/5 to-blue-50 rounded-lg">
                 <div>
                   <Label className="text-sm text-muted-foreground">Invoice Number</Label>
                   <p className="font-semibold text-lg">{selectedInvoice.invoice_number}</p>

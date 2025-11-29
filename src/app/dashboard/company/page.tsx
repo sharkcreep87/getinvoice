@@ -191,7 +191,7 @@ export default function CompanySettingsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-pink-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
             Company Settings
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -207,7 +207,7 @@ export default function CompanySettingsPage() {
       <div className="grid gap-6 md:grid-cols-2">
         {/* Company Logo */}
         <Card className="md:col-span-2 border-2 border-primary/20 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-primary/10 to-pink-50">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-50">
             <CardTitle className="flex items-center gap-2">
               <Building2 className="h-5 w-5 text-primary" />
               Company Logo
@@ -263,7 +263,7 @@ export default function CompanySettingsPage() {
 
         {/* Company Information */}
         <Card className="border-2 border-primary/20 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-primary/10 to-pink-50">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-50">
             <CardTitle>Company Information</CardTitle>
             <CardDescription>Basic company details</CardDescription>
           </CardHeader>
@@ -315,7 +315,7 @@ export default function CompanySettingsPage() {
 
         {/* Company Address */}
         <Card className="border-2 border-primary/20 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-primary/10 to-pink-50">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-50">
             <CardTitle>Company Address</CardTitle>
             <CardDescription>Will appear on invoices</CardDescription>
           </CardHeader>
@@ -379,7 +379,7 @@ export default function CompanySettingsPage() {
 
         {/* Invoice Customization */}
         <Card className="md:col-span-2 border-2 border-primary/20 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-primary/10 to-pink-50">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-50">
             <CardTitle>Invoice Customization</CardTitle>
             <CardDescription>
               Customize the terms and footer that appear on your invoices

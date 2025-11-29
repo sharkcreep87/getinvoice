@@ -99,13 +99,13 @@ export async function generateInvoicePDF(invoice: InvoiceData, companyInfo: Comp
     }
   }
 
-  // Header with magenta theme - right side
+  // Header with indigo theme - right side
   doc.setFontSize(28)
-  doc.setTextColor(219, 39, 119) // Magenta color
+  doc.setTextColor(79, 70, 229) // Indigo color
   doc.text('INVOICE', 140, 20, { align: 'right' })
 
   // Add decorative line under INVOICE
-  doc.setDrawColor(219, 39, 119)
+  doc.setDrawColor(79, 70, 229)
   doc.setLineWidth(0.5)
   doc.line(110, 23, 140, 23)
 
@@ -157,8 +157,8 @@ export async function generateInvoicePDF(invoice: InvoiceData, companyInfo: Comp
   // Status badge - right side
   const statusColors: any = {
     draft: [156, 163, 175],
-    sent: [219, 39, 119], // Magenta for sent
-    paid: [34, 197, 94],
+    sent: [79, 70, 229], // Indigo for sent
+    paid: [20, 184, 166], // Teal for paid
     overdue: [239, 68, 68],
     cancelled: [107, 114, 128],
   }

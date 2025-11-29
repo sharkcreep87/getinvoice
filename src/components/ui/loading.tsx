@@ -31,15 +31,15 @@ export function Loading({ size = "md", text, className }: LoadingProps) {
             sizeClasses[size]
           )}
           style={{
-            borderTopColor: "rgb(219, 39, 119)",
-            borderRightColor: "rgb(219, 39, 119)",
+            borderTopColor: "rgb(79, 70, 229)",
+            borderRightColor: "rgb(79, 70, 229)",
           }}
         />
 
         {/* Inner pulsing dot */}
         <div
           className={cn(
-            "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-primary to-pink-500 animate-pulse",
+            "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-primary to-accent animate-pulse",
             dotSizes[size]
           )}
         />
