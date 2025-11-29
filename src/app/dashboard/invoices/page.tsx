@@ -476,57 +476,34 @@ export default function InvoicesPage() {
 
       const pdf = await generateInvoicePDF(invoiceData, companyInfo, userCurrency)
 
-      // Add timestamp to filename to avoid browser appending (1), (2) after .pdf
-      const timestamp = new Date().getTime()
-      const filename = `invoice-${invoice.invoice_number}-${timestamp}.pdf`
-
       // Check if mobile device
-      const isAndroid = /Android/i.test(navigator.userAgent)
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-      const isMobile = isAndroid || isIOS
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 
       if (isMobile) {
-        if (isAndroid) {
-          // For Android: Use data URL which renders better than blob URL
-          const pdfDataUri = pdf.output('datauristring')
+        // For all mobile devices: Open PDF in new window
+        const pdfBlob = pdf.output('blob')
+        const pdfUrl = URL.createObjectURL(pdfBlob)
 
-          // Create anchor and trigger download
-          const link = document.createElement('a')
-          link.href = pdfDataUri
-          link.download = filename
+        const newWindow = window.open(pdfUrl, '_blank')
 
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-
+        if (newWindow) {
           toast({
-            title: "Downloading PDF",
-            description: "Check your Downloads folder",
+            title: "PDF Opened",
+            description: "Use browser menu to download",
             // @ts-ignore
             variant: "success",
           })
         } else {
-          // For iOS: Use blob URL and open in new tab
-          const pdfBlob = pdf.output('blob')
-          const pdfUrl = URL.createObjectURL(pdfBlob)
-
-          const newWindow = window.open(pdfUrl, '_blank')
-
-          if (newWindow) {
-            toast({
-              title: "PDF Opened",
-              description: "Tap share icon to download",
-              // @ts-ignore
-              variant: "success",
-            })
-          } else {
-            window.location.href = pdfUrl
-          }
-
-          setTimeout(() => URL.revokeObjectURL(pdfUrl), 2000)
+          // Fallback if popup blocked
+          window.location.href = pdfUrl
         }
+
+        // Clean up URL after delay
+        setTimeout(() => URL.revokeObjectURL(pdfUrl), 3000)
       } else {
         // For desktop, use normal download
+        const timestamp = new Date().getTime()
+        const filename = `invoice-${invoice.invoice_number}-${timestamp}.pdf`
         pdf.save(filename)
 
         toast({
