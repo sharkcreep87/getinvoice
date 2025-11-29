@@ -99,7 +99,7 @@ export async function updateUserCurrency(currency: CurrencyCode): Promise<boolea
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return false
 
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('profiles')
     .update({ currency })
     .eq('id', user.id)
