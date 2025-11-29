@@ -199,7 +199,7 @@ export default function SubscriptionPage() {
         <p className="text-gray-600">Manage your subscription plan</p>
       </div>
 
-      <Card className="bg-blue-50 border-blue-200">
+      <Card className="bg-blue-100 border-blue-300">
         <CardHeader>
           <CardTitle>Current Plan</CardTitle>
           <CardDescription>
@@ -239,7 +239,7 @@ export default function SubscriptionPage() {
               key={plan.tier}
               className={`relative ${
                 plan.popular ? 'border-blue-600 shadow-lg' : ''
-              } ${isCurrentPlan ? 'bg-blue-50 border-blue-600' : ''}`}
+              } ${isCurrentPlan ? 'bg-blue-100 border-blue-700' : ''}`}
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">

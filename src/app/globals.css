@@ -10,9 +10,10 @@
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 243 75% 59%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 13% 95%;
+      --primary: 222 84% 53%; /* changed from magenta to indigo/blue */
+      --primary-foreground: 0 0% 100%;
+    /* secondary now matches primary's hue (indigo) but lighter for accents — darker than before */
+    --secondary: 222 84% 90%;
     --secondary-foreground: 222 47% 11%;
     --muted: 220 13% 95%;
     --muted-foreground: 215 16% 47%;
@@ -22,7 +23,7 @@
     --destructive-foreground: 0 0% 100%;
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 243 75% 59%;
+      --ring: 222 84% 53%;
     --radius: 0.75rem;
   }
 
@@ -33,9 +34,10 @@
     --card-foreground: 210 40% 98%;
     --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
-    --primary: 243 75% 65%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 217 33% 17%;
+      --primary: 222 84% 64%; /* slightly lighter in dark mode */
+      --primary-foreground: 0 0% 100%;
+    /* dark-mode secondary: same hue as primary, darker to provide better contrast */
+    --secondary: 222 84% 18%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217 33% 17%;
     --muted-foreground: 215 20% 65%;
@@ -45,7 +47,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 217 33% 17%;
     --input: 217 33% 17%;
-    --ring: 243 75% 65%;
+      --ring: 222 84% 64%;
   }
 }
 

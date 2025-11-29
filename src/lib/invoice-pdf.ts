@@ -224,7 +224,7 @@ export async function generateInvoicePDF(invoice: InvoiceData, companyInfo: Comp
     body: tableData,
     theme: 'grid',
     headStyles: {
-      fillColor: [219, 39, 119], // Magenta theme
+      fillColor: [37, 99, 235], // Indigo theme (replaced magenta)
       textColor: [255, 255, 255],
       fontStyle: 'bold',
     },

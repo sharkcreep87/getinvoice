@@ -60,13 +60,13 @@ export function MobileNav() {
   }
 
   return (
-    <div className="md:hidden border-b bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 text-white">
+    <div className="md:hidden border-b bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-900 text-white">
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-pink-500">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-indigo-600">
             <FileText className="h-5 w-5 text-white" />
           </div>
-          <span className="ml-2 text-lg font-bold bg-gradient-to-r from-primary via-pink-400 to-purple-400 bg-clip-text text-transparent">
+          <span className="ml-2 text-lg font-bold bg-gradient-to-r from-primary via-indigo-400 to-indigo-700 bg-clip-text text-transparent">
             GetInvoice
           </span>
         </div>
@@ -78,13 +78,13 @@ export function MobileNav() {
               <span className="sr-only">Open menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0 bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 text-white border-primary/20">
+            <SheetContent side="left" className="w-64 p-0 bg-gradient-to-b from-slate-900 via-indigo-900 to-slate-900 text-white border-primary/20">
             <SheetHeader className="p-6 border-b border-primary/20 bg-black/20">
               <SheetTitle className="flex items-center text-white">
-                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-pink-500">
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-indigo-600">
                   <FileText className="h-6 w-6 text-white" />
                 </div>
-                <span className="ml-3 text-xl font-bold bg-gradient-to-r from-primary via-pink-400 to-purple-400 bg-clip-text text-transparent">
+                <span className="ml-3 text-xl font-bold bg-gradient-to-r from-primary via-indigo-400 to-indigo-700 bg-clip-text text-transparent">
                   GetInvoice
                 </span>
               </SheetTitle>
@@ -102,7 +102,7 @@ export function MobileNav() {
                     className={cn(
                       "flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200",
                       isActive
-                        ? "bg-gradient-to-r from-primary/90 to-pink-500/90 text-white shadow-lg shadow-primary/50"
+                        ? "bg-gradient-to-r from-primary/90 to-indigo-600/90 text-white shadow-lg shadow-primary/50"
                         : "text-gray-300 hover:bg-white/10 hover:text-white"
                     )}
                   >

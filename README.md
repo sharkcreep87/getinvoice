@@ -32,7 +32,7 @@ A modern, full-featured CRM system with powerful invoice generation capabilities
   - Subscription cancellation support
 
 - **Modern Dashboard**
-  - Beautiful magenta/pink gradient theme
+  - Clean indigo/blue gradient theme (updated from magenta)
   - Real-time analytics and statistics
   - Revenue tracking
   - Recent activity overview
@@ -46,7 +46,7 @@ A modern, full-featured CRM system with powerful invoice generation capabilities
 ## Tech Stack
 
 - **Frontend**: Next.js 16.0.5 (App Router), React 18.3.1, TypeScript
-- **Styling**: Tailwind CSS with custom magenta theme, Radix UI Components
+- **Styling**: Tailwind CSS with custom indigo/blue theme, Radix UI Components
 - **Backend**: Supabase (PostgreSQL, Authentication, Storage, Row Level Security)
 - **Payment Processing**: Stripe for subscription payments
 - **PDF Generation**: jsPDF with autoTable

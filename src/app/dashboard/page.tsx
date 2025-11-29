@@ -81,7 +81,7 @@ export default async function DashboardPage() {
         </Card>
 
         <Card className="border-2 border-violet-200/50 hover:border-violet-300 transition-all hover:shadow-xl hover:shadow-violet-500/20">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 bg-gradient-to-br from-violet-50 to-transparent">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 bg-gradient-to-br from-violet-100 to-transparent">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Total Invoices
             </CardTitle>
@@ -98,7 +98,7 @@ export default async function DashboardPage() {
         </Card>
 
         <Card className="border-2 border-teal-200/50 hover:border-teal-300 transition-all hover:shadow-xl hover:shadow-teal-500/20">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 bg-gradient-to-br from-teal-50 to-transparent">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 bg-gradient-to-br from-teal-100 to-transparent">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Total Revenue
             </CardTitle>
@@ -115,7 +115,7 @@ export default async function DashboardPage() {
         </Card>
 
         <Card className="border-2 border-sky-200/50 hover:border-sky-300 transition-all hover:shadow-xl hover:shadow-sky-500/20">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 bg-gradient-to-br from-sky-50 to-transparent">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 bg-gradient-to-br from-sky-100 to-transparent">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Pending Amount
             </CardTitle>
@@ -133,7 +133,7 @@ export default async function DashboardPage() {
       </div>
 
       <Card className="border-2 border-primary/20 shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-50">
+        <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-100">
           <CardTitle className="text-xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
             Recent Invoices
           </CardTitle>
@@ -183,7 +183,7 @@ export default async function DashboardPage() {
       </Card>
 
       <Card className="border-2 border-primary/20 shadow-lg overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-50">
+        <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-100">
           <CardTitle className="text-xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
             Quick Actions
           </CardTitle>
@@ -205,7 +205,7 @@ export default async function DashboardPage() {
             </a>
             <a
               href="/dashboard/invoices"
-              className="group relative overflow-hidden p-6 border-2 border-violet-200/50 rounded-xl hover:border-violet-400 transition-all hover:shadow-lg hover:shadow-violet-500/20 bg-gradient-to-br from-white to-violet-50"
+              className="group relative overflow-hidden p-6 border-2 border-violet-200/50 rounded-xl hover:border-violet-400 transition-all hover:shadow-lg hover:shadow-violet-500/20 bg-gradient-to-br from-white to-violet-100"
             >
               <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-violet-200/50 blur-2xl group-hover:bg-violet-300/50 transition-all"></div>
               <div className="relative">
@@ -218,7 +218,7 @@ export default async function DashboardPage() {
             </a>
             <a
               href="/dashboard/subscription"
-              className="group relative overflow-hidden p-6 border-2 border-teal-200/50 rounded-xl hover:border-teal-400 transition-all hover:shadow-lg hover:shadow-teal-500/20 bg-gradient-to-br from-white to-teal-50"
+              className="group relative overflow-hidden p-6 border-2 border-teal-200/50 rounded-xl hover:border-teal-400 transition-all hover:shadow-lg hover:shadow-teal-500/20 bg-gradient-to-br from-white to-teal-100"
             >
               <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-teal-200/50 blur-2xl group-hover:bg-teal-300/50 transition-all"></div>
               <div className="relative">
