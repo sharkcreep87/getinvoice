@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowRight, BarChart3, FileText, Users, Zap, Menu, X } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
+import { formatCurrency } from '@/lib/utils'
+import { getUserCurrency } from '@/lib/currency'
 
 type SubscriptionPlan = {
   id: string
@@ -21,11 +23,21 @@ type SubscriptionPlan = {
 export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [plans, setPlans] = useState<SubscriptionPlan[]>([])
+  const [currency, setCurrency] = useState<string>('MYR')
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
   useEffect(() => {
     loadPlans()
+
+    ;(async () => {
+      try {
+        const c = await getUserCurrency()
+        setCurrency(c)
+      } catch (e) {
+        // keep default
+      }
+    })()
   }, [])
 
   const loadPlans = async () => {
@@ -307,7 +319,7 @@ export default function HomePage() {
                     </CardDescription>
                     <div className="mt-4">
                       <span className={`text-3xl sm:text-4xl font-bold bg-gradient-to-r ${colors.price} bg-clip-text text-transparent`}>
-                        RM{plan.price}
+                        {formatCurrency(plan.price, currency)}
                       </span>
                       <span className="text-sm sm:text-base text-gray-600">/month</span>
                     </div>

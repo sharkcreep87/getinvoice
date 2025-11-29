@@ -160,8 +160,8 @@ export default async function DashboardPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-lg bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-                      {formatCurrency(invoice.total, invoice.currency || stats.currency)}
+                      <p className="font-bold text-lg bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                        {formatCurrency(invoice.total, stats.currency)}
                     </p>
                     <span
                       className={`text-xs px-3 py-1 rounded-full font-medium ${

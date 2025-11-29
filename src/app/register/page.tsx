@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FileText } from "lucide-react"
+import { formatCurrency } from '@/lib/utils'
+import { getUserCurrency } from '@/lib/currency'
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -27,6 +29,7 @@ export default function RegisterPage() {
   const [subscriptionTier, setSubscriptionTier] = useState<'free' | 'basic' | 'pro' | 'enterprise'>('free')
   const [loading, setLoading] = useState(false)
   const [plans, setPlans] = useState<SubscriptionPlan[]>([])
+  const [currency, setCurrency] = useState<string>('MYR')
   const [plansLoading, setPlansLoading] = useState(true)
   const router = useRouter()
   const { toast } = useToast()
@@ -34,6 +37,15 @@ export default function RegisterPage() {
 
   useEffect(() => {
     loadPlans()
+    // fetch user's preferred currency (falls back to MYR)
+    ;(async () => {
+      try {
+        const c = await getUserCurrency()
+        setCurrency(c)
+      } catch (e) {
+        // ignore - keep default
+      }
+    })()
   }, [])
 
   const loadPlans = async () => {
@@ -160,7 +172,7 @@ export default function RegisterPage() {
                   <SelectContent>
                     {plans.map((plan) => (
                       <SelectItem key={plan.id} value={plan.tier}>
-                        {plan.name} - RM{plan.price}/{plan.billing_period === 'monthly' ? 'month' : 'year'}
+                        {plan.name} - {formatCurrency(plan.price, currency)}/{plan.billing_period === 'monthly' ? 'month' : 'year'}
                       </SelectItem>
                     ))}
                   </SelectContent>

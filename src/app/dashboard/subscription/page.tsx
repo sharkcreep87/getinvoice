@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Check, CreditCard, Loader2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
+import { formatCurrency } from '@/lib/utils'
+import { getUserCurrency } from '@/lib/currency'
 import { useToast } from "@/components/ui/use-toast"
 import { LoadingPage } from "@/components/ui/loading"
 
@@ -36,6 +38,7 @@ export default function SubscriptionPage() {
   const [processingTier, setProcessingTier] = useState<SubscriptionTier | null>(null)
   const [cancelingSubscription, setCancelingSubscription] = useState(false)
   const [plans, setPlans] = useState<SubscriptionPlan[]>([])
+  const [currency, setCurrency] = useState<string>('MYR')
   const { toast } = useToast()
   const supabase = createClient()
   const searchParams = useSearchParams()
@@ -43,6 +46,15 @@ export default function SubscriptionPage() {
   useEffect(() => {
     loadSubscription()
     loadPlans()
+
+    ;(async () => {
+      try {
+        const c = await getUserCurrency()
+        setCurrency(c)
+      } catch (e) {
+        // default remains
+      }
+    })()
 
     // Check for canceled payment
     if (searchParams.get('canceled') === 'true') {
@@ -259,7 +271,7 @@ export default function SubscriptionPage() {
                 <CardTitle>{plan.name}</CardTitle>
                 <CardDescription>{planDescriptions[plan.tier] || plan.tier}</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">RM{plan.price}</span>
+                  <span className="text-4xl font-bold">{formatCurrency(plan.price, currency)}</span>
                   <span className="text-gray-600">/{plan.billing_period === 'monthly' ? 'month' : 'year'}</span>
                 </div>
               </CardHeader>
