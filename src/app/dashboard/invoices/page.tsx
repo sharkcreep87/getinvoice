@@ -102,8 +102,8 @@ export default function InvoicesPage() {
         .eq('id', user.id)
         .single()
 
-      if (profile?.currency) {
-        setUserCurrency(profile.currency)
+      if ((profile as any)?.currency) {
+        setUserCurrency((profile as any).currency)
       }
     } catch (error) {
       console.error('Error loading currency:', error)
