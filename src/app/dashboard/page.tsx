@@ -5,7 +5,7 @@ import { formatCurrency } from "@/lib/utils"
 
 export const dynamic = 'force-dynamic'
 
-async function getDashboardStats(userId: string) {
+async function getDashboardStats(userId: string, userCurrency: string) {
   const supabase = await createServerClient()
 
   const [customersResult, invoicesResult] = await Promise.all([
@@ -30,6 +30,7 @@ async function getDashboardStats(userId: string) {
     totalRevenue,
     pendingAmount,
     recentInvoices: invoices.slice(0, 5),
+    currency: userCurrency,
   }
 }
 
@@ -39,8 +40,6 @@ export default async function DashboardPage() {
 
   if (!user) return null
 
-  const stats = await getDashboardStats(user.id)
-
   const profileResult = await supabase
     .from('profiles')
     .select('*')
@@ -49,6 +48,8 @@ export default async function DashboardPage() {
 
   const profile = profileResult.data as any
   const userCurrency = profile?.currency || 'MYR'
+
+  const stats = await getDashboardStats(user.id, userCurrency)
 
   return (
     <div className="space-y-8">
@@ -107,7 +108,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-              {formatCurrency(stats.totalRevenue, userCurrency)}
+              {formatCurrency(stats.totalRevenue, stats.currency)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">Paid invoices</p>
           </CardContent>
@@ -124,7 +125,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
-              {formatCurrency(stats.pendingAmount, userCurrency)}
+              {formatCurrency(stats.pendingAmount, stats.currency)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">Awaiting payment</p>
           </CardContent>
@@ -160,7 +161,7 @@ export default async function DashboardPage() {
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-lg bg-gradient-to-r from-primary to-pink-600 bg-clip-text text-transparent">
-                      {formatCurrency(invoice.total, userCurrency)}
+                      {formatCurrency(invoice.total, invoice.currency || stats.currency)}
                     </p>
                     <span
                       className={`text-xs px-3 py-1 rounded-full font-medium ${

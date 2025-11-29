@@ -17,6 +17,7 @@ export interface Database {
           avatar_url: string | null
           role: 'admin' | 'user'
           subscription_tier: 'free' | 'basic' | 'pro' | 'enterprise'
+          currency: string
           created_at: string
           updated_at: string
         }
@@ -27,6 +28,7 @@ export interface Database {
           avatar_url?: string | null
           role?: 'admin' | 'user'
           subscription_tier?: 'free' | 'basic' | 'pro' | 'enterprise'
+          currency?: string
           created_at?: string
           updated_at?: string
         }
@@ -37,6 +39,7 @@ export interface Database {
           avatar_url?: string | null
           role?: 'admin' | 'user'
           subscription_tier?: 'free' | 'basic' | 'pro' | 'enterprise'
+          currency?: string
           created_at?: string
           updated_at?: string
         }
@@ -105,6 +108,7 @@ export interface Database {
           tax_amount: number
           discount_amount: number
           total: number
+          currency: string
           notes: string | null
           terms: string | null
           created_at: string
@@ -123,6 +127,7 @@ export interface Database {
           tax_amount?: number
           discount_amount?: number
           total: number
+          currency?: string
           notes?: string | null
           terms?: string | null
           created_at?: string
@@ -141,6 +146,7 @@ export interface Database {
           tax_amount?: number
           discount_amount?: number
           total?: number
+          currency?: string
           notes?: string | null
           terms?: string | null
           created_at?: string

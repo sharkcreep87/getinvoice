@@ -8,10 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
+import { getSupportedCurrencies, type Currency } from "@/lib/currency"
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [currencies, setCurrencies] = useState<Currency[]>([])
   const [profile, setProfile] = useState({
     full_name: "",
     email: "",
@@ -29,7 +31,13 @@ export default function SettingsPage() {
 
   useEffect(() => {
     loadProfile()
+    loadCurrencies()
   }, [])
+
+  const loadCurrencies = async () => {
+    const supportedCurrencies = await getSupportedCurrencies()
+    setCurrencies(supportedCurrencies)
+  }
 
   const loadProfile = async () => {
     try {
@@ -215,16 +223,19 @@ export default function SettingsPage() {
                 value={profile.currency}
                 onValueChange={(value) => setProfile({ ...profile, currency: value })}
               >
-                <SelectTrigger id="currency">
+                <SelectTrigger>
                   <SelectValue placeholder="Select currency" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="USD">USD - US Dollar ($)</SelectItem>
-                  <SelectItem value="MYR">MYR - Malaysian Ringgit (RM)</SelectItem>
+                  {currencies.map((currency) => (
+                    <SelectItem key={currency.code} value={currency.code}>
+                      {currency.symbol} {currency.code} - {currency.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <p className="text-sm text-gray-500">
-                This currency will be used for all your invoices
+                This currency will be used for all new invoices and financial displays
               </p>
             </div>
             <Button type="submit" disabled={saving}>

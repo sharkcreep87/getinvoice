@@ -88,7 +88,27 @@ export default function InvoicesPage() {
 
   useEffect(() => {
     loadData()
+    loadUserCurrency()
   }, [])
+
+  const loadUserCurrency = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('currency')
+        .eq('id', user.id)
+        .single()
+
+      if (profile?.currency) {
+        setUserCurrency(profile.currency)
+      }
+    } catch (error) {
+      console.error('Error loading currency:', error)
+    }
+  }
 
   const loadData = async () => {
     try {
@@ -199,6 +219,7 @@ export default function InvoicesPage() {
             tax_amount: taxAmount,
             discount_amount: formData.discount_amount,
             total,
+            currency: userCurrency,
             notes: formData.notes,
             terms: formData.terms,
             updated_at: new Date().toISOString(),
@@ -252,6 +273,7 @@ export default function InvoicesPage() {
             tax_amount: taxAmount,
             discount_amount: formData.discount_amount,
             total,
+            currency: userCurrency,
             notes: formData.notes,
             terms: formData.terms,
           })
@@ -750,7 +772,7 @@ export default function InvoicesPage() {
                     <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
                     <TableCell>{new Date(invoice.issue_date).toLocaleDateString()}</TableCell>
                     <TableCell>{new Date(invoice.due_date).toLocaleDateString()}</TableCell>
-                    <TableCell>{formatCurrency(invoice.total, userCurrency)}</TableCell>
+                    <TableCell>{formatCurrency(invoice.total, invoice.currency || userCurrency)}</TableCell>
                     <TableCell>
                       <span
                         className={`text-xs px-2 py-1 rounded-full ${
