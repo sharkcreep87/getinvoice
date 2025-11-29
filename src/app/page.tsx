@@ -62,6 +62,13 @@ export default function HomePage() {
       <header className="border-b border-primary/20 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors mr-2"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
             <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-primary to-indigo-600">
               <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
             </div>
@@ -78,14 +85,7 @@ export default function HomePage() {
             </Link>
           </nav>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors"
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          {/* mobile button moved to the left side for compact view */}
         </div>
 
         {/* Mobile Navigation */}
