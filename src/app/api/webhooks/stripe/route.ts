@@ -99,6 +99,7 @@ async function handleCheckoutSessionCompleted(
   }
 
   // Update user subscription tier
+  const supabaseAdmin = getSupabaseAdmin()
   const { error: updateError } = await supabaseAdmin
     .from('profiles')
     .update({
@@ -141,6 +142,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   }
 
   // Update subscription status
+  const supabaseAdmin = getSupabaseAdmin()
   const { error } = await supabaseAdmin.from('payments').update({
     status: subscription.status,
   }).eq('stripe_subscription_id', subscription.id)
@@ -161,6 +163,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   }
 
   // Downgrade user to free tier
+  const supabaseAdmin = getSupabaseAdmin()
   const { error: updateError } = await supabaseAdmin
     .from('profiles')
     .update({
@@ -193,6 +196,7 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
 
   if (!subscriptionId) return
 
+  const supabaseAdmin = getSupabaseAdmin()
   const { error } = await supabaseAdmin
     .from('payments')
     .update({
@@ -212,6 +216,7 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
 
   if (!subscriptionId) return
 
+  const supabaseAdmin = getSupabaseAdmin()
   const { error } = await supabaseAdmin
     .from('payments')
     .update({

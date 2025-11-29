@@ -12,11 +12,21 @@ RUN npm install
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+RUN mkdir -p public
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Set environment variable for build
 ENV NEXT_TELEMETRY_DISABLED=1
+
+# Accept build arguments for Supabase configuration
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+# Set as environment variables for the build
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 RUN npm run build
 
