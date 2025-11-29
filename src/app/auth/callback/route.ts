@@ -13,6 +13,6 @@ export async function GET(request: Request) {
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  // Redirect to login page
-  return NextResponse.redirect(`${origin}/login`)
+  // Redirect to login page with success parameter
+  return NextResponse.redirect(`${origin}/login?verified=true`)
 }

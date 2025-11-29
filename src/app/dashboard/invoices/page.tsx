@@ -9,11 +9,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Download, Eye, Trash2, Edit } from "lucide-react"
+import { Plus, Download, Eye, Trash2, Edit, Share2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 import { generateInvoiceNumber, formatCurrency } from "@/lib/utils"
 import { generateInvoicePDF } from "@/lib/invoice-pdf"
+import { sharePDF, canSharePDF } from "@/lib/share-pdf"
 import { LoadingPage } from "@/components/ui/loading"
 
 type Invoice = {
@@ -489,6 +490,98 @@ export default function InvoicesPage() {
     }
   }
 
+  const handleSharePDF = async (invoice: Invoice) => {
+    try {
+      // Check if sharing is supported
+      if (!canSharePDF()) {
+        toast({
+          title: "Not Supported",
+          description: "PDF sharing is not supported on this device. Try downloading instead.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      const { data: customer } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('id', invoice.customer_id)
+        .single()
+
+      const { data: invoiceItems } = await supabase
+        .from('invoice_items')
+        .select('*')
+        .eq('invoice_id', invoice.id)
+
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error("Not authenticated")
+
+      const profileResult = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+
+      const profile = profileResult.data as any
+
+      // Fetch company settings
+      const companySettingsResult = await supabase
+        .from('company_settings')
+        .select('*')
+        .eq('user_id', user.id)
+        .single()
+
+      const companySettings = companySettingsResult.data as any
+
+      if (!customer || !invoiceItems) throw new Error("Failed to load invoice data")
+
+      const invoiceData = {
+        ...invoice,
+        customer,
+        items: invoiceItems,
+      }
+
+      // Use company settings if available, fallback to profile
+      const companyInfo = {
+        name: profile?.full_name || 'Your Company',
+        email: profile?.email || '',
+        company_name: companySettings?.company_name,
+        company_email: companySettings?.company_email,
+        company_phone: companySettings?.company_phone,
+        company_address: companySettings?.company_address,
+        company_city: companySettings?.company_city,
+        company_state: companySettings?.company_state,
+        company_zip: companySettings?.company_zip,
+        company_country: companySettings?.company_country,
+        company_logo_url: companySettings?.company_logo_url,
+        tax_id: companySettings?.tax_id,
+        invoice_terms: companySettings?.invoice_terms,
+        invoice_footer: companySettings?.invoice_footer,
+      }
+
+      const pdf = await generateInvoicePDF(invoiceData, companyInfo, userCurrency)
+      await sharePDF(pdf, `invoice-${invoice.invoice_number}.pdf`)
+
+      toast({
+        title: "Success",
+        description: "Invoice PDF shared successfully",
+        // @ts-ignore - success variant added to toast component
+        variant: "success",
+      })
+    } catch (error: any) {
+      // Don't show error if user cancelled the share
+      if (error.message === 'Share cancelled') {
+        return
+      }
+
+      toast({
+        title: "Error",
+        description: error.message || "Failed to share PDF",
+        variant: "destructive",
+      })
+    }
+  }
+
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this invoice?")) return
 
@@ -948,6 +1041,16 @@ export default function InvoicesPage() {
                         >
                           <Download className="h-4 w-4 text-green-600" />
                         </Button>
+                        {canSharePDF() && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleSharePDF(invoice)}
+                            title="Share PDF"
+                          >
+                            <Share2 className="h-4 w-4 text-blue-600" />
+                          </Button>
+                        )}
                         <Button
                           variant="ghost"
                           size="icon"
@@ -1084,10 +1187,18 @@ export default function InvoicesPage() {
               Close
             </Button>
             {selectedInvoice && (
-              <Button onClick={() => handleDownloadPDF(selectedInvoice)}>
-                <Download className="mr-2 h-4 w-4" />
-                Download PDF
-              </Button>
+              <>
+                <Button onClick={() => handleDownloadPDF(selectedInvoice)}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Download PDF
+                </Button>
+                {canSharePDF() && (
+                  <Button onClick={() => handleSharePDF(selectedInvoice)} variant="default">
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Share PDF
+                  </Button>
+                )}
+              </>
             )}
           </DialogFooter>
         </DialogContent>
