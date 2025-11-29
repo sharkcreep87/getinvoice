@@ -77,6 +77,8 @@ export default function RegisterPage() {
             full_name: fullName,
             subscription_tier: subscriptionTier,
           },
+          // ensure the confirmation link directs to the friendly verify page
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/verify`,
         },
       })
 

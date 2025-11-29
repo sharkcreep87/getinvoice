@@ -103,6 +103,11 @@ Before you begin, ensure you have:
    - `http://localhost:3000/**` (for development)
    - `https://yourdomain.com/**` (for production)
 
+   Tip: If you'd like users to land on a friendly confirmation page after they click the verification link, add an explicit redirect for the verification route used by this app:
+
+   - `http://localhost:3000/auth/verify` (local dev)
+   - `https://yourdomain.com/auth/verify` (production)
+
 ## Local Development Setup
 
 ### Step 1: Clone and Install
