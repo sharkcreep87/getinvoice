@@ -1,6 +1,7 @@
 import { createServerClient } from "@/lib/supabase/server"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DollarSign, FileText, Users, TrendingUp } from "lucide-react"
+import { formatCurrency } from "@/lib/utils"
 
 export const dynamic = 'force-dynamic'
 
@@ -47,6 +48,7 @@ export default async function DashboardPage() {
     .single()
 
   const profile = profileResult.data as any
+  const userCurrency = profile?.currency || 'USD'
 
   return (
     <div className="space-y-8">
@@ -105,7 +107,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-              ${stats.totalRevenue.toFixed(2)}
+              {formatCurrency(stats.totalRevenue, userCurrency)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">Paid invoices</p>
           </CardContent>
@@ -122,7 +124,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
-              ${stats.pendingAmount.toFixed(2)}
+              {formatCurrency(stats.pendingAmount, userCurrency)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">Awaiting payment</p>
           </CardContent>
@@ -158,7 +160,7 @@ export default async function DashboardPage() {
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-lg bg-gradient-to-r from-primary to-pink-600 bg-clip-text text-transparent">
-                      ${invoice.total.toFixed(2)}
+                      {formatCurrency(invoice.total, userCurrency)}
                     </p>
                     <span
                       className={`text-xs px-3 py-1 rounded-full font-medium ${

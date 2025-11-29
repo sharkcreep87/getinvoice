@@ -17,6 +17,7 @@ export default function SettingsPage() {
     email: "",
     role: "user" as const,
     subscription_tier: "free" as const,
+    currency: "USD",
   })
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -50,6 +51,7 @@ export default function SettingsPage() {
         email: data.email,
         role: data.role,
         subscription_tier: data.subscription_tier,
+        currency: data.currency || "USD",
       })
     } catch (error: any) {
       toast({
@@ -74,6 +76,7 @@ export default function SettingsPage() {
         .from('profiles')
         .update({
           full_name: profile.full_name,
+          currency: profile.currency,
         })
         .eq('id', user.id)
 
@@ -204,6 +207,24 @@ export default function SettingsPage() {
                 <a href="/dashboard/subscription" className="text-blue-600 hover:underline">
                   Subscription page
                 </a>
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="currency">Preferred Currency</Label>
+              <Select
+                value={profile.currency}
+                onValueChange={(value) => setProfile({ ...profile, currency: value })}
+              >
+                <SelectTrigger id="currency">
+                  <SelectValue placeholder="Select currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="USD">USD - US Dollar ($)</SelectItem>
+                  <SelectItem value="MYR">MYR - Malaysian Ringgit (RM)</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-gray-500">
+                This currency will be used for all your invoices
               </p>
             </div>
             <Button type="submit" disabled={saving}>

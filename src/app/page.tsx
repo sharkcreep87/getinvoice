@@ -86,55 +86,150 @@ export default function HomePage() {
 
       {/* Features Section */}
       <section className="container mx-auto px-4 py-12 sm:py-16 md:py-20">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-pink-600 bg-clip-text text-transparent mb-4">Everything You Need</h2>
-          <p className="text-sm sm:text-base text-gray-700">Powerful features to manage your business efficiently</p>
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-pink-600 bg-clip-text text-transparent mb-4">Everything You Need</h2>
+          <p className="text-sm sm:text-base md:text-lg text-gray-600 max-w-2xl mx-auto">Powerful features to manage your business efficiently and scale effortlessly</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <Card className="border-2 border-primary/20 hover:border-primary/40 transition-all hover:shadow-xl hover:shadow-primary/20">
-            <CardHeader>
-              <div className="p-3 bg-gradient-to-br from-primary to-pink-500 rounded-xl inline-block mb-2">
-                <Users className="h-8 w-8 text-white" />
-              </div>
-              <CardTitle className="text-lg">CRM System</CardTitle>
-              <CardDescription>
-                Manage customers, track interactions, and build lasting relationships
-              </CardDescription>
-            </CardHeader>
-          </Card>
-          <Card className="border-2 border-pink-200/50 hover:border-pink-300 transition-all hover:shadow-xl hover:shadow-pink-500/20">
-            <CardHeader>
-              <div className="p-3 bg-gradient-to-br from-pink-500 to-purple-500 rounded-xl inline-block mb-2">
-                <FileText className="h-8 w-8 text-white" />
-              </div>
-              <CardTitle className="text-lg">Invoice Generator</CardTitle>
-              <CardDescription>
-                Create beautiful, professional invoices with PDF export
-              </CardDescription>
-            </CardHeader>
-          </Card>
-          <Card className="border-2 border-purple-200/50 hover:border-purple-300 transition-all hover:shadow-xl hover:shadow-purple-500/20">
-            <CardHeader>
-              <div className="p-3 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-xl inline-block mb-2">
-                <BarChart3 className="h-8 w-8 text-white" />
-              </div>
-              <CardTitle className="text-lg">Analytics</CardTitle>
-              <CardDescription>
-                Get insights into your business with powerful analytics
-              </CardDescription>
-            </CardHeader>
-          </Card>
-          <Card className="border-2 border-indigo-200/50 hover:border-indigo-300 transition-all hover:shadow-xl hover:shadow-indigo-500/20">
-            <CardHeader>
-              <div className="p-3 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-xl inline-block mb-2">
-                <Zap className="h-8 w-8 text-white" />
-              </div>
-              <CardTitle className="text-lg">Fast & Secure</CardTitle>
-              <CardDescription>
-                Built with modern technology for speed and security
-              </CardDescription>
-            </CardHeader>
-          </Card>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+          {/* CRM System Card */}
+          <div className="group relative">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-pink-500 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-500"></div>
+            <Card className="relative h-full border-0 bg-white hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2">
+              <CardHeader className="pb-4">
+                <div className="relative mb-6">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-pink-500/20 rounded-2xl blur-xl"></div>
+                  <div className="relative p-4 bg-gradient-to-br from-primary to-pink-500 rounded-2xl inline-block transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                    <Users className="h-10 w-10 text-white" />
+                  </div>
+                </div>
+                <CardTitle className="text-xl mb-3 bg-gradient-to-r from-primary to-pink-600 bg-clip-text text-transparent">CRM System</CardTitle>
+                <CardDescription className="text-sm leading-relaxed text-gray-600">
+                  Manage customers, track interactions, and build lasting relationships with an intuitive interface
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-2 text-xs text-gray-500">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                    <span>Contact Management</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                    <span>Interaction Tracking</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                    <span>Customer Insights</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Invoice Generator Card */}
+          <div className="group relative">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-500"></div>
+            <Card className="relative h-full border-0 bg-white hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2">
+              <CardHeader className="pb-4">
+                <div className="relative mb-6">
+                  <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-2xl blur-xl"></div>
+                  <div className="relative p-4 bg-gradient-to-br from-pink-500 to-purple-500 rounded-2xl inline-block transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                    <FileText className="h-10 w-10 text-white" />
+                  </div>
+                </div>
+                <CardTitle className="text-xl mb-3 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">Invoice Generator</CardTitle>
+                <CardDescription className="text-sm leading-relaxed text-gray-600">
+                  Create beautiful, professional invoices with customizable templates and instant PDF export
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-2 text-xs text-gray-500">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-pink-500"></div>
+                    <span>Custom Templates</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-pink-500"></div>
+                    <span>PDF Export</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-pink-500"></div>
+                    <span>Multi-Currency</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Analytics Card */}
+          <div className="group relative">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-500"></div>
+            <Card className="relative h-full border-0 bg-white hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2">
+              <CardHeader className="pb-4">
+                <div className="relative mb-6">
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-indigo-500/20 rounded-2xl blur-xl"></div>
+                  <div className="relative p-4 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl inline-block transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                    <BarChart3 className="h-10 w-10 text-white" />
+                  </div>
+                </div>
+                <CardTitle className="text-xl mb-3 bg-gradient-to-r from-purple-500 to-indigo-600 bg-clip-text text-transparent">Analytics</CardTitle>
+                <CardDescription className="text-sm leading-relaxed text-gray-600">
+                  Get deep insights into your business performance with powerful analytics and reporting
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-2 text-xs text-gray-500">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div>
+                    <span>Revenue Tracking</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div>
+                    <span>Visual Reports</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div>
+                    <span>Performance Metrics</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Fast & Secure Card */}
+          <div className="group relative">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-500"></div>
+            <Card className="relative h-full border-0 bg-white hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2">
+              <CardHeader className="pb-4">
+                <div className="relative mb-6">
+                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-blue-500/20 rounded-2xl blur-xl"></div>
+                  <div className="relative p-4 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-2xl inline-block transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                    <Zap className="h-10 w-10 text-white" />
+                  </div>
+                </div>
+                <CardTitle className="text-xl mb-3 bg-gradient-to-r from-indigo-500 to-blue-600 bg-clip-text text-transparent">Fast & Secure</CardTitle>
+                <CardDescription className="text-sm leading-relaxed text-gray-600">
+                  Built with cutting-edge technology ensuring blazing-fast performance and enterprise-grade security
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-2 text-xs text-gray-500">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+                    <span>Lightning Fast</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+                    <span>Bank-Level Security</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+                    <span>99.9% Uptime</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
 

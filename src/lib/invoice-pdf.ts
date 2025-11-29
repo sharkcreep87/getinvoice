@@ -49,7 +49,7 @@ type CompanyInfo = {
   invoice_footer?: string
 }
 
-export function generateInvoicePDF(invoice: InvoiceData, companyInfo: CompanyInfo) {
+export function generateInvoicePDF(invoice: InvoiceData, companyInfo: CompanyInfo, currency: string = 'USD') {
   const doc = new jsPDF()
 
   // Add company logo if available
@@ -159,8 +159,8 @@ export function generateInvoicePDF(invoice: InvoiceData, companyInfo: CompanyInf
   const tableData = invoice.items.map(item => [
     item.description,
     item.quantity.toString(),
-    formatCurrency(item.unit_price),
-    formatCurrency(item.amount),
+    formatCurrency(item.unit_price, currency),
+    formatCurrency(item.amount, currency),
   ])
 
   autoTable(doc, {
@@ -190,17 +190,17 @@ export function generateInvoicePDF(invoice: InvoiceData, companyInfo: CompanyInf
 
   doc.setFontSize(10)
   doc.text('Subtotal:', totalsX, finalY)
-  doc.text(formatCurrency(invoice.subtotal), 180, finalY, { align: 'right' })
+  doc.text(formatCurrency(invoice.subtotal, currency), 180, finalY, { align: 'right' })
 
   if (invoice.discount_amount > 0) {
     doc.text('Discount:', totalsX, finalY + 6)
-    doc.text(`-${formatCurrency(invoice.discount_amount)}`, 180, finalY + 6, {
+    doc.text(`-${formatCurrency(invoice.discount_amount, currency)}`, 180, finalY + 6, {
       align: 'right',
     })
   }
 
   doc.text(`Tax (${invoice.tax_rate}%):`, totalsX, finalY + 12)
-  doc.text(formatCurrency(invoice.tax_amount), 180, finalY + 12, {
+  doc.text(formatCurrency(invoice.tax_amount, currency), 180, finalY + 12, {
     align: 'right',
   })
 
@@ -208,7 +208,7 @@ export function generateInvoicePDF(invoice: InvoiceData, companyInfo: CompanyInf
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(12)
   doc.text('Total:', totalsX, finalY + 20)
-  doc.text(formatCurrency(invoice.total), 180, finalY + 20, { align: 'right' })
+  doc.text(formatCurrency(invoice.total, currency), 180, finalY + 20, { align: 'right' })
 
   // Notes and Terms
   let currentY = finalY + 35

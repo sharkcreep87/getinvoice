@@ -60,6 +60,7 @@ export default function InvoicesPage() {
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
   const [editingInvoiceId, setEditingInvoiceId] = useState<string | null>(null)
+  const [userCurrency, setUserCurrency] = useState<string>('USD')
   const [items, setItems] = useState<InvoiceItem[]>([
     { description: "", quantity: 1, unit_price: 0, amount: 0 },
   ])
@@ -94,7 +95,7 @@ export default function InvoicesPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      const [invoicesResult, customersResult] = await Promise.all([
+      const [invoicesResult, customersResult, profileResult] = await Promise.all([
         supabase
           .from('invoices')
           .select('*')
@@ -105,6 +106,11 @@ export default function InvoicesPage() {
           .select('*')
           .eq('user_id', user.id)
           .order('name'),
+        supabase
+          .from('profiles')
+          .select('currency')
+          .eq('id', user.id)
+          .single(),
       ])
 
       if (invoicesResult.error) throw invoicesResult.error
@@ -112,6 +118,7 @@ export default function InvoicesPage() {
 
       setInvoices(invoicesResult.data || [])
       setCustomers(customersResult.data || [])
+      setUserCurrency(profileResult.data?.currency || 'USD')
     } catch (error: any) {
       toast({
         title: "Error",
@@ -345,7 +352,7 @@ export default function InvoicesPage() {
         invoice_footer: companySettings?.invoice_footer,
       }
 
-      const pdf = generateInvoicePDF(invoiceData, companyInfo)
+      const pdf = generateInvoicePDF(invoiceData, companyInfo, userCurrency)
       pdf.save(`invoice-${invoice.invoice_number}.pdf`)
 
       toast({
@@ -651,19 +658,19 @@ export default function InvoicesPage() {
                 <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                   <div className="flex justify-between">
                     <span>Subtotal:</span>
-                    <span>{formatCurrency(subtotal)}</span>
+                    <span>{formatCurrency(subtotal, userCurrency)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Discount:</span>
-                    <span>-{formatCurrency(formData.discount_amount)}</span>
+                    <span>-{formatCurrency(formData.discount_amount, userCurrency)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Tax ({formData.tax_rate}%):</span>
-                    <span>{formatCurrency(taxAmount)}</span>
+                    <span>{formatCurrency(taxAmount, userCurrency)}</span>
                   </div>
                   <div className="flex justify-between text-lg font-bold pt-2 border-t">
                     <span>Total:</span>
-                    <span>{formatCurrency(total)}</span>
+                    <span>{formatCurrency(total, userCurrency)}</span>
                   </div>
                 </div>
 
@@ -743,7 +750,7 @@ export default function InvoicesPage() {
                     <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
                     <TableCell>{new Date(invoice.issue_date).toLocaleDateString()}</TableCell>
                     <TableCell>{new Date(invoice.due_date).toLocaleDateString()}</TableCell>
-                    <TableCell>{formatCurrency(invoice.total)}</TableCell>
+                    <TableCell>{formatCurrency(invoice.total, userCurrency)}</TableCell>
                     <TableCell>
                       <span
                         className={`text-xs px-2 py-1 rounded-full ${
@@ -872,8 +879,8 @@ export default function InvoicesPage() {
                       <TableRow key={index}>
                         <TableCell>{item.description}</TableCell>
                         <TableCell className="text-center">{item.quantity}</TableCell>
-                        <TableCell className="text-right">{formatCurrency(item.unit_price)}</TableCell>
-                        <TableCell className="text-right font-medium">{formatCurrency(item.amount)}</TableCell>
+                        <TableCell className="text-right">{formatCurrency(item.unit_price, userCurrency)}</TableCell>
+                        <TableCell className="text-right font-medium">{formatCurrency(item.amount, userCurrency)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -883,21 +890,21 @@ export default function InvoicesPage() {
               <div className="border-t pt-4 space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>Subtotal:</span>
-                  <span className="font-medium">{formatCurrency(selectedInvoice.subtotal)}</span>
+                  <span className="font-medium">{formatCurrency(selectedInvoice.subtotal, userCurrency)}</span>
                 </div>
                 {selectedInvoice.discount_amount > 0 && (
                   <div className="flex justify-between text-sm text-red-600">
                     <span>Discount:</span>
-                    <span className="font-medium">-{formatCurrency(selectedInvoice.discount_amount)}</span>
+                    <span className="font-medium">-{formatCurrency(selectedInvoice.discount_amount, userCurrency)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm">
                   <span>Tax ({selectedInvoice.tax_rate}%):</span>
-                  <span className="font-medium">{formatCurrency(selectedInvoice.tax_amount)}</span>
+                  <span className="font-medium">{formatCurrency(selectedInvoice.tax_amount, userCurrency)}</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold pt-2 border-t">
                   <span>Total:</span>
-                  <span className="text-primary">{formatCurrency(selectedInvoice.total)}</span>
+                  <span className="text-primary">{formatCurrency(selectedInvoice.total, userCurrency)}</span>
                 </div>
               </div>
 
@@ -1088,15 +1095,15 @@ export default function InvoicesPage() {
               <div className="grid grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
                 <div>
                   <Label className="text-sm">Subtotal</Label>
-                  <p className="font-semibold">{formatCurrency(subtotal)}</p>
+                  <p className="font-semibold">{formatCurrency(subtotal, userCurrency)}</p>
                 </div>
                 <div>
                   <Label className="text-sm">Tax</Label>
-                  <p className="font-semibold">{formatCurrency(taxAmount)}</p>
+                  <p className="font-semibold">{formatCurrency(taxAmount, userCurrency)}</p>
                 </div>
                 <div>
                   <Label className="text-sm">Total</Label>
-                  <p className="font-bold text-lg text-primary">{formatCurrency(total)}</p>
+                  <p className="font-bold text-lg text-primary">{formatCurrency(total, userCurrency)}</p>
                 </div>
               </div>
 
