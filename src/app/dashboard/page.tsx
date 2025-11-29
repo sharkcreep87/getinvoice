@@ -48,7 +48,7 @@ export default async function DashboardPage() {
     .single()
 
   const profile = profileResult.data as any
-  const userCurrency = profile?.currency || 'USD'
+  const userCurrency = profile?.currency || 'MYR'
 
   return (
     <div className="space-y-8">

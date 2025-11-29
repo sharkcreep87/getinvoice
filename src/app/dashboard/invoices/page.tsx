@@ -60,7 +60,7 @@ export default function InvoicesPage() {
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
   const [editingInvoiceId, setEditingInvoiceId] = useState<string | null>(null)
-  const [userCurrency, setUserCurrency] = useState<string>('USD')
+  const [userCurrency, setUserCurrency] = useState<string>('MYR')
   const [items, setItems] = useState<InvoiceItem[]>([
     { description: "", quantity: 1, unit_price: 0, amount: 0 },
   ])
@@ -118,7 +118,7 @@ export default function InvoicesPage() {
 
       setInvoices(invoicesResult.data || [])
       setCustomers(customersResult.data || [])
-      setUserCurrency((profileResult.data as any)?.currency || 'USD')
+      setUserCurrency((profileResult.data as any)?.currency || 'MYR')
     } catch (error: any) {
       toast({
         title: "Error",

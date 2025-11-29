@@ -17,7 +17,7 @@ export default function SettingsPage() {
     email: "",
     role: "user" as const,
     subscription_tier: "free" as const,
-    currency: "USD",
+    currency: "MYR",
   })
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -51,7 +51,7 @@ export default function SettingsPage() {
         email: data.email,
         role: data.role,
         subscription_tier: data.subscription_tier,
-        currency: data.currency || "USD",
+        currency: data.currency || "MYR",
       })
     } catch (error: any) {
       toast({

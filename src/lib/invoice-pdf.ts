@@ -49,7 +49,7 @@ type CompanyInfo = {
   invoice_footer?: string
 }
 
-export function generateInvoicePDF(invoice: InvoiceData, companyInfo: CompanyInfo, currency: string = 'USD') {
+export function generateInvoicePDF(invoice: InvoiceData, companyInfo: CompanyInfo, currency: string = 'MYR') {
   const doc = new jsPDF()
 
   // Add company logo if available
