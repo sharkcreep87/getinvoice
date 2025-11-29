@@ -106,13 +106,15 @@ export default function SubscriptionPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      const { data: profile, error } = await supabase
+      const result = await supabase
         .from('profiles')
         .select('subscription_tier')
         .eq('id', user.id)
         .single()
 
-      if (error) throw error
+      const profile = result.data as any
+
+      if (result.error) throw result.error
       setCurrentTier(profile?.subscription_tier || 'free')
     } catch (error: any) {
       toast({
@@ -134,7 +136,7 @@ export default function SubscriptionPage() {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) throw new Error("Not authenticated")
 
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('profiles')
           .update({ subscription_tier: tier })
           .eq('id', user.id)

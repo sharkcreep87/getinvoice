@@ -82,7 +82,7 @@ export default function CustomersPage() {
       if (!user) throw new Error("Not authenticated")
 
       if (editingCustomer) {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('customers')
           .update(formData)
           .eq('id', editingCustomer.id)
@@ -93,7 +93,7 @@ export default function CustomersPage() {
           description: "Customer updated successfully",
         })
       } else {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('customers')
           .insert({
             ...formData,

@@ -10,7 +10,8 @@ import {
   FileText,
   Settings,
   LogOut,
-  CreditCard
+  CreditCard,
+  Building2
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
@@ -19,6 +20,7 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Customers", href: "/dashboard/customers", icon: Users },
   { name: "Invoices", href: "/dashboard/invoices", icon: FileText },
+  { name: "Company", href: "/dashboard/company", icon: Building2 },
   { name: "Subscription", href: "/dashboard/subscription", icon: CreditCard },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
@@ -48,10 +50,14 @@ export function Sidebar() {
   }
 
   return (
-    <div className="flex h-full flex-col bg-gray-900 text-white">
-      <div className="flex h-16 items-center px-6 border-b border-gray-800">
-        <FileText className="h-8 w-8 text-blue-400" />
-        <span className="ml-2 text-xl font-bold">GetInvoice</span>
+    <div className="flex h-full flex-col bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 text-white border-r border-primary/20">
+      <div className="flex h-16 items-center px-6 border-b border-primary/20 bg-black/20">
+        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-pink-500">
+          <FileText className="h-6 w-6 text-white" />
+        </div>
+        <span className="ml-3 text-xl font-bold bg-gradient-to-r from-primary via-pink-400 to-purple-400 bg-clip-text text-transparent">
+          GetInvoice
+        </span>
       </div>
       <nav className="flex-1 space-y-1 px-3 py-4">
         {navigation.map((item) => {
@@ -62,22 +68,22 @@ export function Sidebar() {
               key={item.name}
               href={item.href}
               className={cn(
-                "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                "flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200",
                 isActive
-                  ? "bg-gray-800 text-white"
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                  ? "bg-gradient-to-r from-primary/90 to-pink-500/90 text-white shadow-lg shadow-primary/50"
+                  : "text-gray-300 hover:bg-white/10 hover:text-white"
               )}
             >
-              <Icon className="mr-3 h-5 w-5" />
+              <Icon className={cn("mr-3 h-5 w-5", isActive && "animate-pulse")} />
               {item.name}
             </Link>
           )
         })}
       </nav>
-      <div className="p-4 border-t border-gray-800">
+      <div className="p-4 border-t border-primary/20 bg-black/20">
         <Button
           variant="ghost"
-          className="w-full justify-start text-gray-300 hover:bg-gray-800 hover:text-white"
+          className="w-full justify-start text-gray-300 hover:bg-white/10 hover:text-white transition-all duration-200"
           onClick={handleLogout}
         >
           <LogOut className="mr-3 h-5 w-5" />

@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Download, Eye, Trash2 } from "lucide-react"
+import { Plus, Download, Eye, Trash2, Edit } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 import { generateInvoiceNumber, formatCurrency } from "@/lib/utils"
@@ -56,12 +56,25 @@ export default function InvoicesPage() {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [viewDialogOpen, setViewDialogOpen] = useState(false)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
+  const [editingInvoiceId, setEditingInvoiceId] = useState<string | null>(null)
   const [items, setItems] = useState<InvoiceItem[]>([
     { description: "", quantity: 1, unit_price: 0, amount: 0 },
   ])
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    customer_id: string
+    status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+    issue_date: string
+    due_date: string
+    tax_rate: number
+    discount_amount: number
+    notes: string
+    terms: string
+  }>({
     customer_id: "",
-    status: "draft" as const,
+    status: "draft",
     issue_date: new Date().toISOString().split('T')[0],
     due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     tax_rate: 0,
@@ -165,54 +178,109 @@ export default function InvoicesPage() {
 
       const { subtotal, taxAmount, total } = calculateTotals()
 
-      const { data: invoice, error: invoiceError } = await supabase
-        .from('invoices')
-        .insert({
-          user_id: user.id,
-          customer_id: formData.customer_id,
-          invoice_number: generateInvoiceNumber(),
-          status: formData.status,
-          issue_date: formData.issue_date,
-          due_date: formData.due_date,
-          subtotal,
-          tax_rate: formData.tax_rate,
-          tax_amount: taxAmount,
-          discount_amount: formData.discount_amount,
-          total,
-          notes: formData.notes,
-          terms: formData.terms,
+      if (editingInvoiceId) {
+        // Update existing invoice
+        const { error: invoiceError } = await (supabase as any)
+          .from('invoices')
+          .update({
+            customer_id: formData.customer_id,
+            status: formData.status,
+            issue_date: formData.issue_date,
+            due_date: formData.due_date,
+            subtotal,
+            tax_rate: formData.tax_rate,
+            tax_amount: taxAmount,
+            discount_amount: formData.discount_amount,
+            total,
+            notes: formData.notes,
+            terms: formData.terms,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', editingInvoiceId)
+
+        if (invoiceError) throw invoiceError
+
+        // Delete existing items
+        const { error: deleteItemsError } = await supabase
+          .from('invoice_items')
+          .delete()
+          .eq('invoice_id', editingInvoiceId)
+
+        if (deleteItemsError) throw deleteItemsError
+
+        // Insert new items
+        const { error: itemsError } = await (supabase as any)
+          .from('invoice_items')
+          .insert(
+            items.map(item => ({
+              invoice_id: editingInvoiceId,
+              description: item.description,
+              quantity: item.quantity,
+              unit_price: item.unit_price,
+              amount: item.amount,
+            }))
+          )
+
+        if (itemsError) throw itemsError
+
+        toast({
+          title: "Success",
+          description: "Invoice updated successfully",
         })
-        .select()
-        .single()
 
-      if (invoiceError) throw invoiceError
+        setEditDialogOpen(false)
+      } else {
+        // Create new invoice
+        const { data: invoice, error: invoiceError } = await (supabase as any)
+          .from('invoices')
+          .insert({
+            user_id: user.id,
+            customer_id: formData.customer_id,
+            invoice_number: generateInvoiceNumber(),
+            status: formData.status,
+            issue_date: formData.issue_date,
+            due_date: formData.due_date,
+            subtotal,
+            tax_rate: formData.tax_rate,
+            tax_amount: taxAmount,
+            discount_amount: formData.discount_amount,
+            total,
+            notes: formData.notes,
+            terms: formData.terms,
+          })
+          .select()
+          .single()
 
-      const { error: itemsError } = await supabase
-        .from('invoice_items')
-        .insert(
-          items.map(item => ({
-            invoice_id: invoice.id,
-            description: item.description,
-            quantity: item.quantity,
-            unit_price: item.unit_price,
-            amount: item.amount,
-          }))
-        )
+        if (invoiceError) throw invoiceError
 
-      if (itemsError) throw itemsError
+        const { error: itemsError } = await (supabase as any)
+          .from('invoice_items')
+          .insert(
+            items.map(item => ({
+              invoice_id: invoice.id,
+              description: item.description,
+              quantity: item.quantity,
+              unit_price: item.unit_price,
+              amount: item.amount,
+            }))
+          )
 
-      toast({
-        title: "Success",
-        description: "Invoice created successfully",
-      })
+        if (itemsError) throw itemsError
 
-      setDialogOpen(false)
+        toast({
+          title: "Success",
+          description: "Invoice created successfully",
+        })
+
+        setDialogOpen(false)
+      }
+
       resetForm()
       loadData()
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to create invoice",
+        description: error.message || `Failed to ${editingInvoiceId ? 'update' : 'create'} invoice`,
         variant: "destructive",
       })
     }
@@ -232,11 +300,24 @@ export default function InvoicesPage() {
         .eq('invoice_id', invoice.id)
 
       const { data: { user } } = await supabase.auth.getUser()
-      const { data: profile } = await supabase
+      if (!user) throw new Error("Not authenticated")
+
+      const profileResult = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user?.id)
+        .eq('id', user.id)
         .single()
+
+      const profile = profileResult.data as any
+
+      // Fetch company settings
+      const companySettingsResult = await supabase
+        .from('company_settings')
+        .select('*')
+        .eq('user_id', user.id)
+        .single()
+
+      const companySettings = companySettingsResult.data as any
 
       if (!customer || !invoiceItems) throw new Error("Failed to load invoice data")
 
@@ -246,9 +327,22 @@ export default function InvoicesPage() {
         items: invoiceItems,
       }
 
+      // Use company settings if available, fallback to profile
       const companyInfo = {
         name: profile?.full_name || 'Your Company',
         email: profile?.email || '',
+        company_name: companySettings?.company_name,
+        company_email: companySettings?.company_email,
+        company_phone: companySettings?.company_phone,
+        company_address: companySettings?.company_address,
+        company_city: companySettings?.company_city,
+        company_state: companySettings?.company_state,
+        company_zip: companySettings?.company_zip,
+        company_country: companySettings?.company_country,
+        company_logo_url: companySettings?.company_logo_url,
+        tax_id: companySettings?.tax_id,
+        invoice_terms: companySettings?.invoice_terms,
+        invoice_footer: companySettings?.invoice_footer,
       }
 
       const pdf = generateInvoicePDF(invoiceData, companyInfo)
@@ -299,6 +393,73 @@ export default function InvoicesPage() {
     }
   }
 
+  const handleView = async (invoice: Invoice) => {
+    try {
+      const { data: invoiceItems } = await supabase
+        .from('invoice_items')
+        .select('*')
+        .eq('invoice_id', invoice.id)
+
+      const { data: customer } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('id', invoice.customer_id)
+        .single()
+
+      if (invoiceItems && customer) {
+        setSelectedInvoice({
+          ...invoice,
+          customer,
+          items: invoiceItems,
+        } as any)
+        setViewDialogOpen(true)
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to load invoice details",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleEdit = async (invoice: Invoice) => {
+    try {
+      const { data: invoiceItems } = await supabase
+        .from('invoice_items')
+        .select('*')
+        .eq('invoice_id', invoice.id)
+
+      if (invoiceItems) {
+        setEditingInvoiceId(invoice.id)
+        setFormData({
+          customer_id: invoice.customer_id,
+          status: invoice.status,
+          issue_date: invoice.issue_date,
+          due_date: invoice.due_date,
+          tax_rate: invoice.tax_rate,
+          discount_amount: invoice.discount_amount,
+          notes: invoice.notes || "",
+          terms: invoice.terms || "",
+        })
+        setItems((invoiceItems as any).map((item: any) => ({
+          id: item.id,
+          description: item.description,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          amount: item.amount,
+        })))
+        setEditDialogOpen(true)
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to load invoice for editing",
+        variant: "destructive",
+      })
+    }
+  }
+
   const resetForm = () => {
     setFormData({
       customer_id: "",
@@ -311,6 +472,7 @@ export default function InvoicesPage() {
       terms: "Payment is due within 30 days",
     })
     setItems([{ description: "", quantity: 1, unit_price: 0, amount: 0 }])
+    setEditingInvoiceId(null)
   }
 
   const { subtotal, taxAmount, total } = calculateTotals()
@@ -602,10 +764,26 @@ export default function InvoicesPage() {
                         <Button
                           variant="ghost"
                           size="icon"
+                          onClick={() => handleView(invoice)}
+                          title="View Details"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(invoice)}
+                          title="Edit Invoice"
+                        >
+                          <Edit className="h-4 w-4 text-blue-600" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => handleDownloadPDF(invoice)}
                           title="Download PDF"
                         >
-                          <Download className="h-4 w-4" />
+                          <Download className="h-4 w-4 text-green-600" />
                         </Button>
                         <Button
                           variant="ghost"
@@ -624,6 +802,330 @@ export default function InvoicesPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* View Invoice Dialog */}
+      <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Invoice Details</DialogTitle>
+            <DialogDescription>
+              View complete invoice information
+            </DialogDescription>
+          </DialogHeader>
+          {selectedInvoice && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4 p-4 bg-gradient-to-r from-primary/5 to-pink-50 rounded-lg">
+                <div>
+                  <Label className="text-sm text-muted-foreground">Invoice Number</Label>
+                  <p className="font-semibold text-lg">{selectedInvoice.invoice_number}</p>
+                </div>
+                <div>
+                  <Label className="text-sm text-muted-foreground">Status</Label>
+                  <p>
+                    <span
+                      className={`text-xs px-3 py-1 rounded-full font-medium ${
+                        selectedInvoice.status === 'paid'
+                          ? 'bg-green-100 text-green-800'
+                          : selectedInvoice.status === 'sent'
+                          ? 'bg-blue-100 text-blue-800'
+                          : selectedInvoice.status === 'overdue'
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {selectedInvoice.status.toUpperCase()}
+                    </span>
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm text-muted-foreground">Issue Date</Label>
+                  <p className="font-medium">{new Date(selectedInvoice.issue_date).toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <Label className="text-sm text-muted-foreground">Due Date</Label>
+                  <p className="font-medium">{new Date(selectedInvoice.due_date).toLocaleDateString()}</p>
+                </div>
+              </div>
+
+              <div className="border-2 border-primary/20 rounded-lg p-4">
+                <Label className="text-sm text-muted-foreground">Customer</Label>
+                <p className="font-semibold text-lg">{(selectedInvoice as any).customer?.name}</p>
+                <p className="text-sm text-gray-600">{(selectedInvoice as any).customer?.email}</p>
+                {(selectedInvoice as any).customer?.company && (
+                  <p className="text-sm text-gray-600">{(selectedInvoice as any).customer?.company}</p>
+                )}
+              </div>
+
+              <div>
+                <Label className="text-lg font-semibold mb-3 block">Items</Label>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Description</TableHead>
+                      <TableHead className="text-center">Qty</TableHead>
+                      <TableHead className="text-right">Unit Price</TableHead>
+                      <TableHead className="text-right">Amount</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(selectedInvoice as any).items?.map((item: any, index: number) => (
+                      <TableRow key={index}>
+                        <TableCell>{item.description}</TableCell>
+                        <TableCell className="text-center">{item.quantity}</TableCell>
+                        <TableCell className="text-right">{formatCurrency(item.unit_price)}</TableCell>
+                        <TableCell className="text-right font-medium">{formatCurrency(item.amount)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <div className="border-t pt-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Subtotal:</span>
+                  <span className="font-medium">{formatCurrency(selectedInvoice.subtotal)}</span>
+                </div>
+                {selectedInvoice.discount_amount > 0 && (
+                  <div className="flex justify-between text-sm text-red-600">
+                    <span>Discount:</span>
+                    <span className="font-medium">-{formatCurrency(selectedInvoice.discount_amount)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-sm">
+                  <span>Tax ({selectedInvoice.tax_rate}%):</span>
+                  <span className="font-medium">{formatCurrency(selectedInvoice.tax_amount)}</span>
+                </div>
+                <div className="flex justify-between text-lg font-bold pt-2 border-t">
+                  <span>Total:</span>
+                  <span className="text-primary">{formatCurrency(selectedInvoice.total)}</span>
+                </div>
+              </div>
+
+              {selectedInvoice.notes && (
+                <div>
+                  <Label className="font-semibold">Notes</Label>
+                  <p className="text-sm text-gray-600 mt-1">{selectedInvoice.notes}</p>
+                </div>
+              )}
+
+              {selectedInvoice.terms && (
+                <div>
+                  <Label className="font-semibold">Terms & Conditions</Label>
+                  <p className="text-sm text-gray-600 mt-1">{selectedInvoice.terms}</p>
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewDialogOpen(false)}>
+              Close
+            </Button>
+            {selectedInvoice && (
+              <Button onClick={() => handleDownloadPDF(selectedInvoice)}>
+                <Download className="mr-2 h-4 w-4" />
+                Download PDF
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Invoice Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={(open) => {
+        setEditDialogOpen(open)
+        if (!open) resetForm()
+      }}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Invoice</DialogTitle>
+            <DialogDescription>
+              Update invoice details below
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="customer">Customer *</Label>
+                  <Select value={formData.customer_id} onValueChange={(value) => setFormData({ ...formData, customer_id: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select customer" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {customers.map(customer => (
+                        <SelectItem key={customer.id} value={customer.id}>
+                          {customer.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="status">Status</Label>
+                  <Select value={formData.status} onValueChange={(value: any) => setFormData({ ...formData, status: value })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="sent">Sent</SelectItem>
+                      <SelectItem value="paid">Paid</SelectItem>
+                      <SelectItem value="overdue">Overdue</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="issue_date">Issue Date</Label>
+                  <Input
+                    type="date"
+                    value={formData.issue_date}
+                    onChange={(e) => setFormData({ ...formData, issue_date: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="due_date">Due Date</Label>
+                  <Input
+                    type="date"
+                    value={formData.due_date}
+                    onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label>Items</Label>
+                  <Button type="button" variant="outline" size="sm" onClick={addItem}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Item
+                  </Button>
+                </div>
+                {items.map((item, index) => (
+                  <div key={index} className="grid grid-cols-12 gap-2 items-end">
+                    <div className="col-span-5 space-y-2">
+                      <Label>Description</Label>
+                      <Input
+                        value={item.description}
+                        onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+                        placeholder="Item description"
+                        required
+                      />
+                    </div>
+                    <div className="col-span-2 space-y-2">
+                      <Label>Qty</Label>
+                      <Input
+                        type="number"
+                        value={item.quantity}
+                        onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
+                        min="0"
+                        step="1"
+                        required
+                      />
+                    </div>
+                    <div className="col-span-2 space-y-2">
+                      <Label>Price</Label>
+                      <Input
+                        type="number"
+                        value={item.unit_price}
+                        onChange={(e) => handleItemChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                        min="0"
+                        step="0.01"
+                        required
+                      />
+                    </div>
+                    <div className="col-span-2 space-y-2">
+                      <Label>Amount</Label>
+                      <Input
+                        type="number"
+                        value={item.amount}
+                        readOnly
+                        disabled
+                      />
+                    </div>
+                    <div className="col-span-1 flex items-end">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeItem(index)}
+                        disabled={items.length === 1}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-600" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="tax_rate">Tax Rate (%)</Label>
+                  <Input
+                    type="number"
+                    value={formData.tax_rate}
+                    onChange={(e) => setFormData({ ...formData, tax_rate: parseFloat(e.target.value) || 0 })}
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="discount_amount">Discount Amount</Label>
+                  <Input
+                    type="number"
+                    value={formData.discount_amount}
+                    onChange={(e) => setFormData({ ...formData, discount_amount: parseFloat(e.target.value) || 0 })}
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <Label className="text-sm">Subtotal</Label>
+                  <p className="font-semibold">{formatCurrency(subtotal)}</p>
+                </div>
+                <div>
+                  <Label className="text-sm">Tax</Label>
+                  <p className="font-semibold">{formatCurrency(taxAmount)}</p>
+                </div>
+                <div>
+                  <Label className="text-sm">Total</Label>
+                  <p className="font-bold text-lg text-primary">{formatCurrency(total)}</p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="notes">Notes</Label>
+                <Input
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  placeholder="Additional notes"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="terms">Terms & Conditions</Label>
+                <Input
+                  value={formData.terms}
+                  onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
+                  placeholder="Payment terms"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setEditDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Update Invoice</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -10,11 +10,13 @@ A modern, full-featured CRM system with powerful invoice generation capabilities
   - Advanced search and filtering
 
 - **Invoice Generator**
-  - Professional invoice creation
+  - Professional invoice creation with view and edit capabilities
   - PDF export with customizable templates
   - Multiple invoice statuses (Draft, Sent, Paid, Overdue, Cancelled)
   - Automatic calculations for subtotals, taxes, and discounts
   - Invoice numbering system
+  - Customizable company branding (logo, details, terms & conditions)
+  - Company logo upload support
 
 - **User Management**
   - Secure authentication with Supabase Auth
@@ -30,9 +32,11 @@ A modern, full-featured CRM system with powerful invoice generation capabilities
   - Subscription cancellation support
 
 - **Modern Dashboard**
+  - Beautiful magenta/pink gradient theme
   - Real-time analytics and statistics
   - Revenue tracking
   - Recent activity overview
+  - Company settings management
 
 - **Production Ready**
   - Docker containerization
@@ -41,9 +45,9 @@ A modern, full-featured CRM system with powerful invoice generation capabilities
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14 (App Router), React 18, TypeScript
-- **Styling**: Tailwind CSS, Radix UI Components
-- **Backend**: Supabase (PostgreSQL, Authentication, Row Level Security)
+- **Frontend**: Next.js 16.0.5 (App Router), React 18.3.1, TypeScript
+- **Styling**: Tailwind CSS with custom magenta theme, Radix UI Components
+- **Backend**: Supabase (PostgreSQL, Authentication, Storage, Row Level Security)
 - **Payment Processing**: Stripe for subscription payments
 - **PDF Generation**: jsPDF with autoTable
 - **Deployment**: Docker, Docker Compose
@@ -96,9 +100,14 @@ STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
 
 1. Go to your Supabase project dashboard
 2. Navigate to SQL Editor
-3. Copy the contents of `supabase/schema.sql`
-4. Run the SQL script to create tables and policies
-5. Run `supabase/schema_payments.sql` to create payment tracking tables
+3. Run the migration scripts in order:
+   - `supabase/migrations/001_initial_schema.sql` - Core tables (profiles, customers, invoices)
+   - `supabase/migrations/002_subscription_system.sql` - Payment and subscription tables
+   - `supabase/migrations/003_company_settings_and_storage.sql` - Company settings table
+4. Set up Storage for company logos:
+   - **IMPORTANT**: Follow the dashboard method in `supabase/STORAGE_SETUP_DASHBOARD.md`
+   - This creates the 'public' bucket and policies for logo uploads
+   - (The SQL method requires system permissions and won't work in SQL Editor)
 
 ### 6. Set Up Stripe (Optional but recommended)
 

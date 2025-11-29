@@ -5,7 +5,7 @@ import { createServerClient } from '@/lib/supabase/server'
 export async function POST(req: NextRequest) {
   try {
     // Get authenticated user
-    const supabase = createServerClient()
+    const supabase = await createServerClient()
     const {
       data: { user },
     } = await supabase.auth.getUser()
@@ -15,14 +15,16 @@ export async function POST(req: NextRequest) {
     }
 
     // Get user's active subscription
-    const { data: payment } = await supabase
+    const result = await supabase
       .from('payments')
-      .select('stripe_subscription_id')
+      .select('*')
       .eq('user_id', user.id)
       .eq('status', 'succeeded')
       .order('created_at', { ascending: false })
       .limit(1)
-      .single()
+      .maybeSingle()
+
+    const payment = result.data as any
 
     if (!payment || !payment.stripe_subscription_id) {
       return NextResponse.json(

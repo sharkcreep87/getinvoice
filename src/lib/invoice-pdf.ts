@@ -32,19 +32,84 @@ type InvoiceData = {
   }>
 }
 
-export function generateInvoicePDF(invoice: InvoiceData, companyInfo: any) {
+type CompanyInfo = {
+  name?: string
+  email?: string
+  company_name?: string
+  company_email?: string
+  company_phone?: string
+  company_address?: string
+  company_city?: string
+  company_state?: string
+  company_zip?: string
+  company_country?: string
+  company_logo_url?: string
+  tax_id?: string
+  invoice_terms?: string
+  invoice_footer?: string
+}
+
+export function generateInvoicePDF(invoice: InvoiceData, companyInfo: CompanyInfo) {
   const doc = new jsPDF()
 
-  // Header
-  doc.setFontSize(24)
-  doc.setTextColor(59, 130, 246)
-  doc.text('INVOICE', 20, 20)
+  // Add company logo if available
+  let logoHeight = 0
+  if (companyInfo.company_logo_url) {
+    try {
+      // Note: In a real implementation, you'd need to load the image properly
+      // This is a placeholder for the logo functionality
+      logoHeight = 20
+    } catch (error) {
+      console.error('Failed to load logo:', error)
+    }
+  }
+
+  // Header with magenta theme
+  doc.setFontSize(28)
+  doc.setTextColor(219, 39, 119) // Magenta color
+  doc.text('INVOICE', 20, 25)
+
+  // Add decorative line
+  doc.setDrawColor(219, 39, 119)
+  doc.setLineWidth(0.5)
+  doc.line(20, 28, 80, 28)
 
   // Company Info
-  doc.setFontSize(10)
+  doc.setFontSize(11)
   doc.setTextColor(0, 0, 0)
-  doc.text(companyInfo.name || 'Your Company', 20, 30)
-  if (companyInfo.email) doc.text(companyInfo.email, 20, 35)
+  doc.setFont('helvetica', 'bold')
+  doc.text(companyInfo.company_name || companyInfo.name || 'Your Company', 20, 38)
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(9)
+
+  let companyY = 43
+  if (companyInfo.company_email) {
+    doc.text(companyInfo.company_email, 20, companyY)
+    companyY += 4
+  }
+  if (companyInfo.company_phone) {
+    doc.text(companyInfo.company_phone, 20, companyY)
+    companyY += 4
+  }
+  if (companyInfo.company_address) {
+    doc.text(companyInfo.company_address, 20, companyY)
+    companyY += 4
+    const cityStateZip = [
+      companyInfo.company_city,
+      companyInfo.company_state,
+      companyInfo.company_zip,
+    ].filter(Boolean).join(', ')
+    if (cityStateZip) {
+      doc.text(cityStateZip, 20, companyY)
+      companyY += 4
+    }
+    if (companyInfo.company_country) {
+      doc.text(companyInfo.company_country, 20, companyY)
+    }
+  }
+  if (companyInfo.tax_id) {
+    doc.text(`Tax ID: ${companyInfo.tax_id}`, 20, companyY + 4)
+  }
 
   // Invoice Details
   doc.setFontSize(10)
@@ -55,7 +120,7 @@ export function generateInvoicePDF(invoice: InvoiceData, companyInfo: any) {
   // Status badge
   const statusColors: any = {
     draft: [156, 163, 175],
-    sent: [59, 130, 246],
+    sent: [219, 39, 119], // Magenta for sent
     paid: [34, 197, 94],
     overdue: [239, 68, 68],
     cancelled: [107, 114, 128],
@@ -104,7 +169,7 @@ export function generateInvoicePDF(invoice: InvoiceData, companyInfo: any) {
     body: tableData,
     theme: 'grid',
     headStyles: {
-      fillColor: [59, 130, 246],
+      fillColor: [219, 39, 119], // Magenta theme
       textColor: [255, 255, 255],
       fontStyle: 'bold',
     },
@@ -158,14 +223,26 @@ export function generateInvoicePDF(invoice: InvoiceData, companyInfo: any) {
     currentY += 5 + splitNotes.length * 4 + 5
   }
 
-  if (invoice.terms) {
+  // Use company invoice terms if available, otherwise use invoice-specific terms
+  const termsToUse = companyInfo.invoice_terms || invoice.terms
+  if (termsToUse) {
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
     doc.text('Terms & Conditions:', 20, currentY)
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(9)
-    const splitTerms = doc.splitTextToSize(invoice.terms, 170)
+    const splitTerms = doc.splitTextToSize(termsToUse, 170)
     doc.text(splitTerms, 20, currentY + 5)
+    currentY += 5 + splitTerms.length * 4 + 5
+  }
+
+  // Footer
+  if (companyInfo.invoice_footer) {
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9)
+    doc.setTextColor(100, 100, 100)
+    const splitFooter = doc.splitTextToSize(companyInfo.invoice_footer, 170)
+    doc.text(splitFooter, 20, currentY)
   }
 
   return doc

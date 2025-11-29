@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Get authenticated user
-    const supabase = createServerClient()
+    const supabase = await createServerClient()
     const {
       data: { user },
     } = await supabase.auth.getUser()
@@ -25,11 +25,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Get user profile
-    const { data: profile } = await supabase
+    const profileResult = await supabase
       .from('profiles')
       .select('email, full_name')
       .eq('id', user.id)
       .single()
+
+    const profile = profileResult.data as any
 
     if (!profile) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
