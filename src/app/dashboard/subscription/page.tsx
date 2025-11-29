@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Check, CreditCard, Loader2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
+import { LoadingPage } from "@/components/ui/loading"
 
 type SubscriptionTier = 'free' | 'basic' | 'pro' | 'enterprise'
 
@@ -188,7 +189,7 @@ export default function SubscriptionPage() {
   }
 
   if (loading) {
-    return <div className="text-center py-12">Loading...</div>
+    return <LoadingPage text="Loading subscription..." />
   }
 
   return (

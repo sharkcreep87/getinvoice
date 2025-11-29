@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 import { getSupportedCurrencies, type Currency } from "@/lib/currency"
+import { LoadingPage } from "@/components/ui/loading"
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
@@ -157,7 +158,7 @@ export default function SettingsPage() {
   }
 
   if (loading) {
-    return <div className="text-center py-12">Loading...</div>
+    return <LoadingPage text="Loading settings..." />
   }
 
   return (

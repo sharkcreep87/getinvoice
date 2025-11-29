@@ -13,6 +13,7 @@ import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 import { generateInvoiceNumber, formatCurrency } from "@/lib/utils"
 import { generateInvoicePDF } from "@/lib/invoice-pdf"
+import { LoadingPage } from "@/components/ui/loading"
 
 type Invoice = {
   id: string
@@ -508,7 +509,7 @@ export default function InvoicesPage() {
   const { subtotal, taxAmount, total } = calculateTotals()
 
   if (loading) {
-    return <div className="text-center py-12">Loading...</div>
+    return <LoadingPage text="Loading invoices..." />
   }
 
   return (

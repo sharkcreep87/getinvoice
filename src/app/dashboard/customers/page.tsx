@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Plus, Pencil, Trash2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
+import { LoadingPage } from "@/components/ui/loading"
 
 type Customer = {
   id: string
@@ -178,7 +179,7 @@ export default function CustomersPage() {
   }
 
   if (loading) {
-    return <div className="text-center py-12">Loading...</div>
+    return <LoadingPage text="Loading customers..." />
   }
 
   return (

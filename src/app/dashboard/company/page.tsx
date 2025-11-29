@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 import { Upload, Building2, Save } from "lucide-react"
 import Image from "next/image"
+import { LoadingPage } from "@/components/ui/loading"
 
 export default function CompanySettingsPage() {
   const supabase = createClient()
@@ -183,14 +184,7 @@ export default function CompanySettingsPage() {
   }
 
   if (loading && !companySettings.company_name) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    )
+    return <LoadingPage text="Loading company settings..." />
   }
 
   return (
