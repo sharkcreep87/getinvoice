@@ -475,12 +475,33 @@ export default function InvoicesPage() {
       }
 
       const pdf = await generateInvoicePDF(invoiceData, companyInfo, userCurrency)
-      pdf.save(`invoice-${invoice.invoice_number}.pdf`)
+      const filename = `invoice-${invoice.invoice_number}.pdf`
 
-      toast({
-        title: "Success",
-        description: "Invoice PDF downloaded",
-      })
+      // Check if it's a mobile device (Android/iOS)
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+
+      if (isMobile) {
+        // For mobile devices, open PDF in a new tab
+        const pdfBlob = pdf.output('blob')
+        const pdfUrl = URL.createObjectURL(pdfBlob)
+        window.open(pdfUrl, '_blank')
+
+        // Clean up the URL after a delay
+        setTimeout(() => URL.revokeObjectURL(pdfUrl), 100)
+
+        toast({
+          title: "Success",
+          description: "Invoice PDF opened in new tab",
+        })
+      } else {
+        // For desktop, use normal download
+        pdf.save(filename)
+
+        toast({
+          title: "Success",
+          description: "Invoice PDF downloaded",
+        })
+      }
     } catch (error: any) {
       toast({
         title: "Error",
@@ -1016,12 +1037,13 @@ export default function InvoicesPage() {
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex justify-end space-x-2">
+                      <div className="flex justify-end gap-1 flex-wrap">
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={() => handleView(invoice)}
                           title="View Details"
+                          className="shrink-0"
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
@@ -1030,6 +1052,7 @@ export default function InvoicesPage() {
                           size="icon"
                           onClick={() => handleEdit(invoice)}
                           title="Edit Invoice"
+                          className="shrink-0"
                         >
                           <Edit className="h-4 w-4 text-blue-600" />
                         </Button>
@@ -1038,6 +1061,7 @@ export default function InvoicesPage() {
                           size="icon"
                           onClick={() => handleDownloadPDF(invoice)}
                           title="Download PDF"
+                          className="shrink-0"
                         >
                           <Download className="h-4 w-4 text-green-600" />
                         </Button>
@@ -1047,6 +1071,7 @@ export default function InvoicesPage() {
                             size="icon"
                             onClick={() => handleSharePDF(invoice)}
                             title="Share PDF"
+                            className="shrink-0"
                           >
                             <Share2 className="h-4 w-4 text-blue-600" />
                           </Button>
@@ -1056,6 +1081,7 @@ export default function InvoicesPage() {
                           size="icon"
                           onClick={() => handleDelete(invoice.id)}
                           title="Delete"
+                          className="shrink-0"
                         >
                           <Trash2 className="h-4 w-4 text-red-600" />
                         </Button>
