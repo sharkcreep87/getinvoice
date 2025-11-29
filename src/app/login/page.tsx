@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText, CheckCircle2 } from "lucide-react"
+import { FileText } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -24,12 +24,7 @@ export default function LoginPage() {
     // Check if user was redirected after email verification
     if (searchParams.get('verified') === 'true') {
       toast({
-        title: (
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5 text-green-600" />
-            <span>Email verified successfully!</span>
-          </div>
-        ),
+        title: "✓ Email verified successfully!",
         description: "Your account is now active. Please sign in to continue.",
         // @ts-ignore - success variant added to toast component
         variant: "success",
