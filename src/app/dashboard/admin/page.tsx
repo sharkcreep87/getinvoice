@@ -29,6 +29,15 @@ type User = {
   created_at: string
 }
 
+type Profile = {
+  id: string
+  email: string
+  full_name: string | null
+  role: string
+  subscription_tier: string
+  created_at: string
+}
+
 export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
   const [isAdmin, setIsAdmin] = useState(false)
@@ -61,7 +70,7 @@ export default function AdminDashboard() {
         .from('profiles')
         .select('role')
         .eq('id', user.id)
-        .single()
+        .single() as { data: { role: string } | null }
 
       if (profile?.role !== 'admin') {
         toast({

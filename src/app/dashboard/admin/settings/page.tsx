@@ -58,7 +58,7 @@ export default function AdminSettings() {
         .from('profiles')
         .select('role')
         .eq('id', user.id)
-        .single()
+        .single() as { data: { role: string } | null }
 
       if (profile?.role !== 'admin') {
         toast({
