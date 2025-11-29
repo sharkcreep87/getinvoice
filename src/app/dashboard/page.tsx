@@ -30,7 +30,7 @@ async function getDashboardStats(userId: string, userCurrency: string) {
     totalInvoices: invoices.length,
     totalRevenue,
     pendingAmount,
-    recentInvoices: invoices.slice(0, 5),
+    recentInvoices: invoices.slice(0, 3),
     currency: userCurrency,
   }
 }
@@ -134,10 +134,13 @@ export default async function DashboardPage() {
       </div>
 
       <Card className="border-2 border-primary/20 shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-100">
+        <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-100 flex items-center justify-between">
           <CardTitle className="text-xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
             Recent Invoices
           </CardTitle>
+          <Link href="/dashboard/invoices" className="text-sm text-primary hover:underline">
+            View more
+          </Link>
         </CardHeader>
         <CardContent className="pt-6">
           {stats.recentInvoices.length === 0 ? (

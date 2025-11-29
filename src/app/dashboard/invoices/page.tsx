@@ -113,13 +113,15 @@ export default function InvoicesPage() {
             .select('*')
             .eq('invoice_id', viewId)
 
+          // invoiceData can be unknown/never in TS inference here — cast safely to any
+          const inv: any = invoiceData
           const { data: customer } = await supabase
             .from('customers')
             .select('*')
-            .eq('id', invoiceData.customer_id)
+            .eq('id', inv.customer_id)
             .single()
 
-          setSelectedInvoice({ ...(invoiceData as any), customer, items: invoiceItems })
+          setSelectedInvoice({ ...(inv as any), customer, items: invoiceItems })
           setViewDialogOpen(true)
         } catch (err) {
           console.error('Failed to open invoice from URL param', err)
