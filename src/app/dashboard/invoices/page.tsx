@@ -475,56 +475,45 @@ export default function InvoicesPage() {
       }
 
       const pdf = await generateInvoicePDF(invoiceData, companyInfo, userCurrency)
-      const filename = `invoice-${invoice.invoice_number}.pdf`
 
-      // Generate blob for both mobile and desktop
-      const pdfBlob = pdf.output('blob')
-      const pdfUrl = URL.createObjectURL(pdfBlob)
+      // Add timestamp to filename to avoid browser appending (1), (2) after .pdf
+      const timestamp = new Date().getTime()
+      const filename = `invoice-${invoice.invoice_number}-${timestamp}.pdf`
 
-      // Check if it's iOS (Safari has special restrictions)
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+      // Check if mobile device
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 
       if (isMobile) {
-        if (isIOS) {
-          // For iOS: Open in new window (Safari blocks downloads)
-          const newWindow = window.open(pdfUrl, '_blank')
-          if (newWindow) {
-            toast({
-              title: "PDF Ready",
-              description: "Tap the share icon in Safari to download",
-              // @ts-ignore
-              variant: "success",
-            })
-          } else {
-            // Fallback if popup blocked
-            window.location.href = pdfUrl
-          }
-        } else {
-          // For Android: Try download with fallback to open
-          const link = document.createElement('a')
-          link.href = pdfUrl
-          link.download = filename
-          link.target = '_blank'
+        // For all mobile devices: Open PDF in new tab
+        // Mobile browsers handle downloads better this way
+        const pdfBlob = pdf.output('blob')
+        const pdfUrl = URL.createObjectURL(pdfBlob)
 
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
+        const newWindow = window.open(pdfUrl, '_blank')
 
+        if (newWindow) {
           toast({
-            title: "Success",
-            description: "PDF download started",
+            title: "PDF Opened",
+            description: "Use your browser menu to download or share",
+            // @ts-ignore
+            variant: "success",
+          })
+        } else {
+          // If popup blocked, navigate to PDF
+          window.location.href = pdfUrl
+          toast({
+            title: "PDF Ready",
+            description: "PDF is loading...",
             // @ts-ignore
             variant: "success",
           })
         }
 
-        // Clean up URL after a delay
-        setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000)
+        // Clean up URL after delay
+        setTimeout(() => URL.revokeObjectURL(pdfUrl), 2000)
       } else {
         // For desktop, use normal download
         pdf.save(filename)
-        URL.revokeObjectURL(pdfUrl)
 
         toast({
           title: "Success",
