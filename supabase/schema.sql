@@ -100,6 +100,10 @@ CREATE POLICY "Users can view own profile" ON public.profiles
 CREATE POLICY "Users can update own profile" ON public.profiles
     FOR UPDATE USING (auth.uid() = id);
 
+-- Allow authenticated users to insert their own profile row (required for client-side signup flow)
+CREATE POLICY "Users can insert own profile" ON public.profiles
+    FOR INSERT WITH CHECK (auth.uid() = id);
+
 -- RLS Policies for customers
 CREATE POLICY "Users can view own customers" ON public.customers
     FOR SELECT USING (auth.uid() = user_id);

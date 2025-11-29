@@ -60,6 +60,8 @@ vercel
    - Click **Run**
    - Then run `supabase/schema_payments.sql`
 
+   - Important: `supabase/schema.sql` enables Row-Level Security (RLS). Be sure the file you apply includes policies that allow authenticated users to insert their own `profiles` row (an INSERT policy that checks `auth.uid() = id`) — otherwise client-side profile creation after sign-up will be blocked.
+
 2. Get your API credentials:
    - Go to **Project Settings** → **API**
    - Copy:
