@@ -2,8 +2,9 @@ import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { formatCurrency, formatDate } from './utils'
 
-// Helper function to load image as data URL
-async function loadImageAsDataURL(url: string): Promise<string> {
+// Helper function to load image as data URL and return natural dimensions
+async function loadImageAsDataURL(url: string): Promise<{ dataUrl: string; width: number; height: number }>
+{
   return new Promise((resolve, reject) => {
     const img = new Image()
     img.crossOrigin = 'anonymous'
@@ -17,7 +18,7 @@ async function loadImageAsDataURL(url: string): Promise<string> {
         return
       }
       ctx.drawImage(img, 0, 0)
-      resolve(canvas.toDataURL('image/png'))
+      resolve({ dataUrl: canvas.toDataURL('image/png'), width: img.width, height: img.height })
     }
     img.onerror = () => reject(new Error('Failed to load image'))
     img.src = url
@@ -82,16 +83,28 @@ export async function generateInvoicePDF(invoice: InvoiceData, companyInfo: Comp
 
   if (companyInfo.company_logo_url) {
     try {
-      const logoData = await loadImageAsDataURL(companyInfo.company_logo_url)
+      const logo = await loadImageAsDataURL(companyInfo.company_logo_url)
       // Add logo in top left corner - smaller size
       const maxLogoWidth = 30
       const maxLogoHeight = 15
       const logoX = 20
       const logoY = 15
 
-      // Add logo image (PDF will maintain aspect ratio)
-      doc.addImage(logoData, 'PNG', logoX, logoY, maxLogoWidth, maxLogoHeight, undefined, 'FAST')
-      logoHeight = maxLogoHeight
+      // Add logo image while preserving its aspect ratio (fit inside max box)
+      const logoData = logo.dataUrl
+      const imgW = logo.width
+      const imgH = logo.height
+
+      // calculate size preserving aspect ratio
+      let drawWidth = maxLogoWidth
+      let drawHeight = (imgH / imgW) * drawWidth
+      if (drawHeight > maxLogoHeight) {
+        drawHeight = maxLogoHeight
+        drawWidth = (imgW / imgH) * drawHeight
+      }
+
+      doc.addImage(logoData, 'PNG', logoX, logoY, drawWidth, drawHeight, undefined, 'FAST')
+      logoHeight = drawHeight
       contentStartY = logoY + logoHeight + 5 // Content starts below logo with spacing
     } catch (error) {
       console.error('Failed to load company logo:', error)
@@ -104,10 +117,21 @@ export async function generateInvoicePDF(invoice: InvoiceData, companyInfo: Comp
   doc.setTextColor(79, 70, 229) // Indigo color
   doc.text('INVOICE', 140, 20, { align: 'right' })
 
-  // Add decorative line under INVOICE
+  // Add decorative line under INVOICE sized to the actual text width
   doc.setDrawColor(79, 70, 229)
   doc.setLineWidth(0.5)
-  doc.line(110, 23, 140, 23)
+  const invoiceText = 'INVOICE'
+  // getTextWidth returns the width using the current font and size
+  const textWidth = (doc as any).getTextWidth
+    ? (doc as any).getTextWidth(invoiceText)
+    : (doc as any).getStringUnitWidth
+    ? (doc as any).getStringUnitWidth(invoiceText) * (doc.getFontSize() / doc.internal.scaleFactor)
+    : 30
+  // right aligned at x=140
+  const lineXEnd = 140
+  const padding = 2 // small padding so the line doesn't touch the letters
+  const lineXStart = lineXEnd - textWidth - padding
+  doc.line(lineXStart, 23, lineXEnd + padding, 23)
 
   // Company Info - starts below logo
   doc.setFontSize(11)
