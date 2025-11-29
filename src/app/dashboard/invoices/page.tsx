@@ -1067,6 +1067,14 @@ export default function InvoicesPage() {
                         >
                           <Edit className="h-3.5 w-3.5" />
                         </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(invoice.id)}
+                          className="h-8 px-2"
+                        >
+                          <Trash2 className="h-3.5 w-3.5 text-red-600" />
+                        </Button>
                       </div>
 
                       {/* Desktop: Show all actions */}
