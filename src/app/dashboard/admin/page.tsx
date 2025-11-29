@@ -38,6 +38,26 @@ type Profile = {
   created_at: string
 }
 
+type Invoice = {
+  id: string
+  user_id: string
+  customer_id: string
+  invoice_number: string
+  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+  issue_date: string
+  due_date: string
+  subtotal: number
+  tax_rate: number
+  tax_amount: number
+  discount_amount: number
+  total: number
+  currency?: string
+  notes: string | null
+  terms: string | null
+  created_at: string
+  updated_at: string
+}
+
 export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
   const [isAdmin, setIsAdmin] = useState(false)
@@ -105,7 +125,7 @@ export default function AdminDashboard() {
       // Load all invoices
       const { data: invoicesData } = await supabase
         .from('invoices')
-        .select('*')
+        .select('*') as { data: Invoice[] | null }
 
       if (usersData) {
         setUsers(usersData)
