@@ -118,7 +118,7 @@ export default function InvoicesPage() {
 
       setInvoices(invoicesResult.data || [])
       setCustomers(customersResult.data || [])
-      setUserCurrency(profileResult.data?.currency || 'USD')
+      setUserCurrency((profileResult.data as any)?.currency || 'USD')
     } catch (error: any) {
       toast({
         title: "Error",
