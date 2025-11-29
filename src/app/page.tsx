@@ -245,7 +245,7 @@ export default function HomePage() {
               <CardTitle>Free</CardTitle>
               <CardDescription>For getting started</CardDescription>
               <div className="mt-4">
-                <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">$0</span>
+                <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">RM0</span>
                 <span className="text-sm sm:text-base text-gray-600">/month</span>
               </div>
             </CardHeader>
@@ -268,7 +268,7 @@ export default function HomePage() {
               <CardTitle className="text-primary">Basic</CardTitle>
               <CardDescription>For small businesses</CardDescription>
               <div className="mt-4">
-                <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-pink-600 bg-clip-text text-transparent">$19</span>
+                <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-pink-600 bg-clip-text text-transparent">RM79</span>
                 <span className="text-sm sm:text-base text-gray-600">/month</span>
               </div>
             </CardHeader>
@@ -289,7 +289,7 @@ export default function HomePage() {
               <CardTitle className="text-pink-600">Pro</CardTitle>
               <CardDescription>For growing teams</CardDescription>
               <div className="mt-4">
-                <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">$49</span>
+                <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">RM199</span>
                 <span className="text-sm sm:text-base text-gray-600">/month</span>
               </div>
             </CardHeader>
@@ -311,7 +311,7 @@ export default function HomePage() {
               <CardTitle className="text-purple-600">Enterprise</CardTitle>
               <CardDescription>For large organizations</CardDescription>
               <div className="mt-4">
-                <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-500 to-indigo-600 bg-clip-text text-transparent">$199</span>
+                <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-500 to-indigo-600 bg-clip-text text-transparent">RM799</span>
                 <span className="text-sm sm:text-base text-gray-600">/month</span>
               </div>
             </CardHeader>
