@@ -77,6 +77,12 @@ export async function generateInvoicePDF(invoice: InvoiceData, companyInfo: Comp
   const invoiceCurrency = currency || invoice.currency || 'MYR'
   const doc = new jsPDF()
 
+  // Set white background for the entire page (fixes black background on mobile/dark mode)
+  const pageWidth = doc.internal.pageSize.getWidth()
+  const pageHeight = doc.internal.pageSize.getHeight()
+  doc.setFillColor(255, 255, 255)
+  doc.rect(0, 0, pageWidth, pageHeight, 'F')
+
   // Add company logo if available (top left, smaller size)
   let logoHeight = 0
   let contentStartY = 20 // Default starting Y for content
