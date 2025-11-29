@@ -475,35 +475,81 @@ export default function InvoicesPage() {
       }
 
       const pdf = await generateInvoicePDF(invoiceData, companyInfo, userCurrency)
+      const timestamp = new Date().getTime()
+      const filename = `invoice-${invoice.invoice_number}-${timestamp}.pdf`
 
       // Check if mobile device
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 
       if (isMobile) {
-        // For all mobile devices: Open PDF in new window
-        const pdfBlob = pdf.output('blob')
-        const pdfUrl = URL.createObjectURL(pdfBlob)
+        // For mobile: Use Web Share API to properly save/share the PDF
+        if (navigator.share && navigator.canShare) {
+          try {
+            const pdfBlob = pdf.output('blob')
+            const file = new File([pdfBlob], filename, { type: 'application/pdf' })
 
-        const newWindow = window.open(pdfUrl, '_blank')
+            // Check if we can share files
+            if (navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                files: [file],
+                title: filename,
+                text: `Invoice ${invoice.invoice_number}`,
+              })
 
-        if (newWindow) {
+              toast({
+                title: "Success",
+                description: "PDF shared successfully",
+                // @ts-ignore
+                variant: "success",
+              })
+            } else {
+              // Fallback: Create download link
+              const pdfUrl = URL.createObjectURL(pdfBlob)
+              const link = document.createElement('a')
+              link.href = pdfUrl
+              link.download = filename
+              document.body.appendChild(link)
+              link.click()
+              document.body.removeChild(link)
+              setTimeout(() => URL.revokeObjectURL(pdfUrl), 100)
+
+              toast({
+                title: "Success",
+                description: "PDF download started",
+                // @ts-ignore
+                variant: "success",
+              })
+            }
+          } catch (error: any) {
+            if (error.name !== 'AbortError') {
+              toast({
+                title: "Error",
+                description: "Failed to share PDF",
+                variant: "destructive",
+              })
+            }
+          }
+        } else {
+          // Fallback for browsers without share API
+          const pdfBlob = pdf.output('blob')
+          const pdfUrl = URL.createObjectURL(pdfBlob)
+          const link = document.createElement('a')
+          link.href = pdfUrl
+          link.download = filename
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+          setTimeout(() => URL.revokeObjectURL(pdfUrl), 100)
+
           toast({
-            title: "PDF Opened",
-            description: "Use browser menu to download",
+            title: "Success",
+            description: "PDF download started",
             // @ts-ignore
             variant: "success",
           })
-        } else {
-          // Fallback if popup blocked
-          window.location.href = pdfUrl
         }
-
-        // Clean up URL after delay
-        setTimeout(() => URL.revokeObjectURL(pdfUrl), 3000)
       } else {
         // For desktop, use normal download
-        const timestamp = new Date().getTime()
-        const filename = `invoice-${invoice.invoice_number}-${timestamp}.pdf`
         pdf.save(filename)
 
         toast({
