@@ -272,95 +272,99 @@ export default function ProductsPage() {
                     <h3 className="font-semibold">Pricing Calculator</h3>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="cost_price">Cost Price *</Label>
-                    <Input
-                      id="cost_price"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.cost_price}
-                      onChange={(e) => {
-                        const cost = e.target.value
-                        setFormData({ ...formData, cost_price: cost })
-                        if (pricingMode !== 'manual' && cost) {
-                          const price = calculateSellingPrice(
-                            parseFloat(cost),
-                            pricingMode,
-                            parseFloat(percentage)
-                          )
-                          setFormData(prev => ({ ...prev, unit_price: price.toFixed(2) }))
-                        }
-                      }}
-                      placeholder="0.00"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="pricing_mode">Pricing Method</Label>
-                    <Select value={pricingMode} onValueChange={(value: PricingMode) => {
-                      setPricingMode(value)
-                      if (value !== 'manual' && formData.cost_price) {
-                        const price = calculateSellingPrice(
-                          parseFloat(formData.cost_price),
-                          value,
-                          parseFloat(percentage)
-                        )
-                        setFormData(prev => ({ ...prev, unit_price: price.toFixed(2) }))
-                      }
-                    }}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="markup">By Markup %</SelectItem>
-                        <SelectItem value="margin">By Margin %</SelectItem>
-                        <SelectItem value="manual">Manual Price</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {pricingMode !== 'manual' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="percentage">
-                        {pricingMode === 'markup' ? 'Markup %' : 'Margin %'}
-                      </Label>
+                      <Label htmlFor="cost_price">Cost Price *</Label>
                       <Input
-                        id="percentage"
+                        id="cost_price"
                         type="number"
-                        step="1"
+                        step="0.01"
                         min="0"
-                        max={pricingMode === 'margin' ? "99" : undefined}
-                        value={percentage}
+                        value={formData.cost_price}
                         onChange={(e) => {
-                          setPercentage(e.target.value)
-                          if (formData.cost_price) {
+                          const cost = e.target.value
+                          setFormData({ ...formData, cost_price: cost })
+                          if (pricingMode !== 'manual' && cost) {
                             const price = calculateSellingPrice(
-                              parseFloat(formData.cost_price),
+                              parseFloat(cost),
                               pricingMode,
-                              parseFloat(e.target.value)
+                              parseFloat(percentage)
                             )
                             setFormData(prev => ({ ...prev, unit_price: price.toFixed(2) }))
                           }
                         }}
-                        placeholder="50"
+                        placeholder="0.00"
                       />
                     </div>
-                  )}
 
-                  <div className="space-y-2">
-                    <Label htmlFor="unit_price">Selling Price *</Label>
-                    <Input
-                      id="unit_price"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.unit_price}
-                      onChange={(e) => setFormData({ ...formData, unit_price: e.target.value })}
-                      placeholder="0.00"
-                      disabled={pricingMode !== 'manual'}
-                      className={pricingMode !== 'manual' ? 'bg-gray-100' : ''}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="unit_price">Selling Price *</Label>
+                      <Input
+                        id="unit_price"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.unit_price}
+                        onChange={(e) => setFormData({ ...formData, unit_price: e.target.value })}
+                        placeholder="0.00"
+                        disabled={pricingMode !== 'manual'}
+                        className={pricingMode !== 'manual' ? 'bg-gray-100' : ''}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="pricing_mode">Pricing Method</Label>
+                      <Select value={pricingMode} onValueChange={(value: PricingMode) => {
+                        setPricingMode(value)
+                        if (value !== 'manual' && formData.cost_price) {
+                          const price = calculateSellingPrice(
+                            parseFloat(formData.cost_price),
+                            value,
+                            parseFloat(percentage)
+                          )
+                          setFormData(prev => ({ ...prev, unit_price: price.toFixed(2) }))
+                        }
+                      }}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="markup">By Markup %</SelectItem>
+                          <SelectItem value="margin">By Margin %</SelectItem>
+                          <SelectItem value="manual">Manual Price</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {pricingMode !== 'manual' && (
+                      <div className="space-y-2">
+                        <Label htmlFor="percentage">
+                          {pricingMode === 'markup' ? 'Markup %' : 'Margin %'}
+                        </Label>
+                        <Input
+                          id="percentage"
+                          type="number"
+                          step="1"
+                          min="0"
+                          max={pricingMode === 'margin' ? "99" : undefined}
+                          value={percentage}
+                          onChange={(e) => {
+                            setPercentage(e.target.value)
+                            if (formData.cost_price) {
+                              const price = calculateSellingPrice(
+                                parseFloat(formData.cost_price),
+                                pricingMode,
+                                parseFloat(e.target.value)
+                              )
+                              setFormData(prev => ({ ...prev, unit_price: price.toFixed(2) }))
+                            }
+                          }}
+                          placeholder="50"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -560,109 +564,113 @@ export default function ProductsPage() {
                 <h3 className="font-semibold">Pricing Calculator</h3>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="edit-cost_price">Cost Price *</Label>
-                <Input
-                  id="edit-cost_price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.cost_price}
-                  onChange={(e) => {
-                    const cost = e.target.value
-                    setFormData({ ...formData, cost_price: cost })
-                    if (pricingMode !== 'manual' && cost) {
-                      const price = calculateSellingPrice(
-                        parseFloat(cost),
-                        pricingMode,
-                        parseFloat(percentage)
-                      )
-                      setFormData(prev => ({ ...prev, unit_price: price.toFixed(2) }))
-                    }
-                  }}
-                  placeholder="0.00"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="edit-pricing_mode">Pricing Method</Label>
-                <Select value={pricingMode} onValueChange={(value: PricingMode) => {
-                  setPricingMode(value)
-                  if (value !== 'manual' && formData.cost_price) {
-                    const price = calculateSellingPrice(
-                      parseFloat(formData.cost_price),
-                      value,
-                      parseFloat(percentage)
-                    )
-                    setFormData(prev => ({ ...prev, unit_price: price.toFixed(2) }))
-                  }
-                }}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="markup">By Markup %</SelectItem>
-                    <SelectItem value="margin">By Margin %</SelectItem>
-                    <SelectItem value="manual">Manual Price</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {pricingMode !== 'manual' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-percentage">
-                    {pricingMode === 'markup' ? 'Markup %' : 'Margin %'}
-                  </Label>
+                  <Label htmlFor="edit-cost_price">Cost Price *</Label>
                   <Input
-                    id="edit-percentage"
+                    id="edit-cost_price"
                     type="number"
-                    step="1"
+                    step="0.01"
                     min="0"
-                    max={pricingMode === 'margin' ? "99" : undefined}
-                    value={percentage}
+                    value={formData.cost_price}
                     onChange={(e) => {
-                      setPercentage(e.target.value)
-                      if (formData.cost_price) {
+                      const cost = e.target.value
+                      setFormData({ ...formData, cost_price: cost })
+                      if (pricingMode !== 'manual' && cost) {
                         const price = calculateSellingPrice(
-                          parseFloat(formData.cost_price),
+                          parseFloat(cost),
                           pricingMode,
-                          parseFloat(e.target.value)
+                          parseFloat(percentage)
                         )
                         setFormData(prev => ({ ...prev, unit_price: price.toFixed(2) }))
                       }
                     }}
-                    placeholder="50"
+                    placeholder="0.00"
                   />
                 </div>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="edit-unit_price">Selling Price *</Label>
-                <Input
-                  id="edit-unit_price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.unit_price}
-                  onChange={(e) => setFormData({ ...formData, unit_price: e.target.value })}
-                  placeholder="0.00"
-                  disabled={pricingMode !== 'manual'}
-                  className={pricingMode !== 'manual' ? 'bg-gray-100' : ''}
-                />
-              </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="edit-stock">Stock</Label>
+                  <Label htmlFor="edit-unit_price">Selling Price *</Label>
                   <Input
-                    id="edit-stock"
+                    id="edit-unit_price"
                     type="number"
-                    step="1"
+                    step="0.01"
                     min="0"
-                    value={formData.stock}
-                    onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                    placeholder="0"
+                    value={formData.unit_price}
+                    onChange={(e) => setFormData({ ...formData, unit_price: e.target.value })}
+                    placeholder="0.00"
+                    disabled={pricingMode !== 'manual'}
+                    className={pricingMode !== 'manual' ? 'bg-gray-100' : ''}
                   />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-pricing_mode">Pricing Method</Label>
+                  <Select value={pricingMode} onValueChange={(value: PricingMode) => {
+                    setPricingMode(value)
+                    if (value !== 'manual' && formData.cost_price) {
+                      const price = calculateSellingPrice(
+                        parseFloat(formData.cost_price),
+                        value,
+                        parseFloat(percentage)
+                      )
+                      setFormData(prev => ({ ...prev, unit_price: price.toFixed(2) }))
+                    }
+                  }}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="markup">By Markup %</SelectItem>
+                      <SelectItem value="margin">By Margin %</SelectItem>
+                      <SelectItem value="manual">Manual Price</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {pricingMode !== 'manual' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-percentage">
+                      {pricingMode === 'markup' ? 'Markup %' : 'Margin %'}
+                    </Label>
+                    <Input
+                      id="edit-percentage"
+                      type="number"
+                      step="1"
+                      min="0"
+                      max={pricingMode === 'margin' ? "99" : undefined}
+                      value={percentage}
+                      onChange={(e) => {
+                        setPercentage(e.target.value)
+                        if (formData.cost_price) {
+                          const price = calculateSellingPrice(
+                            parseFloat(formData.cost_price),
+                            pricingMode,
+                            parseFloat(e.target.value)
+                          )
+                          setFormData(prev => ({ ...prev, unit_price: price.toFixed(2) }))
+                        }
+                      }}
+                      placeholder="50"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-stock">Stock</Label>
+                <Input
+                  id="edit-stock"
+                  type="number"
+                  step="1"
+                  min="0"
+                  value={formData.stock}
+                  onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                  placeholder="0"
+                />
+              </div>
 
               {formData.cost_price && formData.unit_price && (
                 (() => {
