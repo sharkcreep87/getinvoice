@@ -22,6 +22,7 @@ import {
   Building2,
   Menu,
   Shield,
+  Package,
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
@@ -29,6 +30,7 @@ import { useToast } from "@/components/ui/use-toast"
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Customers", href: "/dashboard/customers", icon: Users },
+  { name: "Products", href: "/dashboard/products", icon: Package },
   { name: "Invoices", href: "/dashboard/invoices", icon: FileText },
   { name: "Company", href: "/dashboard/company", icon: Building2 },
   { name: "Subscription", href: "/dashboard/subscription", icon: CreditCard },

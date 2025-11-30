@@ -18,10 +18,18 @@ type SystemSettings = {
   support_email: string
   default_currency: string
   allow_registration: boolean
-  max_free_invoices: number
-  max_free_customers: number
   stripe_enabled: boolean
   email_notifications_enabled: boolean
+}
+
+type SubscriptionPlan = {
+  id: string
+  name: string
+  tier: string
+  price: number
+  billing_period: string
+  max_customers: number
+  max_invoices_per_month: number
 }
 
 export default function AdminSettings() {
@@ -33,11 +41,10 @@ export default function AdminSettings() {
     support_email: '',
     default_currency: 'MYR',
     allow_registration: true,
-    max_free_invoices: 10,
-    max_free_customers: 5,
     stripe_enabled: false,
     email_notifications_enabled: true,
   })
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([])
   const router = useRouter()
   const { toast } = useToast()
   const supabase = createClient()
@@ -84,16 +91,53 @@ export default function AdminSettings() {
 
   const loadSettings = async () => {
     try {
-      // For now, we'll store settings in localStorage
-      // In production, you'd want to store this in a database table
+      // Load system settings from localStorage
       const savedSettings = localStorage.getItem('admin_settings')
       if (savedSettings) {
         setSettings(JSON.parse(savedSettings))
+      }
+
+      // Load subscription plans from database
+      const { data: plansData } = await supabase
+        .from('subscription_plans')
+        .select('*')
+        .order('price', { ascending: true })
+
+      if (plansData) {
+        setPlans(plansData)
       }
     } catch (error: any) {
       console.error('Failed to load settings:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const updatePlan = async (planId: string, updates: Partial<SubscriptionPlan>) => {
+    try {
+      // @ts-expect-error - Supabase type issue
+      const { error } = await supabase
+        .from('subscription_plans')
+        .update(updates)
+        .eq('id', planId)
+
+      if (error) throw error
+
+      // Update local state
+      setPlans(plans.map(p => p.id === planId ? { ...p, ...updates } : p))
+
+      toast({
+        title: "Success",
+        description: "Subscription plan updated",
+        // @ts-ignore
+        variant: "success",
+      })
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update plan",
+        variant: "destructive",
+      })
     }
   }
 
@@ -213,26 +257,6 @@ export default function AdminSettings() {
                 {settings.allow_registration ? 'Enabled' : 'Disabled'}
               </Button>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="max_free_invoices">Max Free Invoices per Month</Label>
-              <Input
-                id="max_free_invoices"
-                type="number"
-                value={settings.max_free_invoices}
-                onChange={(e) => setSettings({ ...settings, max_free_invoices: parseInt(e.target.value) })}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="max_free_customers">Max Free Customers</Label>
-              <Input
-                id="max_free_customers"
-                type="number"
-                value={settings.max_free_customers}
-                onChange={(e) => setSettings({ ...settings, max_free_customers: parseInt(e.target.value) })}
-              />
-            </div>
           </CardContent>
         </Card>
 
@@ -268,6 +292,77 @@ export default function AdminSettings() {
                 {settings.email_notifications_enabled ? 'Enabled' : 'Disabled'}
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Subscription Plans */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Subscription Plans</CardTitle>
+            <CardDescription>Manage pricing and limits for each subscription tier</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {plans.map((plan) => (
+              <div key={plan.id} className="border rounded-lg p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">{plan.name}</h3>
+                  <span className="text-sm text-gray-600 capitalize">{plan.tier}</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor={`price-${plan.id}`}>Price (MYR)</Label>
+                    <Input
+                      id={`price-${plan.id}`}
+                      type="number"
+                      value={plan.price}
+                      onChange={(e) => updatePlan(plan.id, { price: parseFloat(e.target.value) })}
+                      min="0"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor={`billing-${plan.id}`}>Billing Period</Label>
+                    <Select
+                      value={plan.billing_period}
+                      onValueChange={(value) => updatePlan(plan.id, { billing_period: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="monthly">Monthly</SelectItem>
+                        <SelectItem value="yearly">Yearly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor={`customers-${plan.id}`}>Max Customers</Label>
+                    <Input
+                      id={`customers-${plan.id}`}
+                      type="number"
+                      value={plan.max_customers}
+                      onChange={(e) => updatePlan(plan.id, { max_customers: parseInt(e.target.value) })}
+                      placeholder="-1 for unlimited"
+                    />
+                    <p className="text-xs text-gray-500">Use -1 for unlimited</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor={`invoices-${plan.id}`}>Max Invoices/Month</Label>
+                    <Input
+                      id={`invoices-${plan.id}`}
+                      type="number"
+                      value={plan.max_invoices_per_month}
+                      onChange={(e) => updatePlan(plan.id, { max_invoices_per_month: parseInt(e.target.value) })}
+                      placeholder="-1 for unlimited"
+                    />
+                    <p className="text-xs text-gray-500">Use -1 for unlimited</p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </CardContent>
         </Card>
 

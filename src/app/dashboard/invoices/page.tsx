@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Switch } from "@/components/ui/switch"
 import { Plus, Download, Eye, Trash2, Edit, Share2, MoreVertical } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
@@ -53,11 +54,20 @@ type InvoiceItem = {
   quantity: number
   unit_price: number
   amount: number
+  useProductList?: boolean
+}
+
+type Product = {
+  id: string
+  name: string
+  description: string | null
+  unit_price: number
 }
 
 export default function InvoicesPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [customers, setCustomers] = useState<Customer[]>([])
+  const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [checkModalOpen, setCheckModalOpen] = useState(false)
@@ -69,7 +79,7 @@ export default function InvoicesPage() {
   const [editingInvoiceId, setEditingInvoiceId] = useState<string | null>(null)
   const [userCurrency, setUserCurrency] = useState<string>('MYR')
   const [items, setItems] = useState<InvoiceItem[]>([
-    { description: "", quantity: 1, unit_price: 0, amount: 0 },
+    { description: "", quantity: 1, unit_price: 0, amount: 0, useProductList: false },
   ])
   const [formData, setFormData] = useState<{
     customer_id: string
@@ -169,7 +179,7 @@ export default function InvoicesPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      const [invoicesResult, customersResult, profileResult] = await Promise.all([
+      const [invoicesResult, customersResult, productsResult, profileResult] = await Promise.all([
         supabase
           .from('invoices')
           .select('*')
@@ -177,6 +187,11 @@ export default function InvoicesPage() {
           .order('created_at', { ascending: false }),
         supabase
           .from('customers')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('name'),
+        supabase
+          .from('products')
           .select('*')
           .eq('user_id', user.id)
           .order('name'),
@@ -189,9 +204,11 @@ export default function InvoicesPage() {
 
       if (invoicesResult.error) throw invoicesResult.error
       if (customersResult.error) throw customersResult.error
+      if (productsResult.error) throw productsResult.error
 
       setInvoices(invoicesResult.data || [])
       setCustomers(customersResult.data || [])
+      setProducts(productsResult.data || [])
       setUserCurrency((profileResult.data as any)?.currency || 'MYR')
     } catch (error: any) {
       toast({
@@ -269,13 +286,38 @@ export default function InvoicesPage() {
   }
 
   const addItem = () => {
-    setItems([...items, { description: "", quantity: 1, unit_price: 0, amount: 0 }])
+    setItems([...items, { description: "", quantity: 1, unit_price: 0, amount: 0, useProductList: false }])
   }
 
   const removeItem = (index: number) => {
     if (items.length > 1) {
       setItems(items.filter((_, i) => i !== index))
     }
+  }
+
+  const toggleItemInputMode = (index: number) => {
+    const newItems = [...items]
+    newItems[index] = {
+      ...newItems[index],
+      useProductList: !newItems[index].useProductList,
+    }
+    setItems(newItems)
+  }
+
+  const handleProductSelect = (index: number, productId: string) => {
+    if (!productId) return
+
+    const product = products.find(p => p.id === productId)
+    if (!product) return
+
+    const newItems = [...items]
+    newItems[index] = {
+      ...newItems[index],
+      description: product.description || product.name,
+      unit_price: product.unit_price,
+      amount: newItems[index].quantity * product.unit_price,
+    }
+    setItems(newItems)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -773,7 +815,7 @@ export default function InvoicesPage() {
       notes: "",
       terms: "Payment is due within 30 days",
     })
-    setItems([{ description: "", quantity: 1, unit_price: 0, amount: 0 }])
+    setItems([{ description: "", quantity: 1, unit_price: 0, amount: 0, useProductList: false }])
     setEditingInvoiceId(null)
   }
 
@@ -869,48 +911,18 @@ export default function InvoicesPage() {
                     </Button>
                   </div>
                   {items.map((item, index) => (
-                    <div key={index} className="grid grid-cols-12 gap-2 items-end">
-                      <div className="col-span-5 space-y-2">
-                        <Label>Description</Label>
-                        <Input
-                          value={item.description}
-                          onChange={(e) => handleItemChange(index, 'description', e.target.value)}
-                          placeholder="Item description"
-                          required
-                        />
-                      </div>
-                      <div className="col-span-2 space-y-2">
-                        <Label>Qty</Label>
-                        <Input
-                          type="number"
-                          value={item.quantity}
-                          onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
-                          min="0"
-                          step="1"
-                          required
-                        />
-                      </div>
-                      <div className="col-span-2 space-y-2">
-                        <Label>Price</Label>
-                        <Input
-                          type="number"
-                          value={item.unit_price}
-                          onChange={(e) => handleItemChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
-                          min="0"
-                          step="0.01"
-                          required
-                        />
-                      </div>
-                      <div className="col-span-2 space-y-2">
-                        <Label>Amount</Label>
-                        <Input
-                          type="number"
-                          value={item.amount}
-                          readOnly
-                          disabled
-                        />
-                      </div>
-                      <div className="col-span-1 flex items-end">
+                    <div key={index} className="p-4 border rounded-lg bg-white space-y-3">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                          <Switch
+                            id={`product-toggle-${index}`}
+                            checked={item.useProductList || false}
+                            onCheckedChange={() => toggleItemInputMode(index)}
+                          />
+                          <Label htmlFor={`product-toggle-${index}`} className="text-sm font-medium cursor-pointer">
+                            {item.useProductList ? "Using Product List" : "Manual Entry"}
+                          </Label>
+                        </div>
                         <Button
                           type="button"
                           variant="ghost"
@@ -920,6 +932,70 @@ export default function InvoicesPage() {
                         >
                           <Trash2 className="h-4 w-4 text-red-600" />
                         </Button>
+                      </div>
+
+                      {item.useProductList && (
+                        <div className="space-y-2">
+                          <Label>Select Product</Label>
+                          <Select onValueChange={(value) => handleProductSelect(index, value)}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Choose a product" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {products.map(product => (
+                                <SelectItem key={product.id} value={product.id}>
+                                  {product.name} - {formatCurrency(product.unit_price, userCurrency)}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+
+                      <div className="space-y-3">
+                        <div className="space-y-2">
+                          <Label>Description *</Label>
+                          <Input
+                            value={item.description}
+                            onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+                            placeholder="Item description"
+                            required
+                          />
+                        </div>
+                        <div className="grid grid-cols-3 gap-3">
+                          <div className="space-y-2">
+                            <Label>Qty *</Label>
+                            <Input
+                              type="number"
+                              value={item.quantity}
+                              onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
+                              min="0"
+                              step="1"
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Price *</Label>
+                            <Input
+                              type="number"
+                              value={item.unit_price}
+                              onChange={(e) => handleItemChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                              min="0"
+                              step="0.01"
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Amount</Label>
+                            <Input
+                              type="number"
+                              value={item.amount}
+                              readOnly
+                              disabled
+                              className="bg-gray-100"
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1080,7 +1156,7 @@ export default function InvoicesPage() {
                     <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
                     <TableCell>{new Date(invoice.issue_date).toLocaleDateString()}</TableCell>
                     <TableCell>{new Date(invoice.due_date).toLocaleDateString()}</TableCell>
-                    <TableCell>{formatCurrency(invoice.total, invoice.currency || userCurrency)}</TableCell>
+                    <TableCell>{formatCurrency(invoice.total, userCurrency)}</TableCell>
                     <TableCell>
                       <span
                         className={`text-xs px-2 py-1 rounded-full ${
@@ -1386,48 +1462,18 @@ export default function InvoicesPage() {
                   </Button>
                 </div>
                 {items.map((item, index) => (
-                  <div key={index} className="grid grid-cols-12 gap-2 items-end">
-                    <div className="col-span-5 space-y-2">
-                      <Label>Description</Label>
-                      <Input
-                        value={item.description}
-                        onChange={(e) => handleItemChange(index, 'description', e.target.value)}
-                        placeholder="Item description"
-                        required
-                      />
-                    </div>
-                    <div className="col-span-2 space-y-2">
-                      <Label>Qty</Label>
-                      <Input
-                        type="number"
-                        value={item.quantity}
-                        onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
-                        min="0"
-                        step="1"
-                        required
-                      />
-                    </div>
-                    <div className="col-span-2 space-y-2">
-                      <Label>Price</Label>
-                      <Input
-                        type="number"
-                        value={item.unit_price}
-                        onChange={(e) => handleItemChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
-                        min="0"
-                        step="0.01"
-                        required
-                      />
-                    </div>
-                    <div className="col-span-2 space-y-2">
-                      <Label>Amount</Label>
-                      <Input
-                        type="number"
-                        value={item.amount}
-                        readOnly
-                        disabled
-                      />
-                    </div>
-                    <div className="col-span-1 flex items-end">
+                  <div key={index} className="p-4 border rounded-lg bg-white space-y-3">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <Switch
+                          id={`edit-product-toggle-${index}`}
+                          checked={item.useProductList || false}
+                          onCheckedChange={() => toggleItemInputMode(index)}
+                        />
+                        <Label htmlFor={`edit-product-toggle-${index}`} className="text-sm font-medium cursor-pointer">
+                          {item.useProductList ? "Using Product List" : "Manual Entry"}
+                        </Label>
+                      </div>
                       <Button
                         type="button"
                         variant="ghost"
@@ -1437,6 +1483,70 @@ export default function InvoicesPage() {
                       >
                         <Trash2 className="h-4 w-4 text-red-600" />
                       </Button>
+                    </div>
+
+                    {item.useProductList && (
+                      <div className="space-y-2">
+                        <Label>Select Product</Label>
+                        <Select onValueChange={(value) => handleProductSelect(index, value)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Choose a product" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {products.map(product => (
+                              <SelectItem key={product.id} value={product.id}>
+                                {product.name} - {formatCurrency(product.unit_price, userCurrency)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <Label>Description *</Label>
+                        <Input
+                          value={item.description}
+                          onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+                          placeholder="Item description"
+                          required
+                        />
+                      </div>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="space-y-2">
+                          <Label>Qty *</Label>
+                          <Input
+                            type="number"
+                            value={item.quantity}
+                            onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
+                            min="0"
+                            step="1"
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Price *</Label>
+                          <Input
+                            type="number"
+                            value={item.unit_price}
+                            onChange={(e) => handleItemChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                            min="0"
+                            step="0.01"
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Amount</Label>
+                          <Input
+                            type="number"
+                            value={item.amount}
+                            readOnly
+                            disabled
+                            className="bg-gray-100"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
