@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, Save, Settings } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
+import { Database } from '@/lib/supabase/database.types'
 import { useToast } from "@/components/ui/use-toast"
 import { LoadingPage } from "@/components/ui/loading"
 
@@ -113,17 +114,20 @@ export default function AdminSettings() {
     }
   }
 
-  const updatePlan = async (planId: string, updates: Partial<SubscriptionPlan>) => {
+  const updatePlan = async (
+    planId: string,
+    updates: Partial<Database['public']['Tables']['subscription_plans']['Update']>
+  ) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('subscription_plans')
-        .update(updates)
+        .update(updates as any)
         .eq('id', planId)
 
       if (error) throw error
 
-      // Update local state
-      setPlans(plans.map(p => p.id === planId ? { ...p, ...updates } : p))
+      // Update local state — cast because DB Update type can be slightly different from the local SubscriptionPlan type
+      setPlans(plans.map(p => p.id === planId ? { ...p, ...(updates as Partial<SubscriptionPlan>) } : p))
 
       toast({
         title: "Success",
@@ -324,7 +328,7 @@ export default function AdminSettings() {
                     <Label htmlFor={`billing-${plan.id}`}>Billing Period</Label>
                     <Select
                       value={plan.billing_period}
-                      onValueChange={(value) => updatePlan(plan.id, { billing_period: value })}
+                      onValueChange={(value) => updatePlan(plan.id, { billing_period: value as 'monthly' | 'yearly' })}
                     >
                       <SelectTrigger>
                         <SelectValue />

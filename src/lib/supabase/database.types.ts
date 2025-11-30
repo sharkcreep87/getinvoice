@@ -220,6 +220,38 @@ export interface Database {
           updated_at?: string
         }
       }
+        products: {
+          Row: {
+            id: string
+            user_id: string
+            name: string
+            description: string | null
+            cost_price: number
+            unit_price: number
+            created_at: string
+            updated_at: string
+          }
+          Insert: {
+            id?: string
+            user_id: string
+            name: string
+            description?: string | null
+            cost_price?: number
+            unit_price: number
+            created_at?: string
+            updated_at?: string
+          }
+          Update: {
+            id?: string
+            user_id?: string
+            name?: string
+            description?: string | null
+            cost_price?: number
+            unit_price?: number
+            created_at?: string
+            updated_at?: string
+          }
+        }
       payments: {
         Row: {
           id: string

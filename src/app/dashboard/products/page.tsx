@@ -99,7 +99,7 @@ export default function ProductsPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error("Not authenticated")
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('products')
         .insert({
           user_id: user.id,
@@ -107,7 +107,7 @@ export default function ProductsPage() {
           description: formData.description || null,
           cost_price: parseFloat(formData.cost_price) || 0,
           unit_price: parseFloat(formData.unit_price),
-        })
+        } as any)
 
       if (error) throw error
 
@@ -135,14 +135,14 @@ export default function ProductsPage() {
     try {
       if (!selectedProduct) return
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('products')
         .update({
           name: formData.name,
           description: formData.description || null,
           cost_price: parseFloat(formData.cost_price) || 0,
           unit_price: parseFloat(formData.unit_price),
-        })
+        } as any)
         .eq('id', selectedProduct.id)
 
       if (error) throw error
