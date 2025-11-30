@@ -112,6 +112,7 @@ export interface Database {
           notes: string | null
           terms: string | null
           created_at: string
+          stock_reserved: boolean
           updated_at: string
         }
         Insert: {
@@ -132,6 +133,7 @@ export interface Database {
           terms?: string | null
           created_at?: string
           updated_at?: string
+          stock_reserved?: boolean
         }
         Update: {
           id?: string
@@ -151,6 +153,7 @@ export interface Database {
           terms?: string | null
           created_at?: string
           updated_at?: string
+          stock_reserved?: boolean
         }
       }
       invoice_items: {
@@ -161,6 +164,7 @@ export interface Database {
           quantity: number
           unit_price: number
           amount: number
+          product_id: string | null
           created_at: string
         }
         Insert: {
@@ -170,6 +174,7 @@ export interface Database {
           quantity: number
           unit_price: number
           amount: number
+          product_id?: string | null
           created_at?: string
         }
         Update: {
@@ -179,6 +184,7 @@ export interface Database {
           quantity?: number
           unit_price?: number
           amount?: number
+          product_id?: string | null
           created_at?: string
         }
       }
@@ -227,6 +233,7 @@ export interface Database {
             name: string
             description: string | null
             cost_price: number
+            stock: number
             unit_price: number
             created_at: string
             updated_at: string
@@ -237,6 +244,7 @@ export interface Database {
             name: string
             description?: string | null
             cost_price?: number
+            stock?: number
             unit_price: number
             created_at?: string
             updated_at?: string
@@ -247,6 +255,7 @@ export interface Database {
             name?: string
             description?: string | null
             cost_price?: number
+            stock?: number
             unit_price?: number
             created_at?: string
             updated_at?: string

@@ -55,6 +55,7 @@ type InvoiceItem = {
   unit_price: number
   amount: number
   useProductList?: boolean
+  product_id?: string | null
 }
 
 type Product = {
@@ -79,7 +80,7 @@ export default function InvoicesPage() {
   const [editingInvoiceId, setEditingInvoiceId] = useState<string | null>(null)
   const [userCurrency, setUserCurrency] = useState<string>('MYR')
   const [items, setItems] = useState<InvoiceItem[]>([
-    { description: "", quantity: 1, unit_price: 0, amount: 0, useProductList: false },
+    { description: "", quantity: 1, unit_price: 0, amount: 0, useProductList: false, product_id: null },
   ])
   const [formData, setFormData] = useState<{
     customer_id: string
@@ -315,6 +316,7 @@ export default function InvoicesPage() {
       ...newItems[index],
       description: product.description || product.name,
       unit_price: product.unit_price,
+      product_id: productId,
       amount: newItems[index].quantity * product.unit_price,
     }
     setItems(newItems)
@@ -388,6 +390,7 @@ export default function InvoicesPage() {
               quantity: item.quantity,
               unit_price: item.unit_price,
               amount: item.amount,
+              product_id: item.product_id || null,
             }))
           )
 
@@ -433,6 +436,7 @@ export default function InvoicesPage() {
               quantity: item.quantity,
               unit_price: item.unit_price,
               amount: item.amount,
+              product_id: item.product_id || null,
             }))
           )
 
@@ -792,6 +796,7 @@ export default function InvoicesPage() {
           quantity: item.quantity,
           unit_price: item.unit_price,
           amount: item.amount,
+          product_id: (item as any).product_id ?? null,
         })))
         setEditDialogOpen(true)
       }

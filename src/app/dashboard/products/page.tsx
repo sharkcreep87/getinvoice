@@ -28,6 +28,7 @@ type Product = {
   description: string | null
   cost_price: number
   unit_price: number
+  stock: number
   created_at: string
   updated_at: string
 }
@@ -44,6 +45,7 @@ export default function ProductsPage() {
     description: "",
     cost_price: "",
     unit_price: "",
+    stock: "0",
   })
   const [pricingMode, setPricingMode] = useState<PricingMode>('markup')
   const [percentage, setPercentage] = useState("50")
@@ -101,12 +103,13 @@ export default function ProductsPage() {
 
       const { error } = await (supabase as any)
         .from('products')
-        .insert({
+          .insert({
           user_id: user.id,
           name: formData.name,
           description: formData.description || null,
           cost_price: parseFloat(formData.cost_price) || 0,
           unit_price: parseFloat(formData.unit_price),
+          stock: parseInt(formData.stock || '0', 10),
         } as any)
 
       if (error) throw error
@@ -119,7 +122,7 @@ export default function ProductsPage() {
       })
 
       setIsAddDialogOpen(false)
-      setFormData({ name: "", description: "", cost_price: "", unit_price: "" })
+      setFormData({ name: "", description: "", cost_price: "", unit_price: "", stock: "0" })
       setPercentage("50")
       loadProducts()
     } catch (error: any) {
@@ -142,6 +145,7 @@ export default function ProductsPage() {
           description: formData.description || null,
           cost_price: parseFloat(formData.cost_price) || 0,
           unit_price: parseFloat(formData.unit_price),
+          stock: parseInt(formData.stock || '0', 10),
         } as any)
         .eq('id', selectedProduct.id)
 
@@ -156,7 +160,7 @@ export default function ProductsPage() {
 
       setIsEditDialogOpen(false)
       setSelectedProduct(null)
-      setFormData({ name: "", description: "", cost_price: "", unit_price: "" })
+      setFormData({ name: "", description: "", cost_price: "", unit_price: "", stock: "0" })
       setPercentage("50")
       loadProducts()
     } catch (error: any) {
@@ -203,6 +207,7 @@ export default function ProductsPage() {
       description: product.description || "",
       cost_price: product.cost_price?.toString() || "0",
       unit_price: product.unit_price.toString(),
+      stock: product.stock?.toString() || '0',
     })
     setIsEditDialogOpen(true)
   }
@@ -358,6 +363,19 @@ export default function ProductsPage() {
                     />
                   </div>
 
+                  <div className="space-y-2">
+                    <Label htmlFor="stock">Stock</Label>
+                    <Input
+                      id="stock"
+                      type="number"
+                      step="1"
+                      min="0"
+                      value={formData.stock}
+                      onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                      placeholder="0"
+                    />
+                  </div>
+
                   {formData.cost_price && formData.unit_price && (
                     (() => {
                       const calc = calculatePricing(
@@ -461,6 +479,7 @@ export default function ProductsPage() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead className="hidden md:table-cell">Description</TableHead>
+                    <TableHead className="text-center">Stock</TableHead>
                     <TableHead>Unit Price</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -476,6 +495,7 @@ export default function ProductsPage() {
                           <span className="text-gray-400 italic">No description</span>
                         )}
                       </TableCell>
+                      <TableCell className="text-center">{product.stock}</TableCell>
                       <TableCell>{formatCurrency(product.unit_price, 'MYR')}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
@@ -628,6 +648,19 @@ export default function ProductsPage() {
                   className={pricingMode !== 'manual' ? 'bg-gray-100' : ''}
                 />
               </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="edit-stock">Stock</Label>
+                  <Input
+                    id="edit-stock"
+                    type="number"
+                    step="1"
+                    min="0"
+                    value={formData.stock}
+                    onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                    placeholder="0"
+                  />
+                </div>
 
               {formData.cost_price && formData.unit_price && (
                 (() => {
