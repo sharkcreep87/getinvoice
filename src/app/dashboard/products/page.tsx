@@ -222,13 +222,13 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-          <Package className="h-8 w-8 text-blue-600" />
+    <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
+          <Package className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
           Products
         </h1>
-        <p className="text-gray-600 mt-1">Manage your product catalog</p>
+        <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your product catalog</p>
 
         {/* Add Product dialog moved to the top header */}
         <div className="mt-4 flex justify-end">
@@ -239,12 +239,12 @@ export default function ProductsPage() {
                 Add Product
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden">
               <DialogHeader>
                 <DialogTitle>Add New Product</DialogTitle>
                 <DialogDescription>Create a new product for your catalog</DialogDescription>
               </DialogHeader>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+              <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Product Name *</Label>
                   <Input
@@ -266,7 +266,7 @@ export default function ProductsPage() {
                 </div>
 
                 {/* Pricing Calculator */}
-                <div className="space-y-4 p-4 border rounded-lg bg-slate-50 md:sticky md:top-8">
+                <div className="space-y-4 p-4 border rounded-lg bg-slate-50">
                   <div className="flex items-center gap-2">
                     <Calculator className="h-5 w-5 text-blue-600" />
                     <h3 className="font-semibold">Pricing Calculator</h3>
@@ -445,12 +445,12 @@ export default function ProductsPage() {
           {/* Search */}
           <div className="mb-4">
               <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-14 md:pl-16"
+                className="pl-10 sm:pl-11"
               />
             </div>
           </div>
@@ -473,15 +473,15 @@ export default function ProductsPage() {
               )}
             </div>
           ) : (
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
+                    <TableHead className="min-w-[120px]">Name</TableHead>
                     <TableHead className="hidden md:table-cell">Description</TableHead>
-                    <TableHead className="text-center">Stock</TableHead>
-                    <TableHead>Unit Price</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="text-center min-w-[60px]">Stock</TableHead>
+                    <TableHead className="min-w-[100px]">Unit Price</TableHead>
+                    <TableHead className="text-right min-w-[100px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -496,13 +496,14 @@ export default function ProductsPage() {
                         )}
                       </TableCell>
                       <TableCell className="text-center">{product.stock}</TableCell>
-                      <TableCell>{formatCurrency(product.unit_price, 'MYR')}</TableCell>
+                      <TableCell className="whitespace-nowrap">{formatCurrency(product.unit_price, 'MYR')}</TableCell>
                       <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
+                        <div className="flex justify-end gap-1 sm:gap-2">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => openEditDialog(product)}
+                            className="h-8 w-8 p-0"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -510,6 +511,7 @@ export default function ProductsPage() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleDeleteProduct(product.id)}
+                            className="h-8 w-8 p-0"
                           >
                             <Trash2 className="h-4 w-4 text-red-600" />
                           </Button>
@@ -526,12 +528,12 @@ export default function ProductsPage() {
 
       {/* Edit Product Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden">
           <DialogHeader>
             <DialogTitle>Edit Product</DialogTitle>
             <DialogDescription>Update product information</DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <div className="grid grid-cols-1 gap-4">
             <div className="space-y-2">
               <Label htmlFor="edit-name">Product Name *</Label>
               <Input
@@ -552,7 +554,7 @@ export default function ProductsPage() {
               />
             </div>
             {/* Pricing Calculator */}
-            <div className="space-y-4 p-4 border rounded-lg bg-slate-50 md:sticky md:top-8">
+            <div className="space-y-4 p-4 border rounded-lg bg-slate-50">
               <div className="flex items-center gap-2">
                 <Calculator className="h-5 w-5 text-blue-600" />
                 <h3 className="font-semibold">Pricing Calculator</h3>
