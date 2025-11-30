@@ -9,17 +9,24 @@ import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
-import { Package, Plus, Edit, Trash2, Search } from "lucide-react"
+import { Package, Plus, Edit, Trash2, Search, Calculator } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 import { LoadingPage } from "@/components/ui/loading"
 import { formatCurrency } from "@/lib/utils"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  calculatePricing,
+  calculateSellingPrice,
+  type PricingMode,
+} from "@/lib/pricing-calculator"
 
 type Product = {
   id: string
   user_id: string
   name: string
   description: string | null
+  cost_price: number
   unit_price: number
   created_at: string
   updated_at: string
@@ -35,8 +42,11 @@ export default function ProductsPage() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    cost_price: "",
     unit_price: "",
   })
+  const [pricingMode, setPricingMode] = useState<PricingMode>('markup')
+  const [percentage, setPercentage] = useState("50")
   const router = useRouter()
   const { toast } = useToast()
   const supabase = createClient()
@@ -95,6 +105,7 @@ export default function ProductsPage() {
           user_id: user.id,
           name: formData.name,
           description: formData.description || null,
+          cost_price: parseFloat(formData.cost_price) || 0,
           unit_price: parseFloat(formData.unit_price),
         })
 
@@ -108,7 +119,8 @@ export default function ProductsPage() {
       })
 
       setIsAddDialogOpen(false)
-      setFormData({ name: "", description: "", unit_price: "" })
+      setFormData({ name: "", description: "", cost_price: "", unit_price: "" })
+      setPercentage("50")
       loadProducts()
     } catch (error: any) {
       toast({
@@ -128,6 +140,7 @@ export default function ProductsPage() {
         .update({
           name: formData.name,
           description: formData.description || null,
+          cost_price: parseFloat(formData.cost_price) || 0,
           unit_price: parseFloat(formData.unit_price),
         })
         .eq('id', selectedProduct.id)
@@ -143,7 +156,8 @@ export default function ProductsPage() {
 
       setIsEditDialogOpen(false)
       setSelectedProduct(null)
-      setFormData({ name: "", description: "", unit_price: "" })
+      setFormData({ name: "", description: "", cost_price: "", unit_price: "" })
+      setPercentage("50")
       loadProducts()
     } catch (error: any) {
       toast({
@@ -187,6 +201,7 @@ export default function ProductsPage() {
     setFormData({
       name: product.name,
       description: product.description || "",
+      cost_price: product.cost_price?.toString() || "0",
       unit_price: product.unit_price.toString(),
     })
     setIsEditDialogOpen(true)
@@ -225,7 +240,7 @@ export default function ProductsPage() {
                   Add Product
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 <DialogHeader>
                   <DialogTitle>Add New Product</DialogTitle>
                   <DialogDescription>Create a new product for your catalog</DialogDescription>
@@ -250,17 +265,142 @@ export default function ProductsPage() {
                       rows={3}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="unit_price">Unit Price *</Label>
-                    <Input
-                      id="unit_price"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.unit_price}
-                      onChange={(e) => setFormData({ ...formData, unit_price: e.target.value })}
-                      placeholder="0.00"
-                    />
+                  {/* Pricing Calculator */}
+                  <div className="space-y-4 p-4 border rounded-lg bg-slate-50">
+                    <div className="flex items-center gap-2">
+                      <Calculator className="h-5 w-5 text-blue-600" />
+                      <h3 className="font-semibold">Pricing Calculator</h3>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="cost_price">Cost Price *</Label>
+                      <Input
+                        id="cost_price"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.cost_price}
+                        onChange={(e) => {
+                          const cost = e.target.value
+                          setFormData({ ...formData, cost_price: cost })
+                          if (pricingMode !== 'manual' && cost) {
+                            const price = calculateSellingPrice(
+                              parseFloat(cost),
+                              pricingMode,
+                              parseFloat(percentage)
+                            )
+                            setFormData(prev => ({ ...prev, unit_price: price.toFixed(2) }))
+                          }
+                        }}
+                        placeholder="0.00"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="pricing_mode">Pricing Method</Label>
+                      <Select value={pricingMode} onValueChange={(value: PricingMode) => {
+                        setPricingMode(value)
+                        if (value !== 'manual' && formData.cost_price) {
+                          const price = calculateSellingPrice(
+                            parseFloat(formData.cost_price),
+                            value,
+                            parseFloat(percentage)
+                          )
+                          setFormData(prev => ({ ...prev, unit_price: price.toFixed(2) }))
+                        }
+                      }}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="markup">By Markup %</SelectItem>
+                          <SelectItem value="margin">By Margin %</SelectItem>
+                          <SelectItem value="manual">Manual Price</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {pricingMode !== 'manual' && (
+                      <div className="space-y-2">
+                        <Label htmlFor="percentage">
+                          {pricingMode === 'markup' ? 'Markup %' : 'Margin %'}
+                        </Label>
+                        <Input
+                          id="percentage"
+                          type="number"
+                          step="1"
+                          min="0"
+                          max={pricingMode === 'margin' ? "99" : undefined}
+                          value={percentage}
+                          onChange={(e) => {
+                            setPercentage(e.target.value)
+                            if (formData.cost_price) {
+                              const price = calculateSellingPrice(
+                                parseFloat(formData.cost_price),
+                                pricingMode,
+                                parseFloat(e.target.value)
+                              )
+                              setFormData(prev => ({ ...prev, unit_price: price.toFixed(2) }))
+                            }
+                          }}
+                          placeholder="50"
+                        />
+                      </div>
+                    )}
+
+                    <div className="space-y-2">
+                      <Label htmlFor="unit_price">Selling Price *</Label>
+                      <Input
+                        id="unit_price"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.unit_price}
+                        onChange={(e) => setFormData({ ...formData, unit_price: e.target.value })}
+                        placeholder="0.00"
+                        disabled={pricingMode !== 'manual'}
+                        className={pricingMode !== 'manual' ? 'bg-gray-100' : ''}
+                      />
+                    </div>
+
+                    {formData.cost_price && formData.unit_price && (
+                      (() => {
+                        const calc = calculatePricing(
+                          parseFloat(formData.cost_price),
+                          parseFloat(formData.unit_price)
+                        )
+                        return (
+                          <div className="p-3 bg-white rounded-lg border space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Profit:</span>
+                              <span className="font-semibold text-green-600">
+                                {formatCurrency(calc.profit, 'MYR')}
+                              </span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Margin:</span>
+                              <span className="font-medium">{calc.profitMargin.toFixed(1)}%</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Markup:</span>
+                              <span className="font-medium">{calc.markup.toFixed(1)}%</span>
+                            </div>
+                            <div className="flex items-center justify-between pt-2 border-t">
+                              <span className="text-sm text-gray-600">Status:</span>
+                              <span className={`text-sm font-semibold ${
+                                calc.marginHealth === 'healthy' ? 'text-green-600' :
+                                calc.marginHealth === 'acceptable' ? 'text-yellow-600' :
+                                'text-red-600'
+                              }`}>
+                                {calc.marginHealth === 'healthy' ? '● Healthy Margin' :
+                                 calc.marginHealth === 'acceptable' ? '● Acceptable' :
+                                 '● Low Margin'}
+                              </span>
+                            </div>
+                          </div>
+                        )
+                      })()
+                    )}
                   </div>
                 </div>
                 <DialogFooter>
@@ -361,7 +501,7 @@ export default function ProductsPage() {
 
       {/* Edit Product Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <DialogHeader>
             <DialogTitle>Edit Product</DialogTitle>
             <DialogDescription>Update product information</DialogDescription>
@@ -386,17 +526,142 @@ export default function ProductsPage() {
                 rows={3}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-unit_price">Unit Price *</Label>
-              <Input
-                id="edit-unit_price"
-                type="number"
-                step="0.01"
-                min="0"
-                value={formData.unit_price}
-                onChange={(e) => setFormData({ ...formData, unit_price: e.target.value })}
-                placeholder="0.00"
-              />
+            {/* Pricing Calculator */}
+            <div className="space-y-4 p-4 border rounded-lg bg-slate-50">
+              <div className="flex items-center gap-2">
+                <Calculator className="h-5 w-5 text-blue-600" />
+                <h3 className="font-semibold">Pricing Calculator</h3>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-cost_price">Cost Price *</Label>
+                <Input
+                  id="edit-cost_price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.cost_price}
+                  onChange={(e) => {
+                    const cost = e.target.value
+                    setFormData({ ...formData, cost_price: cost })
+                    if (pricingMode !== 'manual' && cost) {
+                      const price = calculateSellingPrice(
+                        parseFloat(cost),
+                        pricingMode,
+                        parseFloat(percentage)
+                      )
+                      setFormData(prev => ({ ...prev, unit_price: price.toFixed(2) }))
+                    }
+                  }}
+                  placeholder="0.00"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-pricing_mode">Pricing Method</Label>
+                <Select value={pricingMode} onValueChange={(value: PricingMode) => {
+                  setPricingMode(value)
+                  if (value !== 'manual' && formData.cost_price) {
+                    const price = calculateSellingPrice(
+                      parseFloat(formData.cost_price),
+                      value,
+                      parseFloat(percentage)
+                    )
+                    setFormData(prev => ({ ...prev, unit_price: price.toFixed(2) }))
+                  }
+                }}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="markup">By Markup %</SelectItem>
+                    <SelectItem value="margin">By Margin %</SelectItem>
+                    <SelectItem value="manual">Manual Price</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {pricingMode !== 'manual' && (
+                <div className="space-y-2">
+                  <Label htmlFor="edit-percentage">
+                    {pricingMode === 'markup' ? 'Markup %' : 'Margin %'}
+                  </Label>
+                  <Input
+                    id="edit-percentage"
+                    type="number"
+                    step="1"
+                    min="0"
+                    max={pricingMode === 'margin' ? "99" : undefined}
+                    value={percentage}
+                    onChange={(e) => {
+                      setPercentage(e.target.value)
+                      if (formData.cost_price) {
+                        const price = calculateSellingPrice(
+                          parseFloat(formData.cost_price),
+                          pricingMode,
+                          parseFloat(e.target.value)
+                        )
+                        setFormData(prev => ({ ...prev, unit_price: price.toFixed(2) }))
+                      }
+                    }}
+                    placeholder="50"
+                  />
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-unit_price">Selling Price *</Label>
+                <Input
+                  id="edit-unit_price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.unit_price}
+                  onChange={(e) => setFormData({ ...formData, unit_price: e.target.value })}
+                  placeholder="0.00"
+                  disabled={pricingMode !== 'manual'}
+                  className={pricingMode !== 'manual' ? 'bg-gray-100' : ''}
+                />
+              </div>
+
+              {formData.cost_price && formData.unit_price && (
+                (() => {
+                  const calc = calculatePricing(
+                    parseFloat(formData.cost_price),
+                    parseFloat(formData.unit_price)
+                  )
+                  return (
+                    <div className="p-3 bg-white rounded-lg border space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Profit:</span>
+                        <span className="font-semibold text-green-600">
+                          {formatCurrency(calc.profit, 'MYR')}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Margin:</span>
+                        <span className="font-medium">{calc.profitMargin.toFixed(1)}%</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Markup:</span>
+                        <span className="font-medium">{calc.markup.toFixed(1)}%</span>
+                      </div>
+                      <div className="flex items-center justify-between pt-2 border-t">
+                        <span className="text-sm text-gray-600">Status:</span>
+                        <span className={`text-sm font-semibold ${
+                          calc.marginHealth === 'healthy' ? 'text-green-600' :
+                          calc.marginHealth === 'acceptable' ? 'text-yellow-600' :
+                          'text-red-600'
+                        }`}>
+                          {calc.marginHealth === 'healthy' ? '● Healthy Margin' :
+                           calc.marginHealth === 'acceptable' ? '● Acceptable' :
+                           '● Low Margin'}
+                        </span>
+                      </div>
+                    </div>
+                  )
+                })()
+              )}
             </div>
           </div>
           <DialogFooter>

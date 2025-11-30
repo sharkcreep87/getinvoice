@@ -115,7 +115,6 @@ export default function AdminSettings() {
 
   const updatePlan = async (planId: string, updates: Partial<SubscriptionPlan>) => {
     try {
-      // @ts-expect-error - Supabase type issue
       const { error } = await supabase
         .from('subscription_plans')
         .update(updates)
