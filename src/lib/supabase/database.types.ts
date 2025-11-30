@@ -198,6 +198,7 @@ export interface Database {
           features: Json
           max_customers: number
           max_invoices_per_month: number
+          max_products: number
           created_at: string
           updated_at: string
         }
@@ -210,6 +211,7 @@ export interface Database {
           features: Json
           max_customers: number
           max_invoices_per_month: number
+          max_products: number
           created_at?: string
           updated_at?: string
         }
@@ -222,6 +224,7 @@ export interface Database {
           features?: Json
           max_customers?: number
           max_invoices_per_month?: number
+          max_products?: number
           created_at?: string
           updated_at?: string
         }

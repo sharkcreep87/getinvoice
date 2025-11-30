@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -40,6 +41,8 @@ export default function ProductsPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [subscriptionTier, setSubscriptionTier] = useState<'free' | 'basic' | 'pro' | 'enterprise'>('free')
+  const [maxProducts, setMaxProducts] = useState<number>(10)
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -64,6 +67,7 @@ export default function ProductsPage() {
         router.push('/login')
         return
       }
+      await loadSubscriptionInfo(user.id)
       loadProducts()
     } catch (error: any) {
       toast({
@@ -73,6 +77,56 @@ export default function ProductsPage() {
       })
       router.push('/login')
     }
+  }
+
+  const loadSubscriptionInfo = async (userId: string) => {
+    try {
+      // Get user's subscription tier from profile
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('subscription_tier')
+        .eq('id', userId)
+        .single()
+
+      if (profileError) throw profileError
+
+      const tier = profile?.subscription_tier || 'free'
+      setSubscriptionTier(tier)
+
+      // Get subscription plan limits
+      const { data: plan, error: planError } = await supabase
+        .from('subscription_plans')
+        .select('max_products')
+        .eq('tier', tier)
+        .single()
+
+      if (planError) throw planError
+
+      setMaxProducts(plan?.max_products || 10)
+    } catch (error: any) {
+      console.error('Failed to load subscription info:', error)
+      // Set defaults on error
+      setSubscriptionTier('free')
+      setMaxProducts(10)
+    }
+  }
+
+  const canAddProduct = () => {
+    // -1 means unlimited
+    if (maxProducts === -1) return true
+    return products.length < maxProducts
+  }
+
+  const handleOpenAddDialog = () => {
+    if (!canAddProduct()) {
+      toast({
+        title: "Subscription Limit Reached",
+        description: `You've reached the maximum of ${maxProducts} products for your ${subscriptionTier} plan. Please upgrade your subscription to add more products.`,
+        variant: "destructive",
+      })
+      return
+    }
+    setIsAddDialogOpen(true)
   }
 
   const loadProducts = async () => {
@@ -231,14 +285,34 @@ export default function ProductsPage() {
         <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your product catalog</p>
 
         {/* Add Product dialog moved to the top header */}
-        <div className="mt-4 flex justify-end">
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Product
-              </Button>
-            </DialogTrigger>
+        <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="text-sm text-gray-600">
+              {maxProducts === -1 ? (
+                <span>Products: <span className="font-semibold text-gray-900">{products.length}</span> (Unlimited)</span>
+              ) : (
+                <span>
+                  Products: <span className="font-semibold text-gray-900">{products.length} / {maxProducts}</span>
+                  {products.length >= maxProducts && (
+                    <span className="ml-2 text-amber-600 font-medium">Limit reached</span>
+                  )}
+                </span>
+              )}
+            </div>
+            {maxProducts !== -1 && products.length >= maxProducts * 0.8 && (
+              <Link href="/dashboard/subscription">
+                <Button variant="outline" size="sm" className="text-xs">
+                  Upgrade
+                </Button>
+              </Link>
+            )}
+          </div>
+          <Button onClick={handleOpenAddDialog} disabled={!canAddProduct()}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Product
+          </Button>
+        </div>
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden">
               <DialogHeader>
                 <DialogTitle>Add New Product</DialogTitle>
@@ -469,7 +543,7 @@ export default function ProductsPage() {
               </p>
               {!searchQuery && (
                 <div className="mt-6">
-                  <Button onClick={() => setIsAddDialogOpen(true)}>
+                  <Button onClick={handleOpenAddDialog}>
                     <Plus className="mr-2 h-4 w-4" />
                     Add Product
                   </Button>
