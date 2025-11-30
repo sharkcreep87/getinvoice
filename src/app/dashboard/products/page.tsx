@@ -507,7 +507,6 @@ export default function ProductsPage() {
             </DialogContent>
           </Dialog>
         </div>
-      </div>
 
       <Card>
         <CardHeader>
