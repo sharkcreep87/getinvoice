@@ -490,8 +490,8 @@ export default function ProductsPage() {
                       )
                     })()
                   )}
-                  </div>
                 </div>
+              </div>
 
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
