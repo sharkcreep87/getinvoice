@@ -840,7 +840,7 @@ export default function InvoicesPage() {
                 <Plus className="mr-2 h-4 w-4" />
                 New Invoice
               </Button>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <DialogHeader>
               <DialogTitle>Create New Invoice</DialogTitle>
               <DialogDescription>
@@ -849,7 +849,7 @@ export default function InvoicesPage() {
             </DialogHeader>
             <form onSubmit={handleSubmit}>
               <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="customer">Customer *</Label>
                     <Select value={formData.customer_id} onValueChange={(value) => setFormData({ ...formData, customer_id: value })}>
@@ -881,7 +881,7 @@ export default function InvoicesPage() {
                     </Select>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="issue_date">Issue Date</Label>
                     <Input
@@ -1253,7 +1253,7 @@ export default function InvoicesPage() {
 
       {/* View Invoice Dialog */}
       <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <DialogHeader>
             <DialogTitle>Invoice Details</DialogTitle>
             <DialogDescription>
@@ -1262,7 +1262,7 @@ export default function InvoicesPage() {
           </DialogHeader>
           {selectedInvoice && (
             <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4 p-4 bg-gradient-to-r from-primary/5 to-blue-100 rounded-lg">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gradient-to-r from-primary/5 to-blue-100 rounded-lg">
                 <div>
                   <Label className="text-sm text-muted-foreground">Invoice Number</Label>
                   <p className="font-semibold text-lg">{selectedInvoice.invoice_number}</p>
@@ -1391,7 +1391,7 @@ export default function InvoicesPage() {
         setEditDialogOpen(open)
         if (!open) resetForm()
       }}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <DialogHeader>
             <DialogTitle>Edit Invoice</DialogTitle>
             <DialogDescription>
@@ -1400,7 +1400,7 @@ export default function InvoicesPage() {
           </DialogHeader>
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="customer">Customer *</Label>
                   <Select value={formData.customer_id} onValueChange={(value) => setFormData({ ...formData, customer_id: value })}>
@@ -1432,7 +1432,7 @@ export default function InvoicesPage() {
                   </Select>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="issue_date">Issue Date</Label>
                   <Input

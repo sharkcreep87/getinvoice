@@ -240,12 +240,12 @@ export default function ProductsPage() {
                   Add Product
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 <DialogHeader>
                   <DialogTitle>Add New Product</DialogTitle>
                   <DialogDescription>Create a new product for your catalog</DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                   <div className="space-y-2">
                     <Label htmlFor="name">Product Name *</Label>
                     <Input
@@ -266,7 +266,7 @@ export default function ProductsPage() {
                     />
                   </div>
                   {/* Pricing Calculator */}
-                  <div className="space-y-4 p-4 border rounded-lg bg-slate-50">
+                  <div className="space-y-4 p-4 border rounded-lg bg-slate-50 md:sticky md:top-8">
                     <div className="flex items-center gap-2">
                       <Calculator className="h-5 w-5 text-blue-600" />
                       <h3 className="font-semibold">Pricing Calculator</h3>
@@ -421,13 +421,13 @@ export default function ProductsPage() {
         <CardContent>
           {/* Search */}
           <div className="mb-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-14 md:pl-16"
               />
             </div>
           </div>
@@ -501,12 +501,12 @@ export default function ProductsPage() {
 
       {/* Edit Product Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <DialogHeader>
             <DialogTitle>Edit Product</DialogTitle>
             <DialogDescription>Update product information</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <div className="space-y-2">
               <Label htmlFor="edit-name">Product Name *</Label>
               <Input
@@ -527,7 +527,7 @@ export default function ProductsPage() {
               />
             </div>
             {/* Pricing Calculator */}
-            <div className="space-y-4 p-4 border rounded-lg bg-slate-50">
+            <div className="space-y-4 p-4 border rounded-lg bg-slate-50 md:sticky md:top-8">
               <div className="flex items-center gap-2">
                 <Calculator className="h-5 w-5 text-blue-600" />
                 <h3 className="font-semibold">Pricing Calculator</h3>
