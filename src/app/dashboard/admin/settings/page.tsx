@@ -31,6 +31,7 @@ type SubscriptionPlan = {
   billing_period: string
   max_customers: number
   max_invoices_per_month: number
+  max_products: number
 }
 
 export default function AdminSettings() {
@@ -359,6 +360,18 @@ export default function AdminSettings() {
                       type="number"
                       value={plan.max_invoices_per_month}
                       onChange={(e) => updatePlan(plan.id, { max_invoices_per_month: parseInt(e.target.value) })}
+                      placeholder="-1 for unlimited"
+                    />
+                    <p className="text-xs text-gray-500">Use -1 for unlimited</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor={`products-${plan.id}`}>Max Products</Label>
+                    <Input
+                      id={`products-${plan.id}`}
+                      type="number"
+                      value={plan.max_products}
+                      onChange={(e) => updatePlan(plan.id, { max_products: parseInt(e.target.value) })}
                       placeholder="-1 for unlimited"
                     />
                     <p className="text-xs text-gray-500">Use -1 for unlimited</p>
