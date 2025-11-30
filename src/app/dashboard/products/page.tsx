@@ -90,7 +90,7 @@ export default function ProductsPage() {
 
       if (profileError) throw profileError
 
-      const tier = profile?.subscription_tier || 'free'
+      const tier = (profile?.subscription_tier || 'free') as 'free' | 'basic' | 'pro' | 'enterprise'
       setSubscriptionTier(tier)
 
       // Get subscription plan limits
