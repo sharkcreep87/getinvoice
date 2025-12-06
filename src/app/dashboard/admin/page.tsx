@@ -200,7 +200,7 @@ export default function AdminDashboard() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-            <Shield className="h-8 w-8 text-blue-600" />
+            <Shield className="h-8 w-8 text-primary" />
             Admin Dashboard
           </h1>
           <p className="text-gray-600 mt-1">Manage users, view analytics, and configure system settings</p>
@@ -216,7 +216,7 @@ export default function AdminDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-            <Users className="h-4 w-4 text-blue-600" />
+            <Users className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalUsers}</div>
@@ -286,7 +286,7 @@ export default function AdminDashboard() {
                   <TableCell>
                     <span className={`px-2 py-1 rounded text-xs font-semibold ${
                       user.role === 'admin'
-                        ? 'bg-purple-100 text-purple-800'
+                        ? 'bg-secondary/10 text-secondary'
                         : 'bg-gray-100 text-gray-800'
                     }`}>
                       {user.role}

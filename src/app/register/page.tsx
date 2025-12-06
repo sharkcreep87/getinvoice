@@ -114,11 +114,11 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-100 to-white px-4 py-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-primary/10 to-white px-4 py-8">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center space-x-2 mb-4">
-            <FileText className="h-10 w-10 text-blue-600" />
+            <FileText className="h-10 w-10 text-primary" />
             <span className="text-3xl font-bold text-gray-900">GetInvoice</span>
           </Link>
         </div>
@@ -197,7 +197,7 @@ export default function RegisterPage() {
               </Button>
               <p className="text-sm text-gray-600 text-center">
                 Already have an account?{" "}
-                <Link href="/login" className="text-blue-600 hover:underline">
+                <Link href="/login" className="text-primary hover:underline">
                   Sign in
                 </Link>
               </p>

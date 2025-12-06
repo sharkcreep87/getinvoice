@@ -65,11 +65,11 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-100 to-white px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-primary/10 to-white px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center space-x-2 mb-4">
-            <FileText className="h-10 w-10 text-blue-600" />
+            <FileText className="h-10 w-10 text-primary" />
             <span className="text-3xl font-bold text-gray-900">GetInvoice</span>
           </Link>
         </div>
@@ -109,7 +109,7 @@ function LoginForm() {
               </Button>
               <p className="text-sm text-gray-600 text-center">
                 Don't have an account?{" "}
-                <Link href="/register" className="text-blue-600 hover:underline">
+                <Link href="/register" className="text-primary hover:underline">
                   Sign up
                 </Link>
               </p>
@@ -124,11 +124,11 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-100 to-white px-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-primary/10 to-white px-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center space-x-2 mb-4">
-              <FileText className="h-10 w-10 text-blue-600" />
+              <FileText className="h-10 w-10 text-primary" />
               <span className="text-3xl font-bold text-gray-900">GetInvoice</span>
             </Link>
           </div>

@@ -188,7 +188,7 @@ export default function AdminSettings() {
           Back to Admin Dashboard
         </Button>
         <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-          <Settings className="h-8 w-8 text-blue-600" />
+          <Settings className="h-8 w-8 text-primary" />
           System Settings
         </h1>
         <p className="text-gray-600 mt-1">Configure system-wide settings and preferences</p>

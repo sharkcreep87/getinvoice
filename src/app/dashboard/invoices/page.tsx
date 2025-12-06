@@ -1168,7 +1168,7 @@ export default function InvoicesPage() {
                           invoice.status === 'paid'
                             ? 'bg-green-100 text-green-800'
                             : invoice.status === 'sent'
-                            ? 'bg-blue-100 text-blue-800'
+                            ? 'bg-primary/10 text-primary'
                             : invoice.status === 'overdue'
                             ? 'bg-red-100 text-red-800'
                             : 'bg-gray-100 text-gray-800'
@@ -1224,7 +1224,7 @@ export default function InvoicesPage() {
                           title="Edit Invoice"
                           className="shrink-0"
                         >
-                          <Edit className="h-4 w-4 text-blue-600" />
+                          <Edit className="h-4 w-4 text-primary" />
                         </Button>
                         {canSharePDF() && (
                           <Button
@@ -1234,7 +1234,7 @@ export default function InvoicesPage() {
                             title="Share PDF"
                             className="shrink-0"
                           >
-                            <Share2 className="h-4 w-4 text-blue-600" />
+                            <Share2 className="h-4 w-4 text-primary" />
                           </Button>
                         )}
                         <Button
@@ -1280,7 +1280,7 @@ export default function InvoicesPage() {
                         selectedInvoice.status === 'paid'
                           ? 'bg-green-100 text-green-800'
                           : selectedInvoice.status === 'sent'
-                          ? 'bg-blue-100 text-blue-800'
+                          ? 'bg-primary/10 text-primary'
                           : selectedInvoice.status === 'overdue'
                           ? 'bg-red-100 text-red-800'
                           : 'bg-gray-100 text-gray-800'

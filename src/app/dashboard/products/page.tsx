@@ -225,7 +225,7 @@ export default function ProductsPage() {
     <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
       <div className="mb-6 md:mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
-          <Package className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
+          <Package className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
           Products
         </h1>
         <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your product catalog</p>
@@ -268,7 +268,7 @@ export default function ProductsPage() {
                 {/* Pricing Calculator */}
                 <div className="space-y-4 p-4 border rounded-lg bg-slate-50">
                   <div className="flex items-center gap-2">
-                    <Calculator className="h-5 w-5 text-blue-600" />
+                    <Calculator className="h-5 w-5 text-primary" />
                     <h3 className="font-semibold">Pricing Calculator</h3>
                   </div>
 
@@ -560,7 +560,7 @@ export default function ProductsPage() {
             {/* Pricing Calculator */}
             <div className="space-y-4 p-4 border rounded-lg bg-slate-50">
               <div className="flex items-center gap-2">
-                <Calculator className="h-5 w-5 text-blue-600" />
+                <Calculator className="h-5 w-5 text-primary" />
                 <h3 className="font-semibold">Pricing Calculator</h3>
               </div>
 

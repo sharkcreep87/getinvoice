@@ -51,7 +51,7 @@ export default function VerifyEmailPage() {
       <div className="max-w-lg w-full text-center">
         <h1 className="text-2xl font-semibold">Email confirmation</h1>
         <p className="text-sm text-muted-foreground mt-4">Redirecting you to the login page…</p>
-        <p className="mt-6 text-xs text-muted-foreground">If you are not redirected automatically, <a className="text-blue-600 underline" href="/login">click here to sign in</a>.</p>
+        <p className="mt-6 text-xs text-muted-foreground">If you are not redirected automatically, <a className="text-primary underline" href="/login">click here to sign in</a>.</p>
       </div>
     </div>
   )

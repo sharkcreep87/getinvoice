@@ -62,7 +62,7 @@ export default function SubscriptionSuccessPage() {
         <Card className="max-w-md w-full">
           <CardContent className="pt-6">
             <div className="text-center space-y-4">
-              <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto" />
+              <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
               <h2 className="text-xl font-semibold">Processing your payment...</h2>
               <p className="text-gray-600">
                 Please wait while we confirm your subscription

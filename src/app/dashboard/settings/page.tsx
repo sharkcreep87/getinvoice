@@ -15,11 +15,17 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [currencies, setCurrencies] = useState<Currency[]>([])
-  const [profile, setProfile] = useState({
+  const [profile, setProfile] = useState<{
+    full_name: string
+    email: string
+    role: string
+    subscription_tier: 'free' | 'basic' | 'pro' | 'enterprise'
+    currency: string
+  }>({
     full_name: "",
     email: "",
-    role: "user" as const,
-    subscription_tier: "free" as const,
+    role: "user",
+    subscription_tier: "free",
     currency: "MYR",
   })
   const [passwordData, setPasswordData] = useState({
@@ -213,7 +219,7 @@ export default function SettingsPage() {
               />
               <p className="text-sm text-gray-500">
                 Manage your subscription in the{' '}
-                <a href="/dashboard/subscription" className="text-blue-600 hover:underline">
+                <a href="/dashboard/subscription" className="text-primary hover:underline">
                   Subscription page
                 </a>
               </p>

@@ -173,7 +173,7 @@ export default async function DashboardPage() {
                         invoice.status === 'paid'
                           ? 'bg-green-100 text-green-700 ring-1 ring-green-200'
                           : invoice.status === 'sent'
-                          ? 'bg-blue-100 text-blue-700 ring-1 ring-blue-200'
+                          ? 'bg-primary/10 text-primary ring-1 ring-primary/20'
                           : 'bg-gray-100 text-gray-700 ring-1 ring-gray-200'
                       }`}
                     >
@@ -189,8 +189,8 @@ export default async function DashboardPage() {
       </Card>
 
       <Card className="border-2 border-primary/20 shadow-lg overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-100">
-          <CardTitle className="text-xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+        <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10">
+          <CardTitle className="text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             Quick Actions
           </CardTitle>
         </CardHeader>
@@ -202,7 +202,7 @@ export default async function DashboardPage() {
             >
               <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-primary/10 blur-2xl group-hover:bg-primary/20 transition-all"></div>
               <div className="relative">
-                <div className="p-3 bg-gradient-to-br from-primary to-blue-600 rounded-xl inline-block mb-3">
+                <div className="p-3 bg-gradient-to-br from-primary to-secondary rounded-xl inline-block mb-3">
                   <Users className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="font-bold text-lg mb-1">Add Customer</h3>
@@ -211,11 +211,11 @@ export default async function DashboardPage() {
             </a>
             <a
               href="/dashboard/invoices"
-              className="group relative overflow-hidden p-6 border-2 border-violet-200/50 rounded-xl hover:border-violet-400 transition-all hover:shadow-lg hover:shadow-violet-500/20 bg-gradient-to-br from-white to-violet-100"
+              className="group relative overflow-hidden p-6 border-2 border-primary/20 rounded-xl hover:border-primary transition-all hover:shadow-lg hover:shadow-primary/20 bg-gradient-to-br from-white to-primary/5"
             >
-              <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-violet-200/50 blur-2xl group-hover:bg-violet-300/50 transition-all"></div>
+              <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-primary/20 blur-2xl group-hover:bg-primary/30 transition-all"></div>
               <div className="relative">
-                <div className="p-3 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl inline-block mb-3">
+                <div className="p-3 bg-gradient-to-br from-primary to-secondary rounded-xl inline-block mb-3">
                   <FileText className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="font-bold text-lg mb-1">New Invoice</h3>
@@ -224,11 +224,11 @@ export default async function DashboardPage() {
             </a>
             <a
               href="/dashboard/subscription"
-              className="group relative overflow-hidden p-6 border-2 border-teal-200/50 rounded-xl hover:border-teal-400 transition-all hover:shadow-lg hover:shadow-teal-500/20 bg-gradient-to-br from-white to-teal-100"
+              className="group relative overflow-hidden p-6 border-2 border-secondary/20 rounded-xl hover:border-secondary transition-all hover:shadow-lg hover:shadow-secondary/20 bg-gradient-to-br from-white to-secondary/5"
             >
-              <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-teal-200/50 blur-2xl group-hover:bg-teal-300/50 transition-all"></div>
+              <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-secondary/20 blur-2xl group-hover:bg-secondary/30 transition-all"></div>
               <div className="relative">
-                <div className="p-3 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl inline-block mb-3">
+                <div className="p-3 bg-gradient-to-br from-secondary to-primary rounded-xl inline-block mb-3">
                   <TrendingUp className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="font-bold text-lg mb-1">Upgrade Plan</h3>

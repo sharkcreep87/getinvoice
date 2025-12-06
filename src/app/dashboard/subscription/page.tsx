@@ -211,12 +211,12 @@ export default function SubscriptionPage() {
         <p className="text-gray-600">Manage your subscription plan</p>
       </div>
 
-      <Card className="bg-blue-100 border-blue-300">
+      <Card className="bg-primary/10 border-primary/30">
         <CardHeader>
           <CardTitle>Current Plan</CardTitle>
           <CardDescription>
             You are currently on the{' '}
-            <span className="font-bold text-blue-600 capitalize">{currentTier}</span> plan
+            <span className="font-bold text-primary capitalize">{currentTier}</span> plan
           </CardDescription>
         </CardHeader>
         {currentTier !== 'free' && (
@@ -250,12 +250,12 @@ export default function SubscriptionPage() {
             <Card
               key={plan.tier}
               className={`relative ${
-                plan.popular ? 'border-blue-600 shadow-lg' : ''
-              } ${isCurrentPlan ? 'bg-blue-100 border-blue-700' : ''}`}
+                plan.popular ? 'border-primary shadow-lg' : ''
+              } ${isCurrentPlan ? 'bg-primary/10 border-primary' : ''}`}
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                  <span className="bg-primary text-white px-3 py-1 rounded-full text-xs font-semibold">
                     Popular
                   </span>
                 </div>
