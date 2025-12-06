@@ -119,6 +119,48 @@ export default function AdminSettings() {
     updates: Partial<Database['public']['Tables']['subscription_plans']['Update']>
   ) => {
     try {
+      // Validate price if it's being updated
+      if (updates.price !== undefined) {
+        const price = Number(updates.price)
+        if (isNaN(price) || price < 0) {
+          toast({
+            title: "Invalid Price",
+            description: "Please enter a valid price (0 or greater)",
+            variant: "destructive",
+          })
+          return
+        }
+        updates.price = price
+      }
+
+      // Validate max_customers if it's being updated
+      if (updates.max_customers !== undefined) {
+        const maxCustomers = Number(updates.max_customers)
+        if (isNaN(maxCustomers)) {
+          toast({
+            title: "Invalid Value",
+            description: "Please enter a valid number for max customers",
+            variant: "destructive",
+          })
+          return
+        }
+        updates.max_customers = maxCustomers
+      }
+
+      // Validate max_invoices_per_month if it's being updated
+      if (updates.max_invoices_per_month !== undefined) {
+        const maxInvoices = Number(updates.max_invoices_per_month)
+        if (isNaN(maxInvoices)) {
+          toast({
+            title: "Invalid Value",
+            description: "Please enter a valid number for max invoices",
+            variant: "destructive",
+          })
+          return
+        }
+        updates.max_invoices_per_month = maxInvoices
+      }
+
       const { error } = await (supabase as any)
         .from('subscription_plans')
         .update(updates as any)
@@ -131,9 +173,7 @@ export default function AdminSettings() {
 
       toast({
         title: "Success",
-        description: "Subscription plan updated",
-        // @ts-ignore
-        variant: "success",
+        description: "Subscription plan updated successfully",
       })
     } catch (error: any) {
       toast({
@@ -141,6 +181,8 @@ export default function AdminSettings() {
         description: error.message || "Failed to update plan",
         variant: "destructive",
       })
+      // Reload plans to revert to database state
+      loadSettings()
     }
   }
 
@@ -318,9 +360,17 @@ export default function AdminSettings() {
                     <Input
                       id={`price-${plan.id}`}
                       type="number"
-                      value={plan.price}
-                      onChange={(e) => updatePlan(plan.id, { price: parseFloat(e.target.value) })}
+                      step="0.01"
+                      key={`price-${plan.id}-${plan.price}`}
+                      defaultValue={plan.price}
+                      onBlur={(e) => {
+                        const newPrice = parseFloat(e.target.value)
+                        if (!isNaN(newPrice) && newPrice !== plan.price) {
+                          updatePlan(plan.id, { price: newPrice })
+                        }
+                      }}
                       min="0"
+                      placeholder="0.00"
                     />
                   </div>
 
@@ -345,8 +395,14 @@ export default function AdminSettings() {
                     <Input
                       id={`customers-${plan.id}`}
                       type="number"
-                      value={plan.max_customers}
-                      onChange={(e) => updatePlan(plan.id, { max_customers: parseInt(e.target.value) })}
+                      key={`customers-${plan.id}-${plan.max_customers}`}
+                      defaultValue={plan.max_customers}
+                      onBlur={(e) => {
+                        const newValue = parseInt(e.target.value)
+                        if (!isNaN(newValue) && newValue !== plan.max_customers) {
+                          updatePlan(plan.id, { max_customers: newValue })
+                        }
+                      }}
                       placeholder="-1 for unlimited"
                     />
                     <p className="text-xs text-gray-500">Use -1 for unlimited</p>
@@ -357,8 +413,14 @@ export default function AdminSettings() {
                     <Input
                       id={`invoices-${plan.id}`}
                       type="number"
-                      value={plan.max_invoices_per_month}
-                      onChange={(e) => updatePlan(plan.id, { max_invoices_per_month: parseInt(e.target.value) })}
+                      key={`invoices-${plan.id}-${plan.max_invoices_per_month}`}
+                      defaultValue={plan.max_invoices_per_month}
+                      onBlur={(e) => {
+                        const newValue = parseInt(e.target.value)
+                        if (!isNaN(newValue) && newValue !== plan.max_invoices_per_month) {
+                          updatePlan(plan.id, { max_invoices_per_month: newValue })
+                        }
+                      }}
                       placeholder="-1 for unlimited"
                     />
                     <p className="text-xs text-gray-500">Use -1 for unlimited</p>
