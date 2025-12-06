@@ -44,7 +44,7 @@ export default function HomePage() {
     try {
       const { data, error } = await supabase
         .from('subscription_plans')
-        .select('*')
+        .select('id, name, tier, price, billing_period, features, max_customers, max_invoices_per_month')
         .order('price', { ascending: true })
 
       if (error) throw error
@@ -303,7 +303,7 @@ export default function HomePage() {
               const colors = cardColors[index] || cardColors[0]
 
               return (
-                <Card key={plan.id} className={`border-2 ${colors.border} transition-all hover:shadow-lg relative overflow-hidden`}>
+                <Card key={plan.id} className={`border-2 ${colors.border} transition-all hover:shadow-lg relative overflow-hidden flex flex-col`}>
                   {isPopular && (
                     <div className="absolute top-0 right-0 bg-gradient-to-r from-primary to-secondary text-white text-xs px-3 py-1 rounded-bl-lg font-semibold">
                       POPULAR
@@ -324,15 +324,15 @@ export default function HomePage() {
                       <span className="text-sm sm:text-base text-gray-600">/month</span>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2 text-sm text-gray-600">
+                  <CardContent className="flex flex-col flex-1">
+                    <ul className="space-y-2 text-sm text-gray-600 flex-1">
                       {plan.features.map((feature, i) => (
                         <li key={i}>✓ {feature}</li>
                       ))}
                     </ul>
-                    <Link href="/register">
+                    <Link href="/register" className="mt-4">
                       <Button
-                        className={`w-full mt-4 ${isPopular ? 'bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90' : ''}`}
+                        className={`w-full ${isPopular ? 'bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90' : ''}`}
                         variant={isPopular ? 'default' : 'outline'}
                       >
                         {plan.tier === 'enterprise' ? 'Contact Sales' : 'Get Started'}
