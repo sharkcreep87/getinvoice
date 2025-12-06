@@ -245,7 +245,11 @@ export default function SettingsPage() {
                 This currency will be used for all new invoices and financial displays
               </p>
             </div>
-            <Button type="submit" disabled={saving}>
+            <Button
+              type="submit"
+              disabled={saving}
+              className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            >
               {saving ? "Saving..." : "Save Changes"}
             </Button>
           </form>
@@ -281,7 +285,11 @@ export default function SettingsPage() {
                 minLength={6}
               />
             </div>
-            <Button type="submit" disabled={saving}>
+            <Button
+              type="submit"
+              disabled={saving}
+              className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            >
               {saving ? "Updating..." : "Update Password"}
             </Button>
           </form>
@@ -300,7 +308,11 @@ export default function SettingsPage() {
               <p className="text-sm text-gray-600 mb-4">
                 Once you delete your account, there is no going back. All your data will be permanently deleted.
               </p>
-              <Button variant="destructive" disabled>
+              <Button
+                variant="destructive"
+                disabled
+                className="bg-red-600 text-white hover:bg-red-700 hover:shadow-lg hover:shadow-red-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
                 Delete Account
               </Button>
             </div>

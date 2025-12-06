@@ -83,7 +83,10 @@ export default function SubscriptionSuccessPage() {
             <CardDescription>{error}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => router.push('/dashboard/subscription')} className="w-full">
+            <Button
+              onClick={() => router.push('/dashboard/subscription')}
+              className="w-full bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+            >
               Return to Subscriptions
             </Button>
           </CardContent>
@@ -116,13 +119,16 @@ export default function SubscriptionSuccessPage() {
           </div>
 
           <div className="space-y-2">
-            <Button onClick={() => router.push('/dashboard')} className="w-full">
+            <Button
+              onClick={() => router.push('/dashboard')}
+              className="w-full bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+            >
               Go to Dashboard
             </Button>
             <Button
               onClick={() => router.push('/dashboard/subscription')}
-              variant="outline"
-              className="w-full"
+              variant="ghost"
+              className="w-full border-2 border-primary/30 text-primary hover:bg-primary hover:text-white hover:border-primary hover:shadow-md active:scale-[0.98] transition-all duration-200"
             >
               View Subscription Details
             </Button>

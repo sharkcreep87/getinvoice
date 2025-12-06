@@ -198,9 +198,14 @@ export default function CompanySettingsPage() {
             Customize your company details and invoice appearance
           </p>
         </div>
-        <Button onClick={handleSave} disabled={loading} size="lg" className="gap-2">
+        <Button
+          onClick={handleSave}
+          disabled={loading}
+          size="lg"
+          className="gap-2 bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+        >
           <Save className="h-4 w-4" />
-          Save Changes
+          {loading ? "Saving..." : "Save Changes"}
         </Button>
       </div>
 

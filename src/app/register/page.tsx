@@ -192,12 +192,16 @@ export default function RegisterPage() {
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                disabled={loading}
+              >
                 {loading ? "Creating account..." : "Create account"}
               </Button>
               <p className="text-sm text-gray-600 text-center">
                 Already have an account?{" "}
-                <Link href="/login" className="text-primary hover:underline">
+                <Link href="/login" className="text-primary hover:underline font-medium transition-colors">
                   Sign in
                 </Link>
               </p>
