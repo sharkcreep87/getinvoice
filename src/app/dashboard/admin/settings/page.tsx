@@ -101,7 +101,7 @@ export default function AdminSettings() {
       // Load subscription plans from database
       const { data: plansData } = await supabase
         .from('subscription_plans')
-        .select('*')
+        .select('id, name, tier, price, billing_period, features, max_customers, max_invoices_per_month')
         .order('price', { ascending: true })
 
       if (plansData) {

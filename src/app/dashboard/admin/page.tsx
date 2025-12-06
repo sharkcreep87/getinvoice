@@ -119,13 +119,13 @@ export default function AdminDashboard() {
       // Load users
       const { data: usersData } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, email, full_name, role, subscription_tier, created_at')
         .order('created_at', { ascending: false })
 
       // Load all invoices
       const { data: invoicesData } = await supabase
         .from('invoices')
-        .select('*') as { data: Invoice[] | null }
+        .select('id, status, total') as { data: Invoice[] | null }
 
       if (usersData) {
         setUsers(usersData)
@@ -196,16 +196,16 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-            <Shield className="h-8 w-8 text-primary" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
+            <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
             Admin Dashboard
           </h1>
-          <p className="text-gray-600 mt-1">Manage users, view analytics, and configure system settings</p>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage users, view analytics, and configure system settings</p>
         </div>
-        <Button onClick={() => router.push('/dashboard/admin/settings')}>
+        <Button onClick={() => router.push('/dashboard/admin/settings')} className="w-full sm:w-auto">
           <Settings className="mr-2 h-4 w-4" />
           System Settings
         </Button>
@@ -267,22 +267,24 @@ export default function AdminDashboard() {
           <CardDescription>View and manage all users in the system</CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="overflow-x-auto -mx-6 sm:mx-0">
+            <div className="inline-block min-w-full align-middle px-6 sm:px-0">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Email</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Subscription</TableHead>
-                <TableHead>Joined</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="min-w-[150px]">Email</TableHead>
+                <TableHead className="hidden md:table-cell">Name</TableHead>
+                <TableHead className="min-w-[80px]">Role</TableHead>
+                <TableHead className="hidden lg:table-cell">Subscription</TableHead>
+                <TableHead className="hidden sm:table-cell">Joined</TableHead>
+                <TableHead className="min-w-[120px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {users.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">{user.email}</TableCell>
-                  <TableCell>{user.full_name || '-'}</TableCell>
+                  <TableCell className="hidden md:table-cell">{user.full_name || '-'}</TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded text-xs font-semibold ${
                       user.role === 'admin'
@@ -292,10 +294,10 @@ export default function AdminDashboard() {
                       {user.role}
                     </span>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="hidden lg:table-cell">
                     <span className="capitalize">{user.subscription_tier}</span>
                   </TableCell>
-                  <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{new Date(user.created_at).toLocaleDateString()}</TableCell>
                   <TableCell>
                     {user.role === 'admin' ? (
                       <Button
@@ -319,6 +321,8 @@ export default function AdminDashboard() {
               ))}
             </TableBody>
           </Table>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

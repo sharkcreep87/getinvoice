@@ -58,7 +58,7 @@ export default function CustomersPage() {
 
       const { data, error } = await supabase
         .from('customers')
-        .select('*')
+        .select('id, name, email, phone, company, address, city, state, zip, country, notes, created_at')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 

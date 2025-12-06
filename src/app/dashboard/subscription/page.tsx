@@ -70,7 +70,7 @@ export default function SubscriptionPage() {
     try {
       const { data, error } = await supabase
         .from('subscription_plans')
-        .select('*')
+        .select('id, name, tier, price, billing_period, features, max_customers, max_invoices_per_month')
         .order('price', { ascending: true })
 
       if (error) throw error
@@ -207,8 +207,8 @@ export default function SubscriptionPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Subscription</h1>
-        <p className="text-gray-600">Manage your subscription plan</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Subscription</h1>
+        <p className="text-sm sm:text-base text-gray-600">Manage your subscription plan</p>
       </div>
 
       <Card className="bg-primary/10 border-primary/30">
@@ -271,8 +271,8 @@ export default function SubscriptionPage() {
                 <CardTitle>{plan.name}</CardTitle>
                 <CardDescription>{planDescriptions[plan.tier] || plan.tier}</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">{formatCurrency(plan.price, currency)}</span>
-                  <span className="text-gray-600">/{plan.billing_period === 'monthly' ? 'month' : 'year'}</span>
+                  <span className="text-3xl sm:text-4xl font-bold">{formatCurrency(plan.price, currency)}</span>
+                  <span className="text-sm sm:text-base text-gray-600">/{plan.billing_period === 'monthly' ? 'month' : 'year'}</span>
                 </div>
               </CardHeader>
               <CardContent>

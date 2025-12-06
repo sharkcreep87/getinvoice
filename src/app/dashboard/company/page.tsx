@@ -45,7 +45,7 @@ export default function CompanySettingsPage() {
 
       const result = await supabase
         .from('company_settings')
-        .select('*')
+        .select('company_name, company_email, company_phone, company_address, company_city, company_state, company_zip, company_country, company_logo_url, tax_id, invoice_terms, invoice_footer')
         .eq('user_id', user.id)
         .single()
 

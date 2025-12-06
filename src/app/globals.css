@@ -10,9 +10,9 @@
     --card-foreground: 0 0% 18%; /* #2D2D2D - Heading */
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 18%;
-    --primary: 150 74% 43%; /* #1DBF73 - Modern financial green */
+    --primary: 160 84% 34%; /* #0E9F6E - Darker action green */
     --primary-foreground: 0 0% 100%;
-    --secondary: 160 84% 34%; /* #0E9F6E - Darker action green */
+    --secondary: 150 74% 43%; /* #1DBF73 - Modern financial green */
     --secondary-foreground: 0 0% 100%;
     --muted: 152 66% 94%; /* #E6F9F0 - Light green background */
     --muted-foreground: 220 9% 46%; /* #6B7280 - Grey text */
@@ -22,7 +22,7 @@
     --destructive-foreground: 0 0% 100%;
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 150 74% 43%; /* #1DBF73 */
+    --ring: 160 84% 34%; /* #0E9F6E */
     --radius: 0.75rem;
   }
 
@@ -33,9 +33,9 @@
     --card-foreground: 210 20% 98%;
     --popover: 0 0% 14%;
     --popover-foreground: 210 20% 98%;
-    --primary: 150 74% 50%; /* Slightly brighter green for dark mode */
+    --primary: 160 84% 40%; /* Darker action green - slightly brighter for dark mode */
     --primary-foreground: 0 0% 100%;
-    --secondary: 160 84% 40%; /* Darker action green - slightly brighter */
+    --secondary: 150 74% 50%; /* Slightly brighter green for dark mode */
     --secondary-foreground: 0 0% 100%;
     --muted: 152 30% 20%; /* Darker muted green */
     --muted-foreground: 220 9% 60%; /* Lighter grey text for dark mode */
@@ -45,7 +45,7 @@
     --destructive-foreground: 210 20% 98%;
     --border: 0 0% 20%;
     --input: 0 0% 20%;
-    --ring: 150 74% 50%;
+    --ring: 160 84% 40%;
   }
 }
 

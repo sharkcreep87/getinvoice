@@ -117,7 +117,7 @@ export default function InvoicesPage() {
         try {
           const { data: invoiceData } = await supabase
             .from('invoices')
-            .select('*')
+            .select('id, invoice_number, customer_id, status, issue_date, due_date, subtotal, tax_rate, tax_amount, discount_amount, total, currency, notes, terms, created_at')
             .eq('id', viewId)
             .single()
 
@@ -125,14 +125,14 @@ export default function InvoicesPage() {
 
           const { data: invoiceItems } = await supabase
             .from('invoice_items')
-            .select('*')
+            .select('id, description, quantity, unit_price, amount, product_id')
             .eq('invoice_id', viewId)
 
           // invoiceData can be unknown/never in TS inference here — cast safely to any
           const inv: any = invoiceData
           const { data: customer } = await supabase
             .from('customers')
-            .select('*')
+            .select('id, name, email, company, address, city, state, zip, country')
             .eq('id', inv.customer_id)
             .single()
 
@@ -183,17 +183,17 @@ export default function InvoicesPage() {
       const [invoicesResult, customersResult, productsResult, profileResult] = await Promise.all([
         supabase
           .from('invoices')
-          .select('*')
+          .select('id, invoice_number, customer_id, status, issue_date, due_date, subtotal, tax_rate, tax_amount, discount_amount, total, currency, notes, terms, created_at')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false }),
         supabase
           .from('customers')
-          .select('*')
+          .select('id, name, email, company, address, city, state, zip, country')
           .eq('user_id', user.id)
           .order('name'),
         supabase
           .from('products')
-          .select('*')
+          .select('id, name, description, unit_price')
           .eq('user_id', user.id)
           .order('name'),
         supabase
@@ -465,13 +465,13 @@ export default function InvoicesPage() {
     try {
       const { data: customer } = await supabase
         .from('customers')
-        .select('*')
+        .select('id, name, email, company, address, city, state, zip, country')
         .eq('id', invoice.customer_id)
         .single()
 
       const { data: invoiceItems } = await supabase
         .from('invoice_items')
-        .select('*')
+        .select('id, description, quantity, unit_price, amount, product_id')
         .eq('invoice_id', invoice.id)
 
       const { data: { user } } = await supabase.auth.getUser()
@@ -479,7 +479,7 @@ export default function InvoicesPage() {
 
       const profileResult = await supabase
         .from('profiles')
-        .select('*')
+        .select('full_name, email')
         .eq('id', user.id)
         .single()
 
@@ -488,7 +488,7 @@ export default function InvoicesPage() {
       // Fetch company settings
       const companySettingsResult = await supabase
         .from('company_settings')
-        .select('*')
+        .select('company_name, company_email, company_phone, company_address, company_city, company_state, company_zip, company_country, company_logo_url, tax_id, invoice_terms, invoice_footer')
         .eq('user_id', user.id)
         .single()
 
@@ -628,13 +628,13 @@ export default function InvoicesPage() {
 
       const { data: customer } = await supabase
         .from('customers')
-        .select('*')
+        .select('id, name, email, company, address, city, state, zip, country')
         .eq('id', invoice.customer_id)
         .single()
 
       const { data: invoiceItems } = await supabase
         .from('invoice_items')
-        .select('*')
+        .select('id, description, quantity, unit_price, amount, product_id')
         .eq('invoice_id', invoice.id)
 
       const { data: { user } } = await supabase.auth.getUser()
@@ -642,7 +642,7 @@ export default function InvoicesPage() {
 
       const profileResult = await supabase
         .from('profiles')
-        .select('*')
+        .select('full_name, email')
         .eq('id', user.id)
         .single()
 
@@ -651,7 +651,7 @@ export default function InvoicesPage() {
       // Fetch company settings
       const companySettingsResult = await supabase
         .from('company_settings')
-        .select('*')
+        .select('company_name, company_email, company_phone, company_address, company_city, company_state, company_zip, company_country, company_logo_url, tax_id, invoice_terms, invoice_footer')
         .eq('user_id', user.id)
         .single()
 
@@ -745,12 +745,12 @@ export default function InvoicesPage() {
     try {
       const { data: invoiceItems } = await supabase
         .from('invoice_items')
-        .select('*')
+        .select('id, description, quantity, unit_price, amount, product_id')
         .eq('invoice_id', invoice.id)
 
       const { data: customer } = await supabase
         .from('customers')
-        .select('*')
+        .select('id, name, email, company, address, city, state, zip, country')
         .eq('id', invoice.customer_id)
         .single()
 
@@ -775,7 +775,7 @@ export default function InvoicesPage() {
     try {
       const { data: invoiceItems } = await supabase
         .from('invoice_items')
-        .select('*')
+        .select('id, description, quantity, unit_price, amount, product_id')
         .eq('invoice_id', invoice.id)
 
       if (invoiceItems) {
@@ -832,16 +832,16 @@ export default function InvoicesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Invoices</h1>
-          <p className="text-gray-600">Create and manage invoices</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Invoices</h1>
+          <p className="text-sm sm:text-base text-gray-600">Create and manage invoices</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={(open) => {
           setDialogOpen(open)
           if (!open) resetForm()
         }}>
-              <Button onClick={checkBeforeCreate}>
+              <Button onClick={checkBeforeCreate} className="w-full sm:w-auto">
                 <Plus className="mr-2 h-4 w-4" />
                 New Invoice
               </Button>
@@ -1144,24 +1144,26 @@ export default function InvoicesPage() {
               )}
             </div>
           ) : (
+            <div className="overflow-x-auto -mx-6 sm:mx-0">
+              <div className="inline-block min-w-full align-middle px-6 sm:px-0">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Invoice #</TableHead>
-                  <TableHead>Issue Date</TableHead>
-                  <TableHead>Due Date</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="min-w-[120px]">Invoice #</TableHead>
+                  <TableHead className="hidden sm:table-cell">Issue Date</TableHead>
+                  <TableHead className="hidden md:table-cell">Due Date</TableHead>
+                  <TableHead className="min-w-[100px]">Total</TableHead>
+                  <TableHead className="min-w-[80px]">Status</TableHead>
+                  <TableHead className="text-right min-w-[100px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {invoices.map((invoice) => (
                   <TableRow key={invoice.id}>
                     <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
-                    <TableCell>{new Date(invoice.issue_date).toLocaleDateString()}</TableCell>
-                    <TableCell>{new Date(invoice.due_date).toLocaleDateString()}</TableCell>
-                    <TableCell>{formatCurrency(invoice.total, userCurrency)}</TableCell>
+                    <TableCell className="hidden sm:table-cell">{new Date(invoice.issue_date).toLocaleDateString()}</TableCell>
+                    <TableCell className="hidden md:table-cell">{new Date(invoice.due_date).toLocaleDateString()}</TableCell>
+                    <TableCell className="whitespace-nowrap">{formatCurrency(invoice.total, userCurrency)}</TableCell>
                     <TableCell>
                       <span
                         className={`text-xs px-2 py-1 rounded-full ${
@@ -1252,6 +1254,8 @@ export default function InvoicesPage() {
                 ))}
               </TableBody>
             </Table>
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>

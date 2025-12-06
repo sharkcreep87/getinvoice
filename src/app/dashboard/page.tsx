@@ -10,8 +10,8 @@ async function getDashboardStats(userId: string, userCurrency: string) {
   const supabase = await createServerClient()
 
   const [customersResult, invoicesResult] = await Promise.all([
-    supabase.from('customers').select('*', { count: 'exact' }).eq('user_id', userId),
-    supabase.from('invoices').select('*').eq('user_id', userId),
+    supabase.from('customers').select('id', { count: 'exact' }).eq('user_id', userId),
+    supabase.from('invoices').select('id, invoice_number, status, issue_date, total').eq('user_id', userId).order('created_at', { ascending: false }),
   ])
 
   const customers = (customersResult.data || []) as any[]
@@ -43,7 +43,7 @@ export default async function DashboardPage() {
 
   const profileResult = await supabase
     .from('profiles')
-    .select('*')
+    .select('full_name, currency')
     .eq('id', user.id)
     .single()
 
@@ -54,12 +54,12 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary via-blue-600 to-violet-600 p-8 text-white shadow-2xl">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary via-blue-600 to-violet-600 p-6 sm:p-8 text-white shadow-2xl">
         <div className="absolute top-0 right-0 -mt-4 -mr-16 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 -mb-8 -ml-8 h-48 w-48 rounded-full bg-white/10 blur-2xl"></div>
         <div className="relative">
-          <h1 className="text-4xl font-bold mb-2">Welcome back, {profile?.full_name || 'User'}! 👋</h1>
-          <p className="text-white/90 text-lg">Here's what's happening with your business today</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">Welcome back, {profile?.full_name || 'User'}! 👋</h1>
+          <p className="text-white/90 text-sm sm:text-base lg:text-lg">Here's what's happening with your business today</p>
         </div>
       </div>
 
