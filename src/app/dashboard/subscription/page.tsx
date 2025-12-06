@@ -249,7 +249,7 @@ export default function SubscriptionPage() {
           return (
             <Card
               key={plan.tier}
-              className={`relative ${
+              className={`relative flex flex-col ${
                 plan.popular ? 'border-primary shadow-lg' : ''
               } ${isCurrentPlan ? 'bg-primary/10 border-primary' : ''}`}
             >
@@ -275,8 +275,8 @@ export default function SubscriptionPage() {
                   <span className="text-sm sm:text-base text-gray-600">/{plan.billing_period === 'monthly' ? 'month' : 'year'}</span>
                 </div>
               </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 mb-6">
+              <CardContent className="flex flex-col flex-1">
+                <ul className="space-y-3 mb-6 flex-1">
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-start">
                       <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0" />
