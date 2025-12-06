@@ -332,8 +332,12 @@ export default function HomePage() {
                     </ul>
                     <Link href="/register" className="mt-4">
                       <Button
-                        className={`w-full ${isPopular ? 'bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90' : ''}`}
-                        variant={isPopular ? 'default' : 'outline'}
+                        className={`w-full transition-all duration-200 ${
+                          isPopular
+                            ? 'bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98]'
+                            : 'border-2 border-primary/30 text-primary hover:bg-primary hover:text-white hover:border-primary hover:shadow-md active:scale-[0.98]'
+                        }`}
+                        variant={isPopular ? 'default' : 'ghost'}
                       >
                         {plan.tier === 'enterprise' ? 'Contact Sales' : 'Get Started'}
                       </Button>

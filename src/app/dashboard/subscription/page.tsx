@@ -285,12 +285,15 @@ export default function SubscriptionPage() {
                   ))}
                 </ul>
                 {isCurrentPlan ? (
-                  <Button className="w-full" disabled>
+                  <Button
+                    className="w-full bg-gray-100 text-gray-500 cursor-not-allowed"
+                    disabled
+                  >
                     Current Plan
                   </Button>
                 ) : canUpgrade ? (
                   <Button
-                    className="w-full"
+                    className="w-full bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                     onClick={() => handleUpgrade(plan.tier)}
                     disabled={isProcessing}
                   >
@@ -308,8 +311,8 @@ export default function SubscriptionPage() {
                   </Button>
                 ) : canDowngrade ? (
                   <Button
-                    className="w-full"
-                    variant="outline"
+                    className="w-full border-2 border-primary/30 text-primary hover:bg-primary hover:text-white hover:border-primary hover:shadow-md active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    variant="ghost"
                     onClick={() => handleUpgrade(plan.tier)}
                     disabled={isProcessing}
                   >
