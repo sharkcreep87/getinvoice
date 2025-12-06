@@ -171,6 +171,16 @@ CREATE POLICY "Users can delete own invoice items" ON public.invoice_items
 CREATE POLICY "Anyone can view subscription plans" ON public.subscription_plans
     FOR SELECT USING (true);
 
+-- Allow admins to update subscription plans
+CREATE POLICY "Admins can update subscription plans" ON public.subscription_plans
+    FOR UPDATE USING (
+        EXISTS (
+            SELECT 1 FROM public.profiles
+            WHERE profiles.id = auth.uid()
+            AND profiles.role = 'admin'
+        )
+    );
+
 -- Function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
