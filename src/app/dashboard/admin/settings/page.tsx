@@ -146,7 +146,9 @@ If the product is too generic or ambiguous, ask the user 1–2 short clarificati
       // Load system settings from localStorage
       const savedSettings = localStorage.getItem('admin_settings')
       if (savedSettings) {
-        setSettings(JSON.parse(savedSettings))
+        const parsed = JSON.parse(savedSettings)
+        // Merge with current state to ensure all fields have values (including new ai_cost_forecast_prompt)
+        setSettings(prev => ({ ...prev, ...parsed }))
       }
 
       // Load subscription plans from database
