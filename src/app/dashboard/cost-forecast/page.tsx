@@ -104,14 +104,28 @@ export default function CostForecastPage() {
         }])
 
         // Set forecast data with editable ingredients
-        const ingredientsWithIds = data.jsonData.ingredients.map((ing: any, index: number) => ({
-          ...ing,
-          id: `${Date.now()}-${index}`,
-        }))
+        // IMPORTANT: Recalculate cost_per_unit_rm based on quantity × unit_price_rm
+        const ingredientsWithIds = data.jsonData.ingredients.map((ing: any, index: number) => {
+          const quantity = Number(ing.quantity) || 0
+          const unitPrice = Number(ing.unit_price_rm) || 0
+          const calculatedCost = quantity * unitPrice
+
+          return {
+            ...ing,
+            id: `${Date.now()}-${index}`,
+            quantity,
+            unit_price_rm: unitPrice,
+            cost_per_unit_rm: calculatedCost, // Recalculate to ensure accuracy
+          }
+        })
+
+        // Recalculate total cost based on corrected ingredient costs
+        const recalculatedTotalCost = ingredientsWithIds.reduce((sum: number, ing: Ingredient) => sum + ing.cost_per_unit_rm, 0)
 
         setCurrentForecast({
           ...data.jsonData,
           ingredients: ingredientsWithIds,
+          total_cost_per_unit_rm: recalculatedTotalCost,
         })
 
         toast({
@@ -569,7 +583,8 @@ export default function CostForecastPage() {
                       Unit Price (RM)
                     </th>
                     <th className="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-xs sm:text-sm text-gray-900">
-                      Cost (RM)
+                      <div>Total Cost (RM)</div>
+                      <div className="text-[10px] font-normal text-gray-500">(Qty × Price)</div>
                     </th>
                     <th className="text-center py-2 sm:py-3 px-2 font-semibold text-xs sm:text-sm text-gray-900">
                       Action
@@ -611,8 +626,13 @@ export default function CostForecastPage() {
                           className="text-xs sm:text-sm text-right w-24"
                         />
                       </td>
-                      <td className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-right font-medium text-primary whitespace-nowrap">
-                        {formatCurrency(ingredient.cost_per_unit_rm)}
+                      <td className="py-2 sm:py-3 px-2 sm:px-4 text-right whitespace-nowrap">
+                        <div className="font-medium text-primary text-xs sm:text-sm">
+                          {formatCurrency(ingredient.cost_per_unit_rm)}
+                        </div>
+                        <div className="text-[10px] text-gray-400">
+                          {ingredient.quantity} × {formatCurrency(ingredient.unit_price_rm)}
+                        </div>
                       </td>
                       <td className="py-2 sm:py-3 px-2 text-center">
                         <Button
