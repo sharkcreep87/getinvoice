@@ -96,6 +96,8 @@ export default function CostForecastPage() {
 
       const data = await response.json()
 
+      console.log('API Response:', data) // Debug log
+
       if (!response.ok) {
         throw new Error(data.error || 'Failed to get forecast')
       }
@@ -115,6 +117,14 @@ export default function CostForecastPage() {
         toast({
           title: "Success",
           description: "Cost forecast generated! You can now edit all values.",
+        })
+      } else {
+        // If no JSON data returned, show warning
+        console.warn('No JSON data in response:', data)
+        toast({
+          title: "Warning",
+          description: "AI generated a response but couldn't extract cost data. Please try again.",
+          variant: "destructive",
         })
       }
     } catch (error: any) {
