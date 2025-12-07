@@ -1,0 +1,125 @@
+import { NextRequest, NextResponse } from 'next/server'
+import OpenAI from 'openai'
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
+
+const SYSTEM_PROMPT = `You are an AI cost-forecast assistant for a food & product pricing system.
+When the user gives you a product name (for example "Karipap", "Nasi Lemak Ayam", "Iced Latte", etc.), your job is to:
+1. Guess the most common recipe or composition for that product in Malaysia.
+2. List all typical ingredients/components used to produce ONE UNIT of that product (one piece, one cup, one plate, etc.).
+3. For each ingredient, estimate:
+   - quantity per unit
+   - unit of measurement (g, ml, pcs, tbsp, etc.)
+   - price per unit in Malaysian Ringgit (RM)
+   - cost used for one unit of product
+4. Calculate:
+   - total ingredient cost per unit
+   - recommended selling price per unit (include a reasonable profit margin, for example 40–60%)
+   - profit per unit and profit margin (%)
+
+Make reasonable assumptions and clearly show them in an "Assumptions" section.
+
+OUTPUT REQUIREMENTS:
+- Currency must be in RM with 2 decimal places.
+- If the user language is Malay, answer in Malay. If English, answer in English.
+- Always provide:
+  * A short description of the product
+  * A clear ingredient cost table
+  * A pricing summary
+  * A final JSON block for system integration
+
+The JSON must follow this structure exactly:
+{
+  "product_name": "...",
+  "serving_unit": "...",
+  "ingredients": [
+    {
+      "name": "...",
+      "quantity": number,
+      "unit": "...",
+      "unit_price_rm": number,
+      "cost_per_unit_rm": number
+    }
+  ],
+  "total_cost_per_unit_rm": number,
+  "suggested_selling_price_rm": number,
+  "profit_per_unit_rm": number,
+  "profit_margin_percent": number,
+  "assumptions": [
+    "..."
+  ]
+}
+
+Do NOT add any extra fields in the JSON.
+If the product is too generic or ambiguous, ask the user 1–2 short clarification questions before calculating.`
+
+export async function POST(request: NextRequest) {
+  try {
+    const { productName, conversationHistory = [] } = await request.json()
+
+    if (!productName || typeof productName !== 'string') {
+      return NextResponse.json(
+        { error: 'Product name is required' },
+        { status: 400 }
+      )
+    }
+
+    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'sk-proj-placeholder') {
+      return NextResponse.json(
+        { error: 'OpenAI API key not configured. Please add your OpenAI API key to .env.local' },
+        { status: 500 }
+      )
+    }
+
+    // Build messages array with conversation history
+    const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+      { role: 'system', content: SYSTEM_PROMPT },
+      ...conversationHistory,
+      { role: 'user', content: productName }
+    ]
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages,
+      temperature: 0.7,
+      max_tokens: 2000,
+    })
+
+    const response = completion.choices[0]?.message?.content || ''
+
+    // Try to extract JSON from the response
+    let jsonData = null
+    const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/) || response.match(/\{[\s\S]*"product_name"[\s\S]*\}/)
+
+    if (jsonMatch) {
+      try {
+        const jsonString = jsonMatch[1] || jsonMatch[0]
+        jsonData = JSON.parse(jsonString)
+      } catch (e) {
+        console.error('Failed to parse JSON from response:', e)
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      response,
+      jsonData,
+      conversationHistory: [
+        ...conversationHistory,
+        { role: 'user', content: productName },
+        { role: 'assistant', content: response }
+      ]
+    })
+  } catch (error: any) {
+    console.error('Cost forecast error:', error)
+    return NextResponse.json(
+      {
+        error: error.message || 'Failed to generate cost forecast',
+        details: error.response?.data || error.toString()
+      },
+      { status: 500 }
+    )
+  }
+}
