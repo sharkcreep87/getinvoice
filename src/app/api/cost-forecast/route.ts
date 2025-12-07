@@ -87,16 +87,26 @@ export async function POST(request: NextRequest) {
       max_tokens: 2000,
     })
 
-    const response = completion.choices[0]?.message?.content || ''
+    let rawResponse = completion.choices[0]?.message?.content || ''
 
     // Try to extract JSON from the response
     let jsonData = null
-    const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/) || response.match(/\{[\s\S]*"product_name"[\s\S]*\}/)
+    let cleanResponse = rawResponse
+    const jsonMatch = rawResponse.match(/```json\n([\s\S]*?)\n```/) || rawResponse.match(/\{[\s\S]*"product_name"[\s\S]*\}/)
 
     if (jsonMatch) {
       try {
         const jsonString = jsonMatch[1] || jsonMatch[0]
         jsonData = JSON.parse(jsonString)
+
+        // Remove JSON block from the chat display
+        if (jsonMatch[1]) {
+          // Remove ```json...``` block
+          cleanResponse = rawResponse.replace(/```json\n[\s\S]*?\n```/, '').trim()
+        } else {
+          // Remove raw JSON object
+          cleanResponse = rawResponse.replace(/\{[\s\S]*"product_name"[\s\S]*\}/, '').trim()
+        }
       } catch (e) {
         console.error('Failed to parse JSON from response:', e)
       }
@@ -104,12 +114,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      response,
+      response: cleanResponse,
       jsonData,
       conversationHistory: [
         ...conversationHistory,
         { role: 'user', content: productName },
-        { role: 'assistant', content: response }
+        { role: 'assistant', content: cleanResponse }
       ]
     })
   } catch (error: any) {
