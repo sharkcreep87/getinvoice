@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
-import { Loader2, TrendingUp, Calculator, Plus, Trash2 } from "lucide-react"
+import { Loader2, TrendingUp, Calculator, Plus, Trash2, DollarSign } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
+import { useRouter } from "next/navigation"
 
 type Ingredient = {
   id: string
@@ -31,7 +33,10 @@ export default function CostForecastPage() {
   const [productName, setProductName] = useState("")
   const [loading, setLoading] = useState(false)
   const [currentForecast, setCurrentForecast] = useState<CostForecastData | null>(null)
+  const [savingToProducts, setSavingToProducts] = useState(false)
   const { toast } = useToast()
+  const supabase = createClient()
+  const router = useRouter()
 
   // Auto-calculate totals whenever ingredients change
   useEffect(() => {
@@ -220,6 +225,48 @@ export default function CostForecastPage() {
     setProductName("")
   }
 
+  const handleSaveToProducts = async () => {
+    if (!currentForecast) return
+
+    setSavingToProducts(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error("Not authenticated")
+
+      // Insert product to database
+      const { error } = await (supabase as any)
+        .from('products')
+        .insert({
+          user_id: user.id,
+          name: currentForecast.product_name,
+          description: `${currentForecast.serving_unit} - AI Generated`,
+          unit_price: currentForecast.suggested_selling_price_rm,
+          cost_price: currentForecast.total_cost_per_unit_rm,
+          stock: 0,
+        })
+
+      if (error) throw error
+
+      toast({
+        title: "Success",
+        description: "Product saved successfully! You can view it in the Products page.",
+      })
+
+      // Optionally redirect to products page
+      setTimeout(() => {
+        router.push('/dashboard/products')
+      }, 1500)
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save product",
+        variant: "destructive",
+      })
+    } finally {
+      setSavingToProducts(false)
+    }
+  }
+
   const formatCurrency = (amount: number) => {
     return `RM ${amount.toFixed(2)}`
   }
@@ -360,13 +407,32 @@ export default function CostForecastPage() {
                     </div>
                   </div>
 
-                  <Button
-                    onClick={handleReset}
-                    variant="outline"
-                    className="w-full border-2 border-primary/30 text-primary hover:bg-primary hover:text-white hover:border-primary hover:shadow-md active:scale-[0.98] transition-all duration-200"
-                  >
-                    New Forecast
-                  </Button>
+                  <div className="space-y-2">
+                    <Button
+                      onClick={handleSaveToProducts}
+                      disabled={savingToProducts}
+                      className="w-full bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    >
+                      {savingToProducts ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <DollarSign className="h-4 w-4 mr-2" />
+                          Save to Products
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      onClick={handleReset}
+                      variant="outline"
+                      className="w-full border-2 border-primary/30 text-primary hover:bg-primary hover:text-white hover:border-primary hover:shadow-md active:scale-[0.98] transition-all duration-200"
+                    >
+                      New Forecast
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
