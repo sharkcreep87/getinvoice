@@ -57,7 +57,7 @@ If the product is too generic or ambiguous, ask the user 1–2 short clarificati
 
 export async function POST(request: NextRequest) {
   try {
-    const { productName, conversationHistory = [] } = await request.json()
+    const { productName, conversationHistory = [], customPrompt } = await request.json()
 
     if (!productName || typeof productName !== 'string') {
       return NextResponse.json(
@@ -73,9 +73,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Use custom prompt if provided, otherwise use default
+    const systemPrompt = customPrompt && customPrompt.trim() !== '' ? customPrompt : SYSTEM_PROMPT
+
     // Build messages array with conversation history
     const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
-      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'system', content: systemPrompt },
       ...conversationHistory,
       { role: 'user', content: productName }
     ]

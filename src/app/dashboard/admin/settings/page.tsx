@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, Save, Settings } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
@@ -21,6 +22,7 @@ type SystemSettings = {
   allow_registration: boolean
   stripe_enabled: boolean
   email_notifications_enabled: boolean
+  ai_cost_forecast_prompt: string
 }
 
 type SubscriptionPlan = {
@@ -44,6 +46,55 @@ export default function AdminSettings() {
     allow_registration: true,
     stripe_enabled: false,
     email_notifications_enabled: true,
+    ai_cost_forecast_prompt: `You are an AI cost-forecast assistant for a food & product pricing system.
+When the user gives you a product name (for example "Karipap", "Nasi Lemak Ayam", "Iced Latte", etc.), your job is to:
+1. Guess the most common recipe or composition for that product in Malaysia.
+2. List all typical ingredients/components used to produce ONE UNIT of that product (one piece, one cup, one plate, etc.).
+3. For each ingredient, estimate:
+   - quantity per unit
+   - unit of measurement (g, ml, pcs, tbsp, etc.)
+   - price per unit in Malaysian Ringgit (RM)
+   - cost used for one unit of product
+4. Calculate:
+   - total ingredient cost per unit
+   - recommended selling price per unit (include a reasonable profit margin, for example 40–60%)
+   - profit per unit and profit margin (%)
+
+Make reasonable assumptions and clearly show them in an "Assumptions" section.
+
+OUTPUT REQUIREMENTS:
+- Currency must be in RM with 2 decimal places.
+- If the user language is Malay, answer in Malay. If English, answer in English.
+- Always provide:
+  * A short description of the product
+  * A clear ingredient cost table
+  * A pricing summary
+  * A final JSON block for system integration
+
+The JSON must follow this structure exactly:
+{
+  "product_name": "...",
+  "serving_unit": "...",
+  "ingredients": [
+    {
+      "name": "...",
+      "quantity": number,
+      "unit": "...",
+      "unit_price_rm": number,
+      "cost_per_unit_rm": number
+    }
+  ],
+  "total_cost_per_unit_rm": number,
+  "suggested_selling_price_rm": number,
+  "profit_per_unit_rm": number,
+  "profit_margin_percent": number,
+  "assumptions": [
+    "..."
+  ]
+}
+
+Do NOT add any extra fields in the JSON.
+If the product is too generic or ambiguous, ask the user 1–2 short clarification questions before calculating.`,
   })
   const [plans, setPlans] = useState<SubscriptionPlan[]>([])
   const router = useRouter()
@@ -335,6 +386,89 @@ export default function AdminSettings() {
                 onClick={() => setSettings({ ...settings, email_notifications_enabled: !settings.email_notifications_enabled })}
               >
                 {settings.email_notifications_enabled ? 'Enabled' : 'Disabled'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* AI Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle>AI Cost Forecast Settings</CardTitle>
+            <CardDescription>Customize the AI prompt for cost forecasting assistant</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="ai_prompt">System Prompt</Label>
+              <Textarea
+                id="ai_prompt"
+                value={settings.ai_cost_forecast_prompt}
+                onChange={(e) => setSettings({ ...settings, ai_cost_forecast_prompt: e.target.value })}
+                placeholder="Enter the AI system prompt..."
+                className="min-h-[300px] font-mono text-sm"
+              />
+              <p className="text-xs text-gray-500">
+                This prompt controls how the AI analyzes products and generates cost forecasts. Include instructions for output format, pricing calculations, and any specific requirements.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  const defaultPrompt = `You are an AI cost-forecast assistant for a food & product pricing system.
+When the user gives you a product name (for example "Karipap", "Nasi Lemak Ayam", "Iced Latte", etc.), your job is to:
+1. Guess the most common recipe or composition for that product in Malaysia.
+2. List all typical ingredients/components used to produce ONE UNIT of that product (one piece, one cup, one plate, etc.).
+3. For each ingredient, estimate:
+   - quantity per unit
+   - unit of measurement (g, ml, pcs, tbsp, etc.)
+   - price per unit in Malaysian Ringgit (RM)
+   - cost used for one unit of product
+4. Calculate:
+   - total ingredient cost per unit
+   - recommended selling price per unit (include a reasonable profit margin, for example 40–60%)
+   - profit per unit and profit margin (%)
+
+Make reasonable assumptions and clearly show them in an "Assumptions" section.
+
+OUTPUT REQUIREMENTS:
+- Currency must be in RM with 2 decimal places.
+- If the user language is Malay, answer in Malay. If English, answer in English.
+- Always provide:
+  * A short description of the product
+  * A clear ingredient cost table
+  * A pricing summary
+  * A final JSON block for system integration
+
+The JSON must follow this structure exactly:
+{
+  "product_name": "...",
+  "serving_unit": "...",
+  "ingredients": [
+    {
+      "name": "...",
+      "quantity": number,
+      "unit": "...",
+      "unit_price_rm": number,
+      "cost_per_unit_rm": number
+    }
+  ],
+  "total_cost_per_unit_rm": number,
+  "suggested_selling_price_rm": number,
+  "profit_per_unit_rm": number,
+  "profit_margin_percent": number,
+  "assumptions": [
+    "..."
+  ]
+}
+
+Do NOT add any extra fields in the JSON.
+If the product is too generic or ambiguous, ask the user 1–2 short clarification questions before calculating.`
+                  setSettings({ ...settings, ai_cost_forecast_prompt: defaultPrompt })
+                }}
+                className="text-xs"
+              >
+                Reset to Default
               </Button>
             </div>
           </CardContent>

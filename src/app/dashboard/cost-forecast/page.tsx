@@ -62,12 +62,25 @@ export default function CostForecastPage() {
     setMessages(prev => [...prev, { role: 'user', content: userMessage }])
 
     try {
+      // Read custom prompt from admin settings (localStorage)
+      let customPrompt = ''
+      try {
+        const savedSettings = localStorage.getItem('admin_settings')
+        if (savedSettings) {
+          const settings = JSON.parse(savedSettings)
+          customPrompt = settings.ai_cost_forecast_prompt || ''
+        }
+      } catch (e) {
+        console.error('Failed to read admin settings:', e)
+      }
+
       const response = await fetch('/api/cost-forecast', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           productName: userMessage,
           conversationHistory: messages,
+          customPrompt,
         }),
       })
 
