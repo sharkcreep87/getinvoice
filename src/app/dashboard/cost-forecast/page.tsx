@@ -151,7 +151,20 @@ export default function CostForecastPage() {
       })
 
       const totalCost = updatedIngredients.reduce((sum, ing) => sum + ing.cost_per_unit_rm, 0)
-      const suggestedPrice = prev.suggested_selling_price_rm
+
+      // Maintain the same profit margin percentage
+      const currentMargin = prev.profit_margin_percent
+
+      // Calculate new suggested price based on margin: price = cost / (1 - margin/100)
+      let suggestedPrice = prev.suggested_selling_price_rm
+      if (currentMargin > 0 && currentMargin < 100) {
+        suggestedPrice = totalCost / (1 - currentMargin / 100)
+      } else if (totalCost > 0) {
+        // If margin is 0 or invalid, maintain the same profit amount
+        const currentProfit = prev.profit_per_unit_rm
+        suggestedPrice = totalCost + currentProfit
+      }
+
       const profit = suggestedPrice - totalCost
       const margin = suggestedPrice > 0 ? (profit / suggestedPrice) * 100 : 0
 
@@ -159,6 +172,7 @@ export default function CostForecastPage() {
         ...prev,
         ingredients: updatedIngredients,
         total_cost_per_unit_rm: totalCost,
+        suggested_selling_price_rm: suggestedPrice,
         profit_per_unit_rm: profit,
         profit_margin_percent: margin,
       }
@@ -206,7 +220,19 @@ export default function CostForecastPage() {
 
       const updatedIngredients = prev.ingredients.filter(ing => ing.id !== id)
       const totalCost = updatedIngredients.reduce((sum, ing) => sum + ing.cost_per_unit_rm, 0)
-      const suggestedPrice = prev.suggested_selling_price_rm
+
+      // Maintain the same profit margin percentage
+      const currentMargin = prev.profit_margin_percent
+
+      // Calculate new suggested price based on margin
+      let suggestedPrice = prev.suggested_selling_price_rm
+      if (currentMargin > 0 && currentMargin < 100) {
+        suggestedPrice = totalCost / (1 - currentMargin / 100)
+      } else if (totalCost > 0) {
+        const currentProfit = prev.profit_per_unit_rm
+        suggestedPrice = totalCost + currentProfit
+      }
+
       const profit = suggestedPrice - totalCost
       const margin = suggestedPrice > 0 ? (profit / suggestedPrice) * 100 : 0
 
@@ -214,6 +240,7 @@ export default function CostForecastPage() {
         ...prev,
         ingredients: updatedIngredients,
         total_cost_per_unit_rm: totalCost,
+        suggested_selling_price_rm: suggestedPrice,
         profit_per_unit_rm: profit,
         profit_margin_percent: margin,
       }
