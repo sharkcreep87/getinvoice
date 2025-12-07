@@ -110,8 +110,8 @@ export default function CostForecastPage() {
           user_id: user.id,
           name: currentForecast.product_name,
           description: `${currentForecast.serving_unit} - AI Generated`,
-          price: currentForecast.suggested_selling_price_rm,
-          cost: currentForecast.total_cost_per_unit_rm,
+          unit_price: currentForecast.suggested_selling_price_rm,
+          cost_price: currentForecast.total_cost_per_unit_rm,
           stock: 0,
         })
 
