@@ -305,7 +305,7 @@ export default function CostForecastPage() {
 
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
         {/* Chat Interface */}
-        <Card className="lg:col-span-2 border-2 border-primary/20 shadow-lg order-2 lg:order-1">
+        <Card className="lg:col-span-2 border-2 border-primary/20 shadow-lg order-1">
           <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10 border-b border-primary/10">
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
               <Bot className="h-5 w-5 text-primary" />
@@ -391,7 +391,7 @@ export default function CostForecastPage() {
         </Card>
 
         {/* Forecast Summary */}
-        <Card className="border-2 border-primary/20 shadow-lg order-1 lg:order-2">
+        <Card className="border-2 border-primary/20 shadow-lg order-2">
           <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10 border-b border-primary/10">
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
               <TrendingUp className="h-5 w-5 text-primary" />
