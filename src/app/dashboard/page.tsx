@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { FileText, DollarSign, Users, TrendingUp, Clock, CheckCircle, AlertCircle } from "lucide-react"
+import { FileText, DollarSign, Users, TrendingUp, Clock, CheckCircle, AlertCircle, Receipt } from "lucide-react"
 import { createServerClient } from "@/lib/supabase/server"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency } from "@/lib/utils"
@@ -9,13 +9,15 @@ export const dynamic = 'force-dynamic'
 async function getDashboardStats(userId: string, userCurrency: string) {
   const supabase = await createServerClient()
 
-  const [customersResult, invoicesResult] = await Promise.all([
+  const [customersResult, invoicesResult, expensesResult] = await Promise.all([
     supabase.from('customers').select('id', { count: 'exact' }).eq('user_id', userId),
     supabase.from('invoices').select('id, invoice_number, status, issue_date, due_date, total, created_at').eq('user_id', userId).order('created_at', { ascending: false }),
+    supabase.from('expenses').select('id, amount, expense_date').eq('user_id', userId),
   ])
 
   const customers = (customersResult.data || []) as any[]
   const invoices = (invoicesResult.data || []) as any[]
+  const expenses = (expensesResult.data || []) as any[]
 
   const totalRevenue = invoices
     .filter(inv => inv.status === 'paid')
@@ -35,6 +37,28 @@ async function getDashboardStats(userId: string, userCurrency: string) {
 
   const paidInvoicesCount = invoices.filter(inv => inv.status === 'paid').length
 
+  // Calculate monthly expenses and net profit
+  const now = new Date()
+  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+  const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+
+  const monthlyExpenses = expenses
+    .filter(exp => {
+      const expenseDate = new Date(exp.expense_date)
+      return expenseDate >= firstDayOfMonth && expenseDate <= lastDayOfMonth
+    })
+    .reduce((sum, exp) => sum + Number(exp.amount), 0)
+
+  const monthlyRevenue = invoices
+    .filter(inv => {
+      if (inv.status !== 'paid') return false
+      const paidDate = new Date(inv.created_at)
+      return paidDate >= firstDayOfMonth && paidDate <= lastDayOfMonth
+    })
+    .reduce((sum, inv) => sum + inv.total, 0)
+
+  const monthlyNetProfit = monthlyRevenue - monthlyExpenses
+
   return {
     totalCustomers: customersResult.count || 0,
     totalInvoices: invoices.length,
@@ -43,6 +67,8 @@ async function getDashboardStats(userId: string, userCurrency: string) {
     pendingAmount,
     overdueCount: overdueInvoices.length,
     overdueAmount,
+    monthlyExpenses,
+    monthlyNetProfit,
     recentInvoices: invoices.slice(0, 5),
     currency: userCurrency,
   }
@@ -78,7 +104,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Key Metrics */}
-      <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-3">
         {/* Total Customers */}
         <Card className="border border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between pb-3 space-y-0">
@@ -148,6 +174,52 @@ export default async function DashboardPage() {
               {stats.overdueCount}
             </div>
             <p className="text-xs text-muted-foreground mt-1">{formatCurrency(stats.overdueAmount, stats.currency)}</p>
+          </CardContent>
+        </Card>
+
+        {/* Monthly Expenses */}
+        <Card className="border border-orange-200 hover:border-orange-300 transition-all hover:shadow-lg">
+          <CardHeader className="flex flex-row items-center justify-between pb-3 space-y-0">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Expenses (This Month)
+            </CardTitle>
+            <div className="p-2 bg-orange-50 rounded-lg">
+              <Receipt className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-orange-600">
+              {formatCurrency(stats.monthlyExpenses, stats.currency)}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">Business expenses</p>
+          </CardContent>
+        </Card>
+
+        {/* Net Profit */}
+        <Card className={`border transition-all hover:shadow-lg ${
+          stats.monthlyNetProfit >= 0
+            ? 'border-green-200 hover:border-green-300'
+            : 'border-red-200 hover:border-red-300'
+        }`}>
+          <CardHeader className="flex flex-row items-center justify-between pb-3 space-y-0">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Net Profit (This Month)
+            </CardTitle>
+            <div className={`p-2 rounded-lg ${
+              stats.monthlyNetProfit >= 0 ? 'bg-green-50' : 'bg-red-50'
+            }`}>
+              <TrendingUp className={`h-4 w-4 sm:h-5 sm:w-5 ${
+                stats.monthlyNetProfit >= 0 ? 'text-green-600' : 'text-red-600'
+              }`} />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className={`text-xl sm:text-2xl lg:text-3xl font-bold ${
+              stats.monthlyNetProfit >= 0 ? 'text-green-600' : 'text-red-600'
+            }`}>
+              {formatCurrency(stats.monthlyNetProfit, stats.currency)}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">Revenue - Expenses</p>
           </CardContent>
         </Card>
       </div>
@@ -229,7 +301,7 @@ export default async function DashboardPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Link
               href="/dashboard/customers"
               className="group p-5 border border-primary/20 rounded-xl hover:border-primary transition-all hover:shadow-lg bg-white"
@@ -260,7 +332,7 @@ export default async function DashboardPage() {
             </Link>
             <Link
               href="/dashboard/products"
-              className="group p-5 border border-primary/20 rounded-xl hover:border-primary transition-all hover:shadow-lg bg-white sm:col-span-2 lg:col-span-1"
+              className="group p-5 border border-primary/20 rounded-xl hover:border-primary transition-all hover:shadow-lg bg-white"
             >
               <div className="flex items-start gap-3">
                 <div className="p-2.5 bg-primary/10 group-hover:bg-primary/20 rounded-lg transition-colors">
@@ -269,6 +341,20 @@ export default async function DashboardPage() {
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">Add Product</h3>
                   <p className="text-sm text-muted-foreground">Manage inventory</p>
+                </div>
+              </div>
+            </Link>
+            <Link
+              href="/dashboard/expenses"
+              className="group p-5 border border-orange-200 rounded-xl hover:border-orange-400 transition-all hover:shadow-lg bg-white"
+            >
+              <div className="flex items-start gap-3">
+                <div className="p-2.5 bg-orange-50 group-hover:bg-orange-100 rounded-lg transition-colors">
+                  <Receipt className="h-6 w-6 text-orange-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Add Expense</h3>
+                  <p className="text-sm text-muted-foreground">Track spending</p>
                 </div>
               </div>
             </Link>
