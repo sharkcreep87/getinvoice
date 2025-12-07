@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
-import { Package, Plus, Edit, Trash2, Search, Calculator } from "lucide-react"
+import { Package, Plus, Edit, Trash2, Search, Calculator, Share2, Copy, Download, QrCode } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 import { LoadingPage } from "@/components/ui/loading"
@@ -49,6 +49,11 @@ export default function ProductsPage() {
   })
   const [pricingMode, setPricingMode] = useState<PricingMode>('markup')
   const [percentage, setPercentage] = useState("50")
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
+  const [shareProduct, setShareProduct] = useState<Product | null>(null)
+  const [generatedLink, setGeneratedLink] = useState<string>('')
+  const [qrCode, setQrCode] = useState<string>('')
+  const [generatingLink, setGeneratingLink] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
   const supabase = createClient()
@@ -210,6 +215,92 @@ export default function ProductsPage() {
       stock: product.stock?.toString() || '0',
     })
     setIsEditDialogOpen(true)
+  }
+
+  const handleGenerateLink = async (linkType: 'product' | 'catalog') => {
+    try {
+      setGeneratingLink(true)
+
+      const response = await fetch('/api/product-links', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id: linkType === 'product' ? shareProduct?.id : null,
+          link_type: linkType,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to generate link')
+      }
+
+      setGeneratedLink(data.data.full_url)
+
+      // Generate QR code
+      const qrResponse = await fetch('/api/generate-qr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: data.data.full_url }),
+      })
+
+      const qrData = await qrResponse.json()
+
+      if (qrData.success) {
+        setQrCode(qrData.qr_code)
+      }
+
+      toast({
+        title: "Success",
+        description: `${linkType === 'product' ? 'Product' : 'Catalog'} link generated successfully`,
+      })
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate link",
+        variant: "destructive",
+      })
+    } finally {
+      setGeneratingLink(false)
+    }
+  }
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      toast({
+        title: "Copied!",
+        description: "Link copied to clipboard",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to copy link",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const downloadQRCode = () => {
+    if (!qrCode) return
+
+    const link = document.createElement('a')
+    link.download = `qr-code-${shareProduct?.name || 'catalog'}.png`
+    link.href = qrCode
+    link.click()
+
+    toast({
+      title: "Downloaded",
+      description: "QR code downloaded successfully",
+    })
+  }
+
+  const openShareDialog = (product: Product) => {
+    setShareProduct(product)
+    setGeneratedLink('')
+    setQrCode('')
+    setIsShareDialogOpen(true)
   }
 
   const filteredProducts = products.filter(product =>
@@ -485,7 +576,7 @@ export default function ProductsPage() {
                     <TableHead className="hidden md:table-cell">Description</TableHead>
                     <TableHead className="text-center min-w-[60px]">Stock</TableHead>
                     <TableHead className="min-w-[100px]">Unit Price</TableHead>
-                    <TableHead className="text-right min-w-[100px]">Actions</TableHead>
+                    <TableHead className="text-right min-w-[140px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -506,8 +597,18 @@ export default function ProductsPage() {
                           <Button
                             variant="outline"
                             size="sm"
+                            onClick={() => openShareDialog(product)}
+                            className="h-8 w-8 p-0"
+                            title="Share product"
+                          >
+                            <Share2 className="h-4 w-4 text-blue-600" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() => openEditDialog(product)}
                             className="h-8 w-8 p-0"
+                            title="Edit product"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -516,6 +617,7 @@ export default function ProductsPage() {
                             size="sm"
                             onClick={() => handleDeleteProduct(product.id)}
                             className="h-8 w-8 p-0"
+                            title="Delete product"
                           >
                             <Trash2 className="h-4 w-4 text-red-600" />
                           </Button>
@@ -721,6 +823,130 @@ export default function ProductsPage() {
               disabled={!formData.name || !formData.unit_price}
             >
               Update Product
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Share Product Dialog */}
+      <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Share Product</DialogTitle>
+            <DialogDescription>
+              Generate a shareable link or QR code for {shareProduct?.name}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            {/* Link Type Selection */}
+            {!generatedLink && (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">Choose how you want to share:</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Card
+                    className="cursor-pointer hover:border-primary transition-colors"
+                    onClick={() => handleGenerateLink('product')}
+                  >
+                    <CardContent className="pt-6">
+                      <div className="text-center space-y-2">
+                        <Package className="h-8 w-8 mx-auto text-primary" />
+                        <h3 className="font-semibold">Single Product</h3>
+                        <p className="text-sm text-gray-600">
+                          Share a link for this product only
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card
+                    className="cursor-pointer hover:border-primary transition-colors"
+                    onClick={() => handleGenerateLink('catalog')}
+                  >
+                    <CardContent className="pt-6">
+                      <div className="text-center space-y-2">
+                        <Package className="h-8 w-8 mx-auto text-blue-600" />
+                        <h3 className="font-semibold">Full Catalog</h3>
+                        <p className="text-sm text-gray-600">
+                          Share a link to all your products
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            )}
+
+            {/* Generated Link Display */}
+            {generatedLink && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Shareable Link</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={generatedLink}
+                      readOnly
+                      className="font-mono text-sm"
+                    />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => copyToClipboard(generatedLink)}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* QR Code */}
+                {qrCode && (
+                  <div className="space-y-2">
+                    <Label>QR Code</Label>
+                    <div className="flex flex-col items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                      <img
+                        src={qrCode}
+                        alt="QR Code"
+                        className="w-64 h-64"
+                      />
+                      <Button
+                        variant="outline"
+                        onClick={downloadQRCode}
+                        className="w-full sm:w-auto"
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Download QR Code
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Generate Another Link */}
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setGeneratedLink('')
+                    setQrCode('')
+                  }}
+                  className="w-full"
+                >
+                  Generate Another Link
+                </Button>
+              </div>
+            )}
+
+            {generatingLink && (
+              <div className="flex items-center justify-center py-8">
+                <div className="text-center space-y-2">
+                  <QrCode className="h-8 w-8 animate-pulse mx-auto text-primary" />
+                  <p className="text-sm text-gray-600">Generating link and QR code...</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsShareDialogOpen(false)}>
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>

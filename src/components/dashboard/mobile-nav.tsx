@@ -25,6 +25,7 @@ import {
   Package,
   Calculator,
   Receipt,
+  ShoppingCart,
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
@@ -35,6 +36,7 @@ const navigation = [
   { name: "Products", href: "/dashboard/products", icon: Package },
   { name: "Cost Forecast", href: "/dashboard/cost-forecast", icon: Calculator },
   { name: "Invoices", href: "/dashboard/invoices", icon: FileText },
+  { name: "Orders", href: "/dashboard/orders", icon: ShoppingCart },
   { name: "Expenses", href: "/dashboard/expenses", icon: Receipt },
   { name: "Company", href: "/dashboard/company", icon: Building2 },
   { name: "Subscription", href: "/dashboard/subscription", icon: CreditCard },
