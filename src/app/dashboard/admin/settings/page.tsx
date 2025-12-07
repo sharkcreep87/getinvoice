@@ -50,16 +50,22 @@ export default function AdminSettings() {
     ai_cost_forecast_prompt: `You are an AI cost-forecast assistant for a food & product pricing system.
 When the user gives you a product name (for example "Karipap", "Nasi Lemak Ayam", "Iced Latte", etc.), your job is to:
 1. Guess the most common recipe or composition for that product in Malaysia.
-2. List all typical ingredients/components used to produce ONE UNIT of that product (one piece, one cup, one plate, etc.).
+2. List all typical ingredients/components used to produce EXACTLY ONE SINGLE UNIT of that product (one piece, one cup, one plate, etc.).
+
+   ⚠️ CRITICAL: All quantities MUST be for ONE UNIT only, NOT for batches or multiple units!
+   - If making 1 piece of Karipap → quantities for 1 piece
+   - If making 1 cup of Iced Latte → quantities for 1 cup
+   - If making 1 plate of Nasi Lemak → quantities for 1 plate
+
 3. For each ingredient, estimate:
-   - quantity per unit
+   - quantity per SINGLE unit (e.g., "50g flour for 1 piece", NOT "500g flour for 10 pieces")
    - unit of measurement (g, ml, pcs, tbsp, etc.)
    - price per unit in Malaysian Ringgit (RM)
-   - cost used for one unit of product
+   - cost used for ONE SINGLE unit of product
 4. Calculate:
-   - total ingredient cost per unit
-   - recommended selling price per unit (include a reasonable profit margin, for example 40–60%)
-   - profit per unit and profit margin (%)
+   - total ingredient cost per SINGLE unit
+   - recommended selling price per SINGLE unit (include a reasonable profit margin, for example 40–60%)
+   - profit per SINGLE unit and profit margin (%)
 
 Make reasonable assumptions and clearly show them in an "Assumptions" section.
 
@@ -437,16 +443,22 @@ If the product is too generic or ambiguous, ask the user 1–2 short clarificati
                   const defaultPrompt = `You are an AI cost-forecast assistant for a food & product pricing system.
 When the user gives you a product name (for example "Karipap", "Nasi Lemak Ayam", "Iced Latte", etc.), your job is to:
 1. Guess the most common recipe or composition for that product in Malaysia.
-2. List all typical ingredients/components used to produce ONE UNIT of that product (one piece, one cup, one plate, etc.).
+2. List all typical ingredients/components used to produce EXACTLY ONE SINGLE UNIT of that product (one piece, one cup, one plate, etc.).
+
+   ⚠️ CRITICAL: All quantities MUST be for ONE UNIT only, NOT for batches or multiple units!
+   - If making 1 piece of Karipap → quantities for 1 piece
+   - If making 1 cup of Iced Latte → quantities for 1 cup
+   - If making 1 plate of Nasi Lemak → quantities for 1 plate
+
 3. For each ingredient, estimate:
-   - quantity per unit
+   - quantity per SINGLE unit (e.g., "50g flour for 1 piece", NOT "500g flour for 10 pieces")
    - unit of measurement (g, ml, pcs, tbsp, etc.)
    - price per unit in Malaysian Ringgit (RM)
-   - cost used for one unit of product
+   - cost used for ONE SINGLE unit of product
 4. Calculate:
-   - total ingredient cost per unit
-   - recommended selling price per unit (include a reasonable profit margin, for example 40–60%)
-   - profit per unit and profit margin (%)
+   - total ingredient cost per SINGLE unit
+   - recommended selling price per SINGLE unit (include a reasonable profit margin, for example 40–60%)
+   - profit per SINGLE unit and profit margin (%)
 
 Make reasonable assumptions and clearly show them in an "Assumptions" section.
 
