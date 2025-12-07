@@ -39,7 +39,7 @@ export default function CostForecastPage() {
   const [savingToProducts, setSavingToProducts] = useState(false)
   const [subscriptionTier, setSubscriptionTier] = useState<string>('free')
   const [requestCount, setRequestCount] = useState(0)
-  const [requestLimit] = useState(5) // Free tier limit
+  const [requestLimit, setRequestLimit] = useState(5) // Default: 5 requests
   const { toast } = useToast()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
@@ -56,7 +56,23 @@ export default function CostForecastPage() {
   useEffect(() => {
     loadUserSubscription()
     loadRequestCount()
+    loadRequestLimit()
   }, [])
+
+  const loadRequestLimit = () => {
+    try {
+      const savedSettings = localStorage.getItem('admin_settings')
+      if (savedSettings) {
+        const settings = JSON.parse(savedSettings)
+        const limit = settings.ai_request_limit_free
+        if (limit && typeof limit === 'number' && limit > 0) {
+          setRequestLimit(limit)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load request limit:', error)
+    }
+  }
 
   const loadUserSubscription = async () => {
     try {

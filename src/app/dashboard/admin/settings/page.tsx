@@ -23,6 +23,7 @@ type SystemSettings = {
   stripe_enabled: boolean
   email_notifications_enabled: boolean
   ai_cost_forecast_prompt: string
+  ai_request_limit_free: number
 }
 
 type SubscriptionPlan = {
@@ -95,6 +96,7 @@ The JSON must follow this structure exactly:
 
 Do NOT add any extra fields in the JSON.
 If the product is too generic or ambiguous, ask the user 1–2 short clarification questions before calculating.`,
+    ai_request_limit_free: 5,
   })
   const [plans, setPlans] = useState<SubscriptionPlan[]>([])
   const router = useRouter()
@@ -397,9 +399,24 @@ If the product is too generic or ambiguous, ask the user 1–2 short clarificati
         <Card>
           <CardHeader>
             <CardTitle>AI Cost Forecast Settings</CardTitle>
-            <CardDescription>Customize the AI prompt for cost forecasting assistant</CardDescription>
+            <CardDescription>Customize the AI prompt and request limits for cost forecasting assistant</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="ai_request_limit">Daily Request Limit (Free Users)</Label>
+              <Input
+                id="ai_request_limit"
+                type="number"
+                min="1"
+                max="100"
+                value={settings.ai_request_limit_free}
+                onChange={(e) => setSettings({ ...settings, ai_request_limit_free: parseInt(e.target.value) || 5 })}
+                placeholder="5"
+              />
+              <p className="text-xs text-gray-500">
+                Maximum number of AI cost-forecast requests per day for free tier users. Paid users have unlimited access.
+              </p>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="ai_prompt">System Prompt</Label>
               <Textarea
