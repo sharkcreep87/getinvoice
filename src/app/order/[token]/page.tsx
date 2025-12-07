@@ -55,10 +55,10 @@ export default function PublicOrderPage() {
   const loadLinkAndProducts = async () => {
     try {
       // Increment view count
-      await supabase.rpc('increment_link_view_count', { link_token: token })
+      await (supabase as any).rpc('increment_link_view_count', { link_token: token })
 
       // Get link details
-      const { data: linkData, error: linkError } = await supabase
+      const { data: linkData, error: linkError } = await (supabase as any)
         .from('product_links')
         .select('*')
         .eq('token', token)
@@ -79,7 +79,7 @@ export default function PublicOrderPage() {
       // Load products based on link type
       if (linkData.link_type === 'product') {
         // Single product link
-        const { data: productData, error: productError } = await supabase
+        const { data: productData, error: productError } = await (supabase as any)
           .from('products')
           .select('id, name, description, unit_price, stock')
           .eq('id', linkData.product_id)
@@ -90,7 +90,7 @@ export default function PublicOrderPage() {
         setSelectedProduct(productData.id)
       } else {
         // Catalog link - load all products from this user
-        const { data: productsData, error: productsError } = await supabase
+        const { data: productsData, error: productsError } = await (supabase as any)
           .from('products')
           .select('id, name, description, unit_price, stock')
           .eq('user_id', linkData.user_id)
@@ -154,7 +154,7 @@ export default function PublicOrderPage() {
       if (error) throw error
 
       // Increment order count
-      await supabase.rpc('increment_link_order_count', { link_token: token })
+      await (supabase as any).rpc('increment_link_order_count', { link_token: token })
 
       setOrderSuccess(true)
       toast({
