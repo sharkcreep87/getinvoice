@@ -37,6 +37,9 @@ export default function CostForecastPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [currentForecast, setCurrentForecast] = useState<CostForecastData | null>(null)
   const [savingToProducts, setSavingToProducts] = useState(false)
+  const [subscriptionTier, setSubscriptionTier] = useState<string>('free')
+  const [requestCount, setRequestCount] = useState(0)
+  const [requestLimit] = useState(5) // Free tier limit
   const { toast } = useToast()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
@@ -50,9 +53,87 @@ export default function CostForecastPage() {
     scrollToBottom()
   }, [messages])
 
+  useEffect(() => {
+    loadUserSubscription()
+    loadRequestCount()
+  }, [])
+
+  const loadUserSubscription = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('subscription_tier')
+        .eq('id', user.id)
+        .single() as { data: { subscription_tier: string } | null }
+
+      if (profile) {
+        setSubscriptionTier(profile.subscription_tier || 'free')
+      }
+    } catch (error) {
+      console.error('Failed to load subscription:', error)
+    }
+  }
+
+  const loadRequestCount = () => {
+    try {
+      const today = new Date().toDateString()
+      const stored = localStorage.getItem('ai_forecast_requests')
+
+      if (stored) {
+        const { date, count } = JSON.parse(stored)
+
+        // Reset count if it's a new day
+        if (date === today) {
+          setRequestCount(count)
+        } else {
+          setRequestCount(0)
+          localStorage.setItem('ai_forecast_requests', JSON.stringify({ date: today, count: 0 }))
+        }
+      } else {
+        localStorage.setItem('ai_forecast_requests', JSON.stringify({ date: today, count: 0 }))
+      }
+    } catch (error) {
+      console.error('Failed to load request count:', error)
+    }
+  }
+
+  const incrementRequestCount = () => {
+    try {
+      const today = new Date().toDateString()
+      const newCount = requestCount + 1
+      setRequestCount(newCount)
+      localStorage.setItem('ai_forecast_requests', JSON.stringify({ date: today, count: newCount }))
+    } catch (error) {
+      console.error('Failed to increment request count:', error)
+    }
+  }
+
+  const canMakeRequest = () => {
+    // Paid users have unlimited requests
+    if (subscriptionTier !== 'free') {
+      return true
+    }
+
+    // Free users are limited to 5 requests per day
+    return requestCount < requestLimit
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!productName.trim() || loading) return
+
+    // Check if user can make request (free tier limit)
+    if (!canMakeRequest()) {
+      toast({
+        title: "Daily Limit Reached",
+        description: `Free users are limited to ${requestLimit} AI requests per day. Upgrade to get unlimited access!`,
+        variant: "destructive",
+      })
+      return
+    }
 
     setLoading(true)
     const userMessage = productName.trim()
@@ -88,6 +169,11 @@ export default function CostForecastPage() {
 
       if (!response.ok) {
         throw new Error(data.error || 'Failed to get forecast')
+      }
+
+      // Increment request count for free users
+      if (subscriptionTier === 'free') {
+        incrementRequestCount()
       }
 
       // Add assistant response to chat
@@ -167,15 +253,37 @@ export default function CostForecastPage() {
         <div className="absolute top-0 right-0 -mt-4 -mr-16 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 -mb-8 -ml-8 h-48 w-48 rounded-full bg-white/10 blur-2xl"></div>
         <div className="relative">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-white/20 rounded-lg">
-              <Calculator className="h-6 w-6" />
+          <div className="flex items-center justify-between mb-2 gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <Calculator className="h-6 w-6" />
+              </div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Cost Forecast Assistant</h1>
             </div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Cost Forecast Assistant</h1>
+            {subscriptionTier === 'free' && (
+              <div className="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/30">
+                <p className="text-xs sm:text-sm font-semibold whitespace-nowrap">
+                  {requestLimit - requestCount}/{requestLimit} requests left
+                </p>
+              </div>
+            )}
           </div>
           <p className="text-white/90 text-sm sm:text-base lg:text-lg">
             AI-powered product pricing & cost analysis for Malaysian food & products
           </p>
+          {subscriptionTier === 'free' && requestCount >= requestLimit && (
+            <div className="mt-3 bg-yellow-500/20 border border-yellow-300/30 rounded-lg p-3">
+              <p className="text-sm font-medium">
+                Daily limit reached!
+                <button
+                  onClick={() => router.push('/dashboard/subscription')}
+                  className="ml-2 underline hover:text-yellow-200 transition-colors"
+                >
+                  Upgrade for unlimited access →
+                </button>
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
