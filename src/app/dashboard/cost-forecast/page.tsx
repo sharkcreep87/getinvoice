@@ -162,9 +162,10 @@ export default function CostForecastPage() {
 
           // Auto-calculate cost_per_unit when quantity or unit_price changes
           if (field === 'quantity' || field === 'unit_price_rm') {
-            const qty = field === 'quantity' ? Number(value) : updated.quantity
-            const price = field === 'unit_price_rm' ? Number(value) : updated.unit_price_rm
+            const qty = field === 'quantity' ? Number(value) : Number(updated.quantity)
+            const price = field === 'unit_price_rm' ? Number(value) : Number(updated.unit_price_rm)
             updated.cost_per_unit_rm = qty * price
+            console.log('💰 Cost calculation:', { qty, price, cost: updated.cost_per_unit_rm })
           }
 
           return updated
@@ -172,7 +173,17 @@ export default function CostForecastPage() {
         return ing
       })
 
-      const totalCost = updatedIngredients.reduce((sum, ing) => sum + ing.cost_per_unit_rm, 0)
+      const totalCost = updatedIngredients.reduce((sum: number, ing: Ingredient) => {
+        return sum + Number(ing.cost_per_unit_rm || 0)
+      }, 0)
+
+      console.log('📊 Total cost updated:', {
+        field,
+        value,
+        ingredientCount: updatedIngredients.length,
+        totalCost,
+        ingredientCosts: updatedIngredients.map(i => ({ name: i.name, cost: i.cost_per_unit_rm }))
+      })
 
       // Maintain the same profit margin percentage
       const currentMargin = prev.profit_margin_percent
@@ -241,7 +252,9 @@ export default function CostForecastPage() {
       if (!prev) return null
 
       const updatedIngredients = prev.ingredients.filter(ing => ing.id !== id)
-      const totalCost = updatedIngredients.reduce((sum, ing) => sum + ing.cost_per_unit_rm, 0)
+      const totalCost = updatedIngredients.reduce((sum: number, ing: Ingredient) => {
+        return sum + Number(ing.cost_per_unit_rm || 0)
+      }, 0)
 
       // Maintain the same profit margin percentage
       const currentMargin = prev.profit_margin_percent
