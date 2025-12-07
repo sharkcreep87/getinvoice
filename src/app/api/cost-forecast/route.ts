@@ -95,24 +95,61 @@ export async function POST(request: NextRequest) {
     // Try to extract JSON from the response
     let jsonData = null
     let cleanResponse = rawResponse
-    const jsonMatch = rawResponse.match(/```json\n([\s\S]*?)\n```/) || rawResponse.match(/\{[\s\S]*"product_name"[\s\S]*\}/)
 
-    if (jsonMatch) {
-      try {
-        const jsonString = jsonMatch[1] || jsonMatch[0]
-        jsonData = JSON.parse(jsonString)
+    // Try multiple extraction methods
+    let jsonString = null
 
-        // Remove JSON block from the chat display
-        if (jsonMatch[1]) {
-          // Remove ```json...``` block
-          cleanResponse = rawResponse.replace(/```json\n[\s\S]*?\n```/, '').trim()
-        } else {
-          // Remove raw JSON object
-          cleanResponse = rawResponse.replace(/\{[\s\S]*"product_name"[\s\S]*\}/, '').trim()
-        }
-      } catch (e) {
-        console.error('Failed to parse JSON from response:', e)
+    // Method 1: Try to find ```json code block
+    const codeBlockMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/)
+    if (codeBlockMatch) {
+      jsonString = codeBlockMatch[1]
+      cleanResponse = rawResponse.replace(/```json\s*[\s\S]*?\s*```/, '').trim()
+    }
+
+    // Method 2: Try to find JSON object with product_name
+    if (!jsonString) {
+      const jsonObjectMatch = rawResponse.match(/\{[\s\S]*?"product_name"[\s\S]*?\}(?=\s*$|[\s\S]*?(?=\n\n))/m)
+      if (jsonObjectMatch) {
+        jsonString = jsonObjectMatch[0]
+        cleanResponse = rawResponse.replace(jsonObjectMatch[0], '').trim()
       }
+    }
+
+    // Method 3: Find last complete JSON object in response
+    if (!jsonString) {
+      const lastBrace = rawResponse.lastIndexOf('}')
+      if (lastBrace !== -1) {
+        for (let i = 0; i <= lastBrace; i++) {
+          if (rawResponse[i] === '{') {
+            const potentialJson = rawResponse.substring(i, lastBrace + 1)
+            try {
+              const parsed = JSON.parse(potentialJson)
+              if (parsed.product_name) {
+                jsonString = potentialJson
+                cleanResponse = rawResponse.substring(0, i) + rawResponse.substring(lastBrace + 1)
+                cleanResponse = cleanResponse.trim()
+                break
+              }
+            } catch (e) {
+              // Continue searching
+            }
+          }
+        }
+      }
+    }
+
+    // Parse the extracted JSON
+    if (jsonString) {
+      try {
+        jsonData = JSON.parse(jsonString)
+        console.log('Successfully extracted JSON:', jsonData)
+      } catch (e) {
+        console.error('Failed to parse extracted JSON:', e)
+        console.error('JSON string was:', jsonString)
+      }
+    } else {
+      console.warn('Could not find JSON in AI response')
+      console.log('Full response:', rawResponse)
     }
 
     return NextResponse.json({
