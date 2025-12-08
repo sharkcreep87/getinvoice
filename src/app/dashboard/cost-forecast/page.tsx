@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Loader2, TrendingUp, Calculator, Plus, Trash2, DollarSign, Bot, Send, RefreshCw } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
+import { AIUsageBadge } from "@/components/ai-usage-badge"
 
 type Message = {
   role: 'user' | 'assistant'
@@ -341,11 +342,14 @@ export default function CostForecastPage() {
         <div className="absolute top-0 right-0 -mt-4 -mr-16 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 -mb-8 -ml-8 h-48 w-48 rounded-full bg-white/10 blur-2xl"></div>
         <div className="relative">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-white/20 rounded-lg">
-              <Calculator className="h-6 w-6" />
+          <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <Calculator className="h-6 w-6" />
+              </div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Cost Forecast Calculator</h1>
             </div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Cost Forecast Calculator</h1>
+            <AIUsageBadge />
           </div>
           <p className="text-white/90 text-sm sm:text-base lg:text-lg">
             AI-powered product pricing & cost analysis for Malaysian food & products

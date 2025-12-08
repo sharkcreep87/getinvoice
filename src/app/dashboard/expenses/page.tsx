@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Plus, Search, Receipt } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
+import { AIUsageBadge } from "@/components/ai-usage-badge"
 import { LoadingPage } from "@/components/ui/loading"
 import { ExpenseSummary } from "@/components/expenses/expense-summary"
 import { ExpenseTable } from "@/components/expenses/expense-table"
@@ -173,9 +174,12 @@ export default function ExpensesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Expenses</h1>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Expenses</h1>
+            <AIUsageBadge />
+          </div>
           <p className="text-sm sm:text-base text-gray-600">
-            Track and manage your business expenses
+            Track and manage your business expenses (AI Receipt Scanning included)
           </p>
         </div>
         <Button onClick={openAddDialog}>

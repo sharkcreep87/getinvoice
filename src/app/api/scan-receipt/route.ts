@@ -52,6 +52,40 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Check AI usage limit
+    const { data: adminSettings } = await (supabase as any)
+      .from('admin_settings')
+      .select('setting_value')
+      .eq('setting_key', 'daily_ai_request_limit')
+      .single()
+
+    const dailyLimit = adminSettings?.setting_value
+      ? parseInt(adminSettings.setting_value)
+      : 5
+
+    // Check current usage
+    const { data: currentUsage } = await (supabase as any)
+      .rpc('get_total_today_ai_usage', { p_user_id: user.id })
+
+    if (currentUsage >= dailyLimit) {
+      return NextResponse.json(
+        {
+          error: 'Daily AI request limit reached',
+          message: `You have reached your daily limit of ${dailyLimit} AI requests. Please try again tomorrow or contact support to increase your limit.`,
+          limit: dailyLimit,
+          used: currentUsage
+        },
+        { status: 429 }
+      )
+    }
+
+    // Increment usage count
+    await (supabase as any)
+      .rpc('increment_ai_usage', {
+        p_user_id: user.id,
+        p_request_type: 'receipt_scan'
+      })
+
     // Parse multipart form data
     const formData = await request.formData()
     const file = formData.get('file') as File

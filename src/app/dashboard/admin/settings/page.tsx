@@ -159,6 +159,20 @@ If the product is too generic or ambiguous, ask the user 1–2 short clarificati
         setSettings(prev => ({ ...prev, ...parsed }))
       }
 
+      // Load AI request limit from database
+      const { data: aiLimitData } = await (supabase as any)
+        .from('admin_settings')
+        .select('setting_value')
+        .eq('setting_key', 'daily_ai_request_limit')
+        .single()
+
+      if (aiLimitData?.setting_value) {
+        setSettings(prev => ({
+          ...prev,
+          ai_request_limit_free: parseInt(aiLimitData.setting_value)
+        }))
+      }
+
       // Load subscription plans from database
       const { data: plansData } = await supabase
         .from('subscription_plans')
@@ -250,9 +264,21 @@ If the product is too generic or ambiguous, ask the user 1–2 short clarificati
   const handleSave = async () => {
     setSaving(true)
     try {
-      // Save to localStorage for now
-      // In production, you'd save to a database table
+      // Save to localStorage
       localStorage.setItem('admin_settings', JSON.stringify(settings))
+
+      // Save AI request limit to database
+      const { error } = await (supabase as any)
+        .from('admin_settings')
+        .upsert({
+          setting_key: 'daily_ai_request_limit',
+          setting_value: settings.ai_request_limit_free.toString(),
+          description: 'Maximum number of AI requests (cost forecast + receipt scan) per user per day'
+        }, {
+          onConflict: 'setting_key'
+        })
+
+      if (error) throw error
 
       toast({
         title: "Success",
@@ -404,23 +430,23 @@ If the product is too generic or ambiguous, ask the user 1–2 short clarificati
         {/* AI Settings */}
         <Card>
           <CardHeader>
-            <CardTitle>AI Cost Forecast Settings</CardTitle>
-            <CardDescription>Customize the AI prompt and request limits for cost forecasting assistant</CardDescription>
+            <CardTitle>AI Request Settings</CardTitle>
+            <CardDescription>Configure AI usage limits for all features (Cost Forecast + Receipt Scanning)</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="ai_request_limit">Daily Request Limit (Free Users)</Label>
+              <Label htmlFor="ai_request_limit">Daily AI Request Limit (All Users)</Label>
               <Input
                 id="ai_request_limit"
                 type="number"
                 min="1"
-                max="100"
+                max="1000"
                 value={settings.ai_request_limit_free}
                 onChange={(e) => setSettings({ ...settings, ai_request_limit_free: parseInt(e.target.value) || 5 })}
                 placeholder="5"
               />
               <p className="text-xs text-gray-500">
-                Maximum number of AI cost-forecast requests per day for free tier users. Paid users have unlimited access.
+                Maximum number of combined AI requests per user per day. This includes Cost Forecast analysis and Receipt Scanning with image analysis. Applies to all subscription packages.
               </p>
             </div>
             <div className="space-y-2">

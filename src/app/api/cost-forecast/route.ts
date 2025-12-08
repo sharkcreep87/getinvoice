@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
+import { createServerClient } from '@/lib/supabase/server'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -78,6 +79,51 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       )
     }
+
+    // Check AI usage limit
+    const supabase = await createServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    // Get daily limit from admin settings table
+    const { data: adminSettings } = await (supabase as any)
+      .from('admin_settings')
+      .select('setting_value')
+      .eq('setting_key', 'daily_ai_request_limit')
+      .single()
+
+    const dailyLimit = adminSettings?.setting_value
+      ? parseInt(adminSettings.setting_value)
+      : 5
+
+    // Check current usage
+    const { data: currentUsage } = await (supabase as any)
+      .rpc('get_total_today_ai_usage', { p_user_id: user.id })
+
+    if (currentUsage >= dailyLimit) {
+      return NextResponse.json(
+        {
+          error: 'Daily AI request limit reached',
+          message: `You have reached your daily limit of ${dailyLimit} AI requests. Please try again tomorrow or contact support to increase your limit.`,
+          limit: dailyLimit,
+          used: currentUsage
+        },
+        { status: 429 }
+      )
+    }
+
+    // Increment usage count
+    await (supabase as any)
+      .rpc('increment_ai_usage', {
+        p_user_id: user.id,
+        p_request_type: 'cost_forecast'
+      })
 
     // Use custom prompt if provided, otherwise use default
     const systemPrompt = customPrompt && customPrompt.trim() !== '' ? customPrompt : SYSTEM_PROMPT
