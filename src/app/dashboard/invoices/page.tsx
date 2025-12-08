@@ -488,7 +488,7 @@ export default function InvoicesPage() {
       // Fetch company settings
       const companySettingsResult = await supabase
         .from('company_settings')
-        .select('company_name, company_email, company_phone, company_address, company_city, company_state, company_zip, company_country, company_logo_url, tax_id, invoice_terms, invoice_footer')
+        .select('company_name, company_email, company_phone, company_address, company_city, company_state, company_zip, company_country, company_logo_url, tax_id, invoice_terms, invoice_footer, invoice_template')
         .eq('user_id', user.id)
         .single()
 
@@ -520,7 +520,8 @@ export default function InvoicesPage() {
         invoice_footer: companySettings?.invoice_footer,
       }
 
-      const pdf = await generateInvoicePDF(invoiceData, companyInfo, userCurrency)
+      const selectedTemplate = (companySettings?.invoice_template || 'classic') as 'classic' | 'modern' | 'minimal'
+      const pdf = await generateInvoicePDF(invoiceData, companyInfo, userCurrency, selectedTemplate)
 
       // Generate 4-digit random number for unique filename
       const randomNum = Math.floor(1000 + Math.random() * 9000)
@@ -651,7 +652,7 @@ export default function InvoicesPage() {
       // Fetch company settings
       const companySettingsResult = await supabase
         .from('company_settings')
-        .select('company_name, company_email, company_phone, company_address, company_city, company_state, company_zip, company_country, company_logo_url, tax_id, invoice_terms, invoice_footer')
+        .select('company_name, company_email, company_phone, company_address, company_city, company_state, company_zip, company_country, company_logo_url, tax_id, invoice_terms, invoice_footer, invoice_template')
         .eq('user_id', user.id)
         .single()
 
@@ -683,7 +684,8 @@ export default function InvoicesPage() {
         invoice_footer: companySettings?.invoice_footer,
       }
 
-      const pdf = await generateInvoicePDF(invoiceData, companyInfo, userCurrency)
+      const selectedTemplate = (companySettings?.invoice_template || 'classic') as 'classic' | 'modern' | 'minimal'
+      const pdf = await generateInvoicePDF(invoiceData, companyInfo, userCurrency, selectedTemplate)
 
       // Generate 4-digit random number for unique filename
       const randomNum = Math.floor(1000 + Math.random() * 9000)

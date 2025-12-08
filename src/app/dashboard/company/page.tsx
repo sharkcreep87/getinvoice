@@ -32,6 +32,7 @@ export default function CompanySettingsPage() {
     tax_id: "",
     invoice_terms: "",
     invoice_footer: "",
+    invoice_template: "classic",
   })
 
   useEffect(() => {
@@ -45,7 +46,7 @@ export default function CompanySettingsPage() {
 
       const result = await supabase
         .from('company_settings')
-        .select('company_name, company_email, company_phone, company_address, company_city, company_state, company_zip, company_country, company_logo_url, tax_id, invoice_terms, invoice_footer')
+        .select('company_name, company_email, company_phone, company_address, company_city, company_state, company_zip, company_country, company_logo_url, tax_id, invoice_terms, invoice_footer, invoice_template')
         .eq('user_id', user.id)
         .single()
 
@@ -410,6 +411,164 @@ export default function CompanySettingsPage() {
                 placeholder="Thank you for your business!"
                 className="mt-1.5"
               />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Invoice Template Selection */}
+        <Card className="md:col-span-2 border-2 border-primary/20 shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-100">
+            <CardTitle>Invoice Template</CardTitle>
+            <CardDescription>
+              Choose a template design for your invoices
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Classic Template */}
+              <div
+                onClick={() => handleChange('invoice_template', 'classic')}
+                className={`cursor-pointer rounded-lg border-2 p-4 transition-all hover:shadow-lg ${
+                  companySettings.invoice_template === 'classic'
+                    ? 'border-primary bg-primary/5 ring-2 ring-primary'
+                    : 'border-gray-200 hover:border-primary/50'
+                }`}
+              >
+                <div className="aspect-[8.5/11] rounded-md bg-white border border-gray-200 shadow-sm mb-3 overflow-hidden">
+                  <div className="h-full p-2 text-[4px] text-gray-700">
+                    <div className="flex justify-between mb-1">
+                      <div className="w-6 h-2 bg-gray-300 rounded"></div>
+                      <div className="text-right">
+                        <div className="font-bold text-indigo-600 text-[6px]">INVOICE</div>
+                        <div className="h-[2px] bg-indigo-600 w-6 ml-auto"></div>
+                      </div>
+                    </div>
+                    <div className="space-y-[2px] mb-2">
+                      <div className="h-[2px] bg-gray-200 w-8"></div>
+                      <div className="h-[2px] bg-gray-200 w-6"></div>
+                    </div>
+                    <div className="h-8 bg-indigo-100 rounded mb-1"></div>
+                    <div className="h-6 bg-gray-100 rounded"></div>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <h3 className="font-semibold text-sm mb-1">Classic</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Professional indigo theme with clean lines
+                  </p>
+                </div>
+                {companySettings.invoice_template === 'classic' && (
+                  <div className="mt-3 flex items-center justify-center gap-2 text-xs font-medium text-primary">
+                    <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    Selected
+                  </div>
+                )}
+              </div>
+
+              {/* Modern Template */}
+              <div
+                onClick={() => handleChange('invoice_template', 'modern')}
+                className={`cursor-pointer rounded-lg border-2 p-4 transition-all hover:shadow-lg ${
+                  companySettings.invoice_template === 'modern'
+                    ? 'border-primary bg-primary/5 ring-2 ring-primary'
+                    : 'border-gray-200 hover:border-primary/50'
+                }`}
+              >
+                <div className="aspect-[8.5/11] rounded-md bg-white border border-gray-200 shadow-sm mb-3 overflow-hidden">
+                  <div className="h-full text-[4px]">
+                    <div className="h-4 bg-gradient-to-r from-indigo-500 to-purple-500 p-1 flex justify-between items-center">
+                      <div className="w-4 h-2 bg-white rounded-full"></div>
+                      <div className="text-white font-bold text-[5px]">INVOICE</div>
+                    </div>
+                    <div className="p-2">
+                      <div className="grid grid-cols-2 gap-1 mb-1">
+                        <div className="h-4 bg-gray-100 rounded border border-gray-200"></div>
+                        <div className="h-4 bg-gray-100 rounded border border-gray-200"></div>
+                      </div>
+                      <div className="flex gap-1 mb-1">
+                        <div className="flex-1 h-2 bg-cyan-50 rounded border border-cyan-200"></div>
+                        <div className="flex-1 h-2 bg-yellow-50 rounded border border-yellow-200"></div>
+                        <div className="flex-1 h-2 bg-green-50 rounded border border-green-200"></div>
+                      </div>
+                      <div className="h-6 bg-gray-50 rounded mb-1"></div>
+                      <div className="h-3 bg-indigo-500 rounded"></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <h3 className="font-semibold text-sm mb-1">Modern</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Bold design with colorful accents
+                  </p>
+                </div>
+                {companySettings.invoice_template === 'modern' && (
+                  <div className="mt-3 flex items-center justify-center gap-2 text-xs font-medium text-primary">
+                    <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    Selected
+                  </div>
+                )}
+              </div>
+
+              {/* Minimal Template */}
+              <div
+                onClick={() => handleChange('invoice_template', 'minimal')}
+                className={`cursor-pointer rounded-lg border-2 p-4 transition-all hover:shadow-lg ${
+                  companySettings.invoice_template === 'minimal'
+                    ? 'border-primary bg-primary/5 ring-2 ring-primary'
+                    : 'border-gray-200 hover:border-primary/50'
+                }`}
+              >
+                <div className="aspect-[8.5/11] rounded-md bg-white border border-gray-200 shadow-sm mb-3 overflow-hidden">
+                  <div className="h-full p-2 text-[4px]">
+                    <div className="border-t-2 border-black mb-2"></div>
+                    <div className="space-y-1 mb-2">
+                      <div className="font-bold text-[7px]">Invoice</div>
+                      <div className="h-[2px] bg-gray-300 w-4"></div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 mb-2">
+                      <div className="space-y-[2px]">
+                        <div className="h-[2px] bg-gray-200 w-3"></div>
+                        <div className="h-[2px] bg-gray-200 w-6"></div>
+                      </div>
+                      <div className="space-y-[2px]">
+                        <div className="h-[2px] bg-gray-200 w-3"></div>
+                        <div className="h-[2px] bg-gray-200 w-6"></div>
+                      </div>
+                    </div>
+                    <div className="border-t border-gray-200 mb-1"></div>
+                    <div className="h-6 bg-white mb-1"></div>
+                    <div className="border-t border-gray-200 mb-1"></div>
+                    <div className="space-y-[2px] ml-auto w-8">
+                      <div className="h-[2px] bg-gray-200"></div>
+                      <div className="h-[2px] bg-black"></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <h3 className="font-semibold text-sm mb-1">Minimal</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Clean and simple with elegant spacing
+                  </p>
+                </div>
+                {companySettings.invoice_template === 'minimal' && (
+                  <div className="mt-3 flex items-center justify-center gap-2 text-xs font-medium text-primary">
+                    <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    Selected
+                  </div>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
