@@ -26,21 +26,58 @@ import {
   Calculator,
   Receipt,
   ShoppingCart,
+  ChevronDown,
+  ChevronRight,
+  ShoppingBag,
+  Wallet,
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 
-const navigation = [
+type NavItem = {
+  name: string
+  href: string
+  icon: any
+}
+
+type NavCategory = {
+  name: string
+  icon: any
+  items: NavItem[]
+}
+
+const mainNavigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Customers", href: "/dashboard/customers", icon: Users },
-  { name: "Products", href: "/dashboard/products", icon: Package },
-  { name: "Cost Forecast", href: "/dashboard/cost-forecast", icon: Calculator },
-  { name: "Invoices", href: "/dashboard/invoices", icon: FileText },
-  { name: "Orders", href: "/dashboard/orders", icon: ShoppingCart },
-  { name: "Expenses", href: "/dashboard/expenses", icon: Receipt },
-  { name: "Company", href: "/dashboard/company", icon: Building2 },
-  { name: "Subscription", href: "/dashboard/subscription", icon: CreditCard },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
+]
+
+const navigationCategories: NavCategory[] = [
+  {
+    name: "Sales & Orders",
+    icon: ShoppingBag,
+    items: [
+      { name: "Customers", href: "/dashboard/customers", icon: Users },
+      { name: "Products", href: "/dashboard/products", icon: Package },
+      { name: "Invoices", href: "/dashboard/invoices", icon: FileText },
+      { name: "Orders", href: "/dashboard/orders", icon: ShoppingCart },
+    ]
+  },
+  {
+    name: "Financial",
+    icon: Wallet,
+    items: [
+      { name: "Cost Forecast", href: "/dashboard/cost-forecast", icon: Calculator },
+      { name: "Expenses", href: "/dashboard/expenses", icon: Receipt },
+    ]
+  },
+  {
+    name: "Settings",
+    icon: Settings,
+    items: [
+      { name: "Company", href: "/dashboard/company", icon: Building2 },
+      { name: "Subscription", href: "/dashboard/subscription", icon: CreditCard },
+      { name: "Settings", href: "/dashboard/settings", icon: Settings },
+    ]
+  }
 ]
 
 const adminNavigation = [
@@ -50,6 +87,11 @@ const adminNavigation = [
 export function MobileNav() {
   const [open, setOpen] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([
+    "Sales & Orders",
+    "Financial",
+    "Settings"
+  ])
   const pathname = usePathname()
   const router = useRouter()
   const { toast } = useToast()
@@ -96,6 +138,18 @@ export function MobileNav() {
     }
   }
 
+  const toggleCategory = (categoryName: string) => {
+    setExpandedCategories(prev =>
+      prev.includes(categoryName)
+        ? prev.filter(name => name !== categoryName)
+        : [...prev, categoryName]
+    )
+  }
+
+  const isCategoryActive = (category: NavCategory) => {
+    return category.items.some(item => pathname === item.href)
+  }
+
   return (
     <div className="md:hidden border-b bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white">
       <div className="flex items-center justify-between p-4">
@@ -114,7 +168,7 @@ export function MobileNav() {
               GetInvoice
             </span>
           </div>
-            <SheetContent side="left" className="w-64 p-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white border-primary/20">
+          <SheetContent side="left" className="w-64 p-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white border-primary/20">
             <SheetHeader className="p-6 border-b border-primary/20 bg-black/20">
               <SheetTitle className="flex items-center text-white">
                 <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary">
@@ -126,8 +180,9 @@ export function MobileNav() {
               </SheetTitle>
             </SheetHeader>
 
-            <nav className="flex-1 space-y-1 px-3 py-4">
-              {navigation.map((item) => {
+            <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto max-h-[calc(100vh-180px)]">
+              {/* Main Navigation - Dashboard */}
+              {mainNavigation.map((item) => {
                 const Icon = item.icon
                 const isActive = pathname === item.href
                 return (
@@ -145,6 +200,63 @@ export function MobileNav() {
                     <Icon className={cn("mr-3 h-5 w-5", isActive && "animate-pulse")} />
                     {item.name}
                   </Link>
+                )
+              })}
+
+              {/* Category Navigation */}
+              {navigationCategories.map((category) => {
+                const CategoryIcon = category.icon
+                const isExpanded = expandedCategories.includes(category.name)
+                const isCatActive = isCategoryActive(category)
+
+                return (
+                  <div key={category.name} className="space-y-1">
+                    <button
+                      onClick={() => toggleCategory(category.name)}
+                      className={cn(
+                        "w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200",
+                        isCatActive
+                          ? "text-primary"
+                          : "text-gray-400 hover:text-white hover:bg-white/5"
+                      )}
+                    >
+                      <div className="flex items-center">
+                        <CategoryIcon className="mr-3 h-4 w-4" />
+                        {category.name}
+                      </div>
+                      {isExpanded ? (
+                        <ChevronDown className="h-4 w-4" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4" />
+                      )}
+                    </button>
+
+                    {/* Submenu Items */}
+                    {isExpanded && (
+                      <div className="ml-4 space-y-0.5 border-l-2 border-white/10 pl-2">
+                        {category.items.map((item) => {
+                          const Icon = item.icon
+                          const isActive = pathname === item.href
+                          return (
+                            <Link
+                              key={item.name}
+                              href={item.href}
+                              onClick={() => setOpen(false)}
+                              className={cn(
+                                "flex items-center px-3 py-2.5 text-sm rounded-lg transition-all duration-200",
+                                isActive
+                                  ? "bg-gradient-to-r from-primary/90 to-secondary/90 text-white shadow-lg shadow-primary/50 font-medium"
+                                  : "text-gray-300 hover:bg-white/10 hover:text-white"
+                              )}
+                            >
+                              <Icon className={cn("mr-3 h-4 w-4", isActive && "animate-pulse")} />
+                              {item.name}
+                            </Link>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
                 )
               })}
 
