@@ -1,7 +1,8 @@
 import Link from "next/link"
-import { FileText, DollarSign, Users, TrendingUp, Clock, CheckCircle, AlertCircle, Receipt } from "lucide-react"
+import { FileText, DollarSign, Users, TrendingUp, Clock, CheckCircle, AlertCircle, Receipt, BarChart3 } from "lucide-react"
 import { createServerClient } from "@/lib/supabase/server"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { formatCurrency } from "@/lib/utils"
 
 export const dynamic = 'force-dynamic'
@@ -97,11 +98,35 @@ export default async function DashboardPage() {
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary to-secondary p-6 sm:p-8 text-white shadow-lg">
         <div className="absolute top-0 right-0 -mt-4 -mr-16 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 -mb-8 -ml-8 h-48 w-48 rounded-full bg-white/10 blur-2xl"></div>
-        <div className="relative">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">Welcome back, {profile?.full_name || 'User'}! 👋</h1>
-          <p className="text-white/90 text-sm sm:text-base lg:text-lg">Here's your business overview</p>
+        <div className="relative flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">Welcome back, {profile?.full_name || 'User'}! 👋</h1>
+            <p className="text-white/90 text-sm sm:text-base lg:text-lg">Here's your business overview</p>
+          </div>
+          <Link href="/dashboard/reports">
+            <Button
+              variant="secondary"
+              size="lg"
+              className="hidden sm:flex gap-2 bg-white text-primary hover:bg-white/90 shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+            >
+              <BarChart3 className="h-5 w-5" />
+              <span className="font-semibold">View Full Reports</span>
+            </Button>
+          </Link>
         </div>
       </div>
+
+      {/* Mobile Reports Button */}
+      <Link href="/dashboard/reports" className="sm:hidden">
+        <Button
+          variant="outline"
+          size="lg"
+          className="w-full gap-2 border-2 border-primary/30 hover:border-primary hover:bg-primary/5"
+        >
+          <BarChart3 className="h-5 w-5" />
+          <span className="font-semibold">View Full Analytics & Reports</span>
+        </Button>
+      </Link>
 
       {/* Key Metrics */}
       <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-3">

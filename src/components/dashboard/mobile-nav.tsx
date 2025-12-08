@@ -30,6 +30,7 @@ import {
   ChevronRight,
   ShoppingBag,
   Wallet,
+  BarChart3,
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
@@ -65,6 +66,7 @@ const navigationCategories: NavCategory[] = [
     name: "Financial",
     icon: Wallet,
     items: [
+      { name: "Reports", href: "/dashboard/reports", icon: BarChart3 },
       { name: "Cost Forecast", href: "/dashboard/cost-forecast", icon: Calculator },
       { name: "Expenses", href: "/dashboard/expenses", icon: Receipt },
     ]
