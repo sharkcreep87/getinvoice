@@ -75,14 +75,19 @@ class WhatsAppBotClient {
     }
 
     this.isInitializing = true
+    console.log(`[Bot ${this.config.userId}] Starting initialization...`)
 
     try {
       // Try to update session status, but don't fail if it errors
       try {
+        console.log(`[Bot ${this.config.userId}] Updating session status to 'connecting'...`)
         await this.updateSessionStatus('connecting')
+        console.log(`[Bot ${this.config.userId}] Session status updated`)
       } catch (dbError) {
         console.error(`[Bot ${this.config.userId}] Failed to update session to connecting, continuing anyway:`, dbError)
       }
+
+      console.log(`[Bot ${this.config.userId}] Creating WhatsApp client...`)
 
       // Create WhatsApp Web.js client with local auth
       this.client = new Client({
@@ -104,8 +109,20 @@ class WhatsAppBotClient {
         },
       })
 
+      console.log(`[Bot ${this.config.userId}] WhatsApp client created, setting up event handlers...`)
       this.setupEventHandlers()
-      await this.client.initialize()
+
+      console.log(`[Bot ${this.config.userId}] Initializing WhatsApp client (this may take 30-60 seconds)...`)
+
+      // Add timeout to prevent hanging indefinitely
+      const initPromise = this.client.initialize()
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Initialization timeout after 60 seconds')), 60000)
+      })
+
+      await Promise.race([initPromise, timeoutPromise])
+
+      console.log(`[Bot ${this.config.userId}] WhatsApp client initialized successfully`)
     } catch (error) {
       console.error(`[Bot ${this.config.userId}] Initialization error:`, error)
       try {
@@ -115,6 +132,7 @@ class WhatsAppBotClient {
       }
       this.config.onError?.(error instanceof Error ? error : new Error('Unknown error'))
       this.isInitializing = false
+      this.client = null // Clean up failed client
       throw error
     }
   }
@@ -124,6 +142,13 @@ class WhatsAppBotClient {
    */
   private setupEventHandlers(): void {
     if (!this.client) return
+
+    console.log(`[Bot ${this.config.userId}] Setting up event handlers...`)
+
+    // Loading screen (Puppeteer starting)
+    this.client.on('loading_screen', (percent: number, message: string) => {
+      console.log(`[Bot ${this.config.userId}] Loading: ${percent}% - ${message}`)
+    })
 
     // QR Code received
     this.client.on('qr', async (qr: string) => {
@@ -144,6 +169,7 @@ class WhatsAppBotClient {
       console.log(`[Bot ${this.config.userId}] Authenticated`)
       await this.updateSessionStatus('authenticated')
     })
+
 
     // Ready
     this.client.on('ready', async () => {
