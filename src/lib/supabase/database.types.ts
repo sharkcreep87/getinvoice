@@ -358,6 +358,236 @@ export interface Database {
           updated_at?: string
         }
       }
+      whatsapp_bot_sessions: {
+        Row: {
+          id: string
+          user_id: string
+          session_id: string | null
+          phone_number: string | null
+          status: string
+          qr_code: string | null
+          qr_expires_at: string | null
+          session_data_path: string | null
+          settings: Json
+          last_heartbeat: string | null
+          connected_at: string | null
+          disconnected_at: string | null
+          error_message: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          session_id?: string | null
+          phone_number?: string | null
+          status?: string
+          qr_code?: string | null
+          qr_expires_at?: string | null
+          session_data_path?: string | null
+          settings?: Json
+          last_heartbeat?: string | null
+          connected_at?: string | null
+          disconnected_at?: string | null
+          error_message?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          session_id?: string | null
+          phone_number?: string | null
+          status?: string
+          qr_code?: string | null
+          qr_expires_at?: string | null
+          session_data_path?: string | null
+          settings?: Json
+          last_heartbeat?: string | null
+          connected_at?: string | null
+          disconnected_at?: string | null
+          error_message?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      whatsapp_conversations: {
+        Row: {
+          id: string
+          user_id: string
+          customer_phone: string
+          customer_name: string | null
+          last_message_at: string
+          message_count: number
+          conversation_state: string
+          context: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          customer_phone: string
+          customer_name?: string | null
+          last_message_at?: string
+          message_count?: number
+          conversation_state?: string
+          context?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          customer_phone?: string
+          customer_name?: string | null
+          last_message_at?: string
+          message_count?: number
+          conversation_state?: string
+          context?: Json
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      whatsapp_knowledge_base: {
+        Row: {
+          id: string
+          user_id: string
+          entry_type: string
+          question: string | null
+          answer: string | null
+          content: string
+          product_id: string | null
+          keywords: string[]
+          priority: number
+          is_auto_synced: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          entry_type: string
+          question?: string | null
+          answer?: string | null
+          content: string
+          product_id?: string | null
+          keywords?: string[]
+          priority?: number
+          is_auto_synced?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          entry_type?: string
+          question?: string | null
+          answer?: string | null
+          content?: string
+          product_id?: string | null
+          keywords?: string[]
+          priority?: number
+          is_auto_synced?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      appointment_slots: {
+        Row: {
+          id: string
+          user_id: string
+          slot_date: string
+          slot_time: string
+          duration_minutes: number
+          max_bookings: number
+          current_bookings: number
+          is_available: boolean
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          slot_date: string
+          slot_time: string
+          duration_minutes?: number
+          max_bookings?: number
+          current_bookings?: number
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          slot_date?: string
+          slot_time?: string
+          duration_minutes?: number
+          max_bookings?: number
+          current_bookings?: number
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      appointments: {
+        Row: {
+          id: string
+          user_id: string
+          slot_id: string
+          conversation_id: string | null
+          customer_name: string
+          customer_phone: string
+          customer_email: string | null
+          appointment_date: string
+          appointment_time: string
+          status: string
+          reminder_sent: boolean
+          reminder_sent_at: string | null
+          notes: string | null
+          cancellation_reason: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          slot_id: string
+          conversation_id?: string | null
+          customer_name: string
+          customer_phone: string
+          customer_email?: string | null
+          appointment_date: string
+          appointment_time: string
+          status?: string
+          reminder_sent?: boolean
+          reminder_sent_at?: string | null
+          notes?: string | null
+          cancellation_reason?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          slot_id?: string
+          conversation_id?: string | null
+          customer_name?: string
+          customer_phone?: string
+          customer_email?: string | null
+          appointment_date?: string
+          appointment_time?: string
+          status?: string
+          reminder_sent?: boolean
+          reminder_sent_at?: string | null
+          notes?: string | null
+          cancellation_reason?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
