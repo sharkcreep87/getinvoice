@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
-import Script from "next/script"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -21,32 +20,6 @@ export default function RootLayout({
       <body className={`${inter.className} overflow-x-hidden`}>
         {children}
         <Toaster />
-        <Script
-          src="https://cdn.lordicon.com/lordicon.js"
-          strategy="afterInteractive"
-        />
-        <Script id="lordicon-error-handler" strategy="afterInteractive">
-          {`
-            // Catch lordicon errors globally
-            if (typeof window !== 'undefined') {
-              // Handle unhandled promise rejections from lordicon
-              window.addEventListener('unhandledrejection', function(event) {
-                if (event.reason && event.reason.message && 
-                    event.reason.message.includes('did not match the expected pattern')) {
-                  console.warn('Suppressed lordicon error:', event.reason.message);
-                  event.preventDefault();
-                }
-              });
-              
-              // Log when lordicon loads
-              window.addEventListener('load', function() {
-                if (window.lottie) {
-                  console.log('LordIcon library loaded successfully');
-                }
-              });
-            }
-          `}
-        </Script>
       </body>
     </html>
   )
