@@ -12,6 +12,22 @@ export async function GET(request: NextRequest) {
   try {
     console.log('[API] QR code fetch request received')
 
+    // Check if running in serverless environment
+    const isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME
+    if (isServerless) {
+      return NextResponse.json(
+        { error: 'WhatsApp bot cannot run on serverless platforms. Please run locally.' },
+        {
+          status: 503,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          }
+        }
+      )
+    }
+
     // Get authenticated user
     const supabase = await createServerClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -40,7 +56,14 @@ export async function GET(request: NextRequest) {
       console.log('[API] QR fetch - No session found for user:', user.id)
       return NextResponse.json(
         { error: 'No bot session found. Please initialize first.' },
-        { status: 404 }
+        {
+          status: 404,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          }
+        }
       )
     }
 
@@ -53,6 +76,12 @@ export async function GET(request: NextRequest) {
           qr_code: null,
           expired: true,
           message: 'QR code expired. Please reinitialize bot.',
+        }, {
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          }
         })
       }
     }
@@ -63,12 +92,37 @@ export async function GET(request: NextRequest) {
       phone_number: session.phone_number,
       expires_at: session.qr_expires_at,
       expired: false,
+    }, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      }
     })
   } catch (error: any) {
     console.error('[API] QR fetch error:', error)
     return NextResponse.json(
       { error: error.message || 'Failed to fetch QR code' },
-      { status: 500 }
+      {
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        }
+      }
     )
   }
+}
+
+// Handle CORS preflight requests
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  })
 }

@@ -13,6 +13,26 @@ export async function POST(request: NextRequest) {
   try {
     console.log('[API] WhatsApp bot init request received')
 
+    // Check if running in serverless environment (Vercel, etc.)
+    const isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME
+    if (isServerless) {
+      console.log('[API] Cannot run WhatsApp bot in serverless environment')
+      return NextResponse.json(
+        {
+          error: 'WhatsApp bot cannot run on serverless platforms like Vercel. Please run this application locally using "npm run dev" to use the WhatsApp bot feature.',
+          details: 'The WhatsApp bot requires Puppeteer/Chromium and a persistent connection, which are not supported in serverless environments.'
+        },
+        {
+          status: 503,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          }
+        }
+      )
+    }
+
     // Get authenticated user
     const supabase = await createServerClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -80,12 +100,37 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Bot initialization started. Check /api/whatsapp-bot/qr for QR code.',
       status: botClient.getStatus(),
+    }, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      }
     })
   } catch (error: any) {
     console.error('[API] Bot initialization error:', error)
     return NextResponse.json(
       { error: error.message || 'Failed to initialize bot' },
-      { status: 500 }
+      {
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        }
+      }
     )
   }
+}
+
+// Handle CORS preflight requests
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  })
 }
