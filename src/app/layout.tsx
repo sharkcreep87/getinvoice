@@ -24,10 +24,27 @@ export default function RootLayout({
         <Script
           src="https://cdn.lordicon.com/lordicon.js"
           strategy="afterInteractive"
+          onLoad={() => {
+            console.log('LordIcon library loaded successfully')
+          }}
           onError={(e) => {
             console.error('Failed to load lordicon:', e)
           }}
         />
+        <Script id="lordicon-error-handler" strategy="afterInteractive">
+          {`
+            // Catch lordicon errors globally
+            if (typeof window !== 'undefined') {
+              window.addEventListener('unhandledrejection', function(event) {
+                if (event.reason && event.reason.message && 
+                    event.reason.message.includes('did not match the expected pattern')) {
+                  console.warn('Suppressed lordicon error:', event.reason.message);
+                  event.preventDefault();
+                }
+              });
+            }
+          `}
+        </Script>
       </body>
     </html>
   )

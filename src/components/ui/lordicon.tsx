@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useEffect, useState } from 'react'
 
 export type LordIconTrigger = 'hover' | 'click' | 'loop' | 'loop-on-hover' | 'morph' | 'boomerang'
 export type LordIconColors = {
@@ -26,12 +26,51 @@ export function LordIcon({
   className = '',
 }: LordIconProps) {
   const iconRef = useRef<any>(null)
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [hasError, setHasError] = useState(false)
+
+  useEffect(() => {
+    // Check if lordicon is loaded
+    const checkLordIconLoaded = () => {
+      if (typeof window !== 'undefined' && (window as any).lottie) {
+        setIsLoaded(true)
+        return true
+      }
+      return false
+    }
+
+    // Try immediately
+    if (checkLordIconLoaded()) {
+      return
+    }
+
+    // Poll for lordicon to load (max 5 seconds)
+    let attempts = 0
+    const maxAttempts = 50 // 50 * 100ms = 5 seconds
+    const interval = setInterval(() => {
+      attempts++
+      if (checkLordIconLoaded()) {
+        clearInterval(interval)
+      } else if (attempts >= maxAttempts) {
+        clearInterval(interval)
+        setHasError(true)
+        console.warn('LordIcon library failed to load after 5 seconds')
+      }
+    }, 100)
+
+    return () => clearInterval(interval)
+  }, [])
 
   const colorString = colors
     ? `primary:${colors.primary || '#121331'},secondary:${colors.secondary || '#121331'}`
     : 'primary:#ffffff,secondary:#e0e0e0'
 
-  // Safely render the icon, catching any errors
+  // Don't render until loaded or if there's an error
+  if (!isLoaded || hasError) {
+    return <div style={{ width: `${size}px`, height: `${size}px` }} className={className} />
+  }
+
+  // Safely render the icon
   try {
     return (
       <lord-icon
@@ -42,14 +81,10 @@ export function LordIcon({
         style={{ width: `${size}px`, height: `${size}px` }}
         delay={delay}
         className={className}
-        onError={(e: any) => {
-          console.error('LordIcon error:', e)
-        }}
       />
     )
   } catch (error) {
     console.error('Failed to render LordIcon:', error)
-    // Return a simple div as fallback
     return <div style={{ width: `${size}px`, height: `${size}px` }} className={className} />
   }
 }
