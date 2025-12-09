@@ -35,7 +35,6 @@
     "dompurify": "^3.3.0",
     "jspdf": "^3.0.4",
     "jspdf-autotable": "^5.0.2",
-    "lottie-react": "^2.4.1",
     "lottie-web": "^5.13.0",
     "lucide-react": "^0.309.0",
     "micro": "^10.0.1",
