@@ -23,7 +23,10 @@ export default function RootLayout({
         <Toaster />
         <Script
           src="https://cdn.lordicon.com/lordicon.js"
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
+          onError={(e) => {
+            console.error('Failed to load lordicon:', e)
+          }}
         />
       </body>
     </html>

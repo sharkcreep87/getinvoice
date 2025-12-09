@@ -31,17 +31,27 @@ export function LordIcon({
     ? `primary:${colors.primary || '#121331'},secondary:${colors.secondary || '#121331'}`
     : 'primary:#ffffff,secondary:#e0e0e0'
 
-  return (
-    <lord-icon
-      ref={iconRef}
-      src={src}
-      trigger={trigger}
-      colors={colorString}
-      style={{ width: `${size}px`, height: `${size}px` }}
-      delay={delay}
-      className={className}
-    />
-  )
+  // Safely render the icon, catching any errors
+  try {
+    return (
+      <lord-icon
+        ref={iconRef}
+        src={src}
+        trigger={trigger}
+        colors={colorString}
+        style={{ width: `${size}px`, height: `${size}px` }}
+        delay={delay}
+        className={className}
+        onError={(e: any) => {
+          console.error('LordIcon error:', e)
+        }}
+      />
+    )
+  } catch (error) {
+    console.error('Failed to render LordIcon:', error)
+    // Return a simple div as fallback
+    return <div style={{ width: `${size}px`, height: `${size}px` }} className={className} />
+  }
 }
 
 // Common Lordicon sources from their library
