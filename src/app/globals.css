@@ -4,25 +4,25 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%; /* #F9FAFB - Light background */
-    --foreground: 217 38% 10%; /* #0F1724 - Dark slate for text */
+    --background: 0 0% 100%; /* #FFFFFF - Pure white background */
+    --foreground: 222 47% 11%; /* #111827 - Dark slate for text (NOT GOLD) */
     --card: 0 0% 100%; /* #FFFFFF - White cards */
-    --card-foreground: 217 38% 10%; /* #0F1724 - Dark slate text */
+    --card-foreground: 222 47% 11%; /* #111827 - Dark slate text */
     --popover: 0 0% 100%;
-    --popover-foreground: 217 38% 10%;
+    --popover-foreground: 222 47% 11%;
     --primary: 43 100% 49%; /* #F8B400 - Honey Gold */
-    --primary-foreground: 0 0% 100%; /* White text on gold */
+    --primary-foreground: 0 0% 100%; /* White text on gold buttons */
     --secondary: 43 100% 41%; /* #D29300 - Darker honey gold */
-    --secondary-foreground: 0 0% 100%; /* White text */
-    --muted: 43 100% 95%; /* #FFF9E6 - Light honey background */
-    --muted-foreground: 214 11% 34%; /* #4B5563 - Graphite text */
-    --accent: 43 100% 83%; /* #FFE9A8 - Honey accent */
-    --accent-foreground: 217 38% 10%; /* Dark text on light honey */
+    --secondary-foreground: 0 0% 100%; /* White text on gold */
+    --muted: 210 40% 96%; /* #F1F5F9 - Light slate background */
+    --muted-foreground: 215 16% 47%; /* #64748B - Slate text */
+    --accent: 43 100% 95%; /* #FFF9E6 - Very light honey */
+    --accent-foreground: 222 47% 11%; /* Dark slate text */
     --destructive: 0 84.2% 60.2%; /* Red for errors */
     --destructive-foreground: 0 0% 100%;
-    --border: 220 13% 91%; /* #E5E7EB - Light border */
-    --input: 220 13% 91%; /* #E5E7EB - Light input border */
-    --ring: 43 100% 49%; /* #F8B400 - Honey Gold ring */
+    --border: 214 32% 91%; /* #E2E8F0 - Light slate border */
+    --input: 214 32% 91%; /* #E2E8F0 - Light slate input border */
+    --ring: 43 100% 49%; /* #F8B400 - Honey Gold ring/focus */
     --radius: 0.5rem; /* 8px default border radius */
   }
 
