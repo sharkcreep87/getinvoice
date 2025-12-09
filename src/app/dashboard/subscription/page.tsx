@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Check, CreditCard, Loader2 } from "lucide-react"
+import { Check, CreditCard, Loader2 } from "@/components/ui/animated-icons"
 import { createClient } from "@/lib/supabase/client"
 import { formatCurrency } from '@/lib/utils'
 import { getUserCurrency } from '@/lib/currency'

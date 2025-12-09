@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { CheckCircle, Loader2 } from "lucide-react"
+import { CheckCircle, Loader2 } from "@/components/ui/animated-icons"
 import { createClient } from "@/lib/supabase/client"
 
 export default function SubscriptionSuccessPage() {

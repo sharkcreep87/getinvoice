@@ -2,7 +2,8 @@
 
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { Upload, Scan, X, Loader2, Image as ImageIcon } from "lucide-react"
+import { Upload, X, Loader2, Image } from "@/components/ui/animated-icons"
+import { Scan } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 
 type ReceiptScannerProps = {
@@ -194,7 +195,7 @@ export function ReceiptScanner({ onScanComplete, disabled }: ReceiptScannerProps
 
           {/* File info */}
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <ImageIcon className="h-4 w-4" />
+            <Image size={16} />
             <span className="truncate">{file.name}</span>
             <span className="text-gray-400">({(file.size / 1024).toFixed(1)} KB)</span>
           </div>
