@@ -10,7 +10,7 @@
  */
 
 import { Client, LocalAuth, Message } from 'whatsapp-web.js'
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@/lib/supabase/server'
 import qrcode from 'qrcode-terminal'
 
 export type BotStatus = 'disconnected' | 'connecting' | 'qr_ready' | 'authenticated' | 'ready' | 'error'
@@ -202,7 +202,7 @@ class WhatsAppBotClient {
     phoneNumber: string | null = null
   ): Promise<void> {
     try {
-      const supabase = createClient()
+      const supabase = await createServerClient()
 
       const updateData: any = {
         status,
@@ -265,7 +265,7 @@ class WhatsAppBotClient {
    */
   private async updateHeartbeat(): Promise<void> {
     try {
-      const supabase = createClient()
+      const supabase = await createServerClient()
       await supabase
         .from('whatsapp_bot_sessions')
         .update({
