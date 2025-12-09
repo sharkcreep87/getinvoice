@@ -77,7 +77,12 @@ class WhatsAppBotClient {
     this.isInitializing = true
 
     try {
-      await this.updateSessionStatus('connecting')
+      // Try to update session status, but don't fail if it errors
+      try {
+        await this.updateSessionStatus('connecting')
+      } catch (dbError) {
+        console.error(`[Bot ${this.config.userId}] Failed to update session to connecting, continuing anyway:`, dbError)
+      }
 
       // Create WhatsApp Web.js client with local auth
       this.client = new Client({
@@ -103,7 +108,11 @@ class WhatsAppBotClient {
       await this.client.initialize()
     } catch (error) {
       console.error(`[Bot ${this.config.userId}] Initialization error:`, error)
-      await this.updateSessionStatus('error', error instanceof Error ? error.message : 'Unknown error')
+      try {
+        await this.updateSessionStatus('error', error instanceof Error ? error.message : 'Unknown error')
+      } catch (dbError) {
+        console.error(`[Bot ${this.config.userId}] Failed to update error status:`, dbError)
+      }
       this.config.onError?.(error instanceof Error ? error : new Error('Unknown error'))
       this.isInitializing = false
       throw error
@@ -246,13 +255,13 @@ class WhatsAppBotClient {
 
       if (error) {
         console.error(`[Bot ${this.config.userId}] Failed to update session:`, error)
-        throw error
+        // Don't throw - log and continue
+      } else {
+        console.log(`[Bot ${this.config.userId}] Session updated successfully:`, data)
       }
-
-      console.log(`[Bot ${this.config.userId}] Session updated successfully:`, data)
     } catch (error) {
       console.error(`[Bot ${this.config.userId}] Error updating session status:`, error)
-      throw error
+      // Don't throw - log and continue
     }
   }
 

@@ -11,32 +11,44 @@ import WhatsAppBotClient from '@/lib/whatsapp-bot/client'
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('[API] WhatsApp bot init request received')
+
     // Get authenticated user
     const supabase = await createServerClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {
+      console.log('[API] Auth failed:', authError)
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
+    console.log(`[API] User authenticated: ${user.id}`)
+
     // Check if user has an active subscription
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('subscription_tier')
       .eq('id', user.id)
-      .single() as { data: { subscription_tier: string } | null }
+      .single() as { data: { subscription_tier: string } | null; error: any }
+
+    console.log('[API] Profile data:', profile)
+    console.log('[API] Profile error:', profileError)
 
     if (!profile || profile.subscription_tier === 'free') {
+      console.log('[API] Subscription check failed - tier:', profile?.subscription_tier)
       return NextResponse.json(
         { error: 'Active subscription required' },
         { status: 403 }
       )
     }
 
+    console.log(`[API] Subscription check passed - tier: ${profile.subscription_tier}`)
+
     // Get or create bot instance
+    console.log('[API] Creating bot instance...')
     const botClient = WhatsAppBotClient.getInstance({
       userId: user.id,
       onQRCode: (qr) => {
@@ -57,8 +69,12 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    console.log('[API] Bot instance created, starting initialization...')
+
     // Initialize bot (async, will generate QR code)
     await botClient.initialize()
+
+    console.log('[API] Bot initialization completed, status:', botClient.getStatus())
 
     return NextResponse.json({
       success: true,
