@@ -72,6 +72,7 @@ export const Refresh = createIcon(LordIcons.refresh, 24, 'hover')
 
 // Communication Icons
 export const MessageCircle = createIcon(LordIcons.whatsapp, 24, 'loop-on-hover')
+export const MessageSquare = createIcon('https://cdn.lordicon.com/fdxqrdfe.json', 24, 'loop-on-hover')
 export const Mail = createIcon(LordIcons.mail, 24, 'hover')
 export const Phone = createIcon(LordIcons.phone, 24, 'loop-on-hover')
 
@@ -113,3 +114,7 @@ export const UserPlus = createIcon(LordIcons.userPlus, 24, 'hover')
 export const TrendingUp = createIcon(LordIcons.trendingUp, 24, 'loop-on-hover')
 export const TrendingDown = createIcon(LordIcons.trendingDown, 24, 'loop-on-hover')
 export const DollarSign = createIcon(LordIcons.dollar, 24, 'loop-on-hover')
+export const Zap = createIcon('https://cdn.lordicon.com/wwjnhmxd.json', 24, 'loop-on-hover')
+export const Power = createIcon('https://cdn.lordicon.com/ternnfzy.json', 24, 'hover')
+export const PowerOff = createIcon('https://cdn.lordicon.com/qhgmphtg.json', 24, 'hover')
+export const RefreshCw = createIcon(LordIcons.refresh, 24, 'hover')
