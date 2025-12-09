@@ -31,6 +31,8 @@ import {
   ShoppingBag,
   Wallet,
   BarChart3,
+  MessageSquare,
+  Zap,
 } from "@/components/ui/animated-icons"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
@@ -60,6 +62,13 @@ const navigationCategories: NavCategory[] = [
       { name: "Products", href: "/dashboard/products", icon: Package },
       { name: "Invoices", href: "/dashboard/invoices", icon: FileText },
       { name: "Orders", href: "/dashboard/orders", icon: ShoppingCart },
+    ]
+  },
+  {
+    name: "Marketing & AI",
+    icon: Zap,
+    items: [
+      { name: "WhatsApp Bot", href: "/dashboard/whatsapp-bot", icon: MessageSquare },
     ]
   },
   {
