@@ -6,515 +6,109 @@ type IconProps = Omit<Partial<LordIconProps>, 'src'> & {
   className?: string
 }
 
-// Create reusable icon components
-export const LayoutDashboard = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.home}
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
+// Default colors for dark backgrounds (white icons)
+const defaultColors = {
+  primary: '#ffffff',
+  secondary: '#e0e0e0'
+}
 
-export const Users = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.users}
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
+// Helper to create icon component
+const createIcon = (src: string, defaultSize: number = 24, trigger: any = 'loop-on-hover') => {
+  return (props: IconProps) => (
+    <LordIcon
+      src={src}
+      trigger={trigger}
+      colors={props.colors || defaultColors}
+      size={props.size || defaultSize}
+      {...props}
+    />
+  )
+}
 
-export const FileText = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.fileText}
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
+// Navigation Icons
+export const LayoutDashboard = createIcon(LordIcons.home, 24)
+export const Users = createIcon(LordIcons.users, 24)
+export const FileText = createIcon(LordIcons.fileText, 24)
+export const Settings = createIcon(LordIcons.settings, 24)
+export const LogOut = createIcon('https://cdn.lordicon.com/gwvmctbb.json', 24, 'hover')
+export const CreditCard = createIcon(LordIcons.creditCard, 24)
+export const Building2 = createIcon('https://cdn.lordicon.com/fhtaantg.json', 24)
+export const Shield = createIcon(LordIcons.shield, 24)
+export const Package = createIcon(LordIcons.package, 24)
+export const Calculator = createIcon('https://cdn.lordicon.com/utqytqrt.json', 24)
+export const Receipt = createIcon(LordIcons.receipt, 24)
+export const ShoppingCart = createIcon(LordIcons.shoppingCart, 24)
+export const ShoppingBag = createIcon('https://cdn.lordicon.com/pbrgppbb.json', 24)
+export const Wallet = createIcon('https://cdn.lordicon.com/fzbalqiq.json', 24)
+export const BarChart3 = createIcon('https://cdn.lordicon.com/qhviklyi.json', 24)
 
-export const Settings = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.settings}
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
+// Chevron Icons
+export const ChevronDown = createIcon(LordIcons.chevronDown, 20, 'hover')
+export const ChevronRight = createIcon('https://cdn.lordicon.com/wmlleaaf.json', 20, 'hover')
+export const ChevronLeft = createIcon(LordIcons.arrowLeft, 20, 'hover')
+export const ChevronUp = createIcon(LordIcons.chevronUp, 20, 'hover')
 
-export const LogOut = (props: IconProps) => (
-  <LordIcon
-    src="https://cdn.lordicon.com/gwvmctbb.json"
-    trigger="hover"
-    {...props}
-  />
-)
+// Loading & Status Icons - PAPER ANIMATION
+export const Loader2 = createIcon('https://cdn.lordicon.com/xjovhxra.json', 32, 'loop')
+export const Check = createIcon(LordIcons.check, 24, 'hover')
+export const CheckCircle = createIcon(LordIcons.checkCircle, 24, 'hover')
+export const XCircle = createIcon('https://cdn.lordicon.com/nqtddedc.json', 24, 'hover')
+export const AlertCircle = createIcon(LordIcons.alert, 24, 'loop-on-hover')
+export const Info = createIcon(LordIcons.info, 24, 'hover')
+export const X = createIcon(LordIcons.close, 24, 'hover')
 
-export const CreditCard = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.creditCard}
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
+// Action Icons
+export const Plus = createIcon(LordIcons.plus, 24, 'hover')
+export const Edit = createIcon(LordIcons.edit, 24, 'hover')
+export const Trash = createIcon(LordIcons.trash, 24, 'hover')
+export const Download = createIcon(LordIcons.download, 24, 'hover')
+export const Upload = createIcon(LordIcons.upload, 24, 'hover')
+export const Save = createIcon(LordIcons.save, 24, 'hover')
+export const Copy = createIcon(LordIcons.copy, 24, 'hover')
+export const Search = createIcon(LordIcons.search, 24, 'hover')
+export const Filter = createIcon(LordIcons.filter, 24, 'hover')
+export const Refresh = createIcon(LordIcons.refresh, 24, 'hover')
 
-export const Building2 = (props: IconProps) => (
-  <LordIcon
-    src="https://cdn.lordicon.com/fhtaantg.json"
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
+// Communication Icons
+export const MessageCircle = createIcon(LordIcons.whatsapp, 24, 'loop-on-hover')
+export const Mail = createIcon(LordIcons.mail, 24, 'hover')
+export const Phone = createIcon(LordIcons.phone, 24, 'loop-on-hover')
 
-export const Shield = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.shield}
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
+// Navigation & UI Icons
+export const Menu = createIcon(LordIcons.menu, 24, 'hover')
+export const ArrowLeft = createIcon(LordIcons.arrowLeft, 24, 'hover')
+export const ArrowRight = createIcon(LordIcons.arrowRight, 24, 'hover')
+export const ExternalLink = createIcon(LordIcons.external, 24, 'hover')
+export const Link2 = createIcon(LordIcons.link, 24, 'hover')
 
-export const Package = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.package}
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
+// View Icons
+export const Eye = createIcon(LordIcons.eye, 24, 'hover')
+export const EyeOff = createIcon(LordIcons.eyeOff, 24, 'hover')
 
-export const Calculator = (props: IconProps) => (
-  <LordIcon
-    src="https://cdn.lordicon.com/utqytqrt.json"
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
+// Time Icons
+export const Calendar = createIcon(LordIcons.calendar, 24, 'hover')
+export const Clock = createIcon(LordIcons.clock, 24, 'loop-on-hover')
 
-export const Receipt = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.receipt}
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
+// Notification Icons
+export const Bell = createIcon(LordIcons.bell, 24, 'loop-on-hover')
 
-export const ShoppingCart = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.shoppingCart}
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
+// Favorite Icons
+export const Star = createIcon(LordIcons.star, 24, 'hover')
+export const Heart = createIcon(LordIcons.heart, 24, 'hover')
 
-export const ChevronDown = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.chevronDown}
-    trigger="hover"
-    {...props}
-  />
-)
+// Security Icons
+export const Lock = createIcon(LordIcons.lock, 24, 'hover')
+export const Unlock = createIcon(LordIcons.unlock, 24, 'hover')
 
-export const ChevronRight = (props: IconProps) => (
-  <LordIcon
-    src="https://cdn.lordicon.com/wmlleaaf.json"
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const ShoppingBag = (props: IconProps) => (
-  <LordIcon
-    src="https://cdn.lordicon.com/pbrgppbb.json"
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
-
-export const Wallet = (props: IconProps) => (
-  <LordIcon
-    src="https://cdn.lordicon.com/fzbalqiq.json"
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
-
-export const BarChart3 = (props: IconProps) => (
-  <LordIcon
-    src="https://cdn.lordicon.com/qhviklyi.json"
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
-
-export const Loader2 = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.loading}
-    trigger="loop"
-    {...props}
-  />
-)
-
-export const Check = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.check}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Plus = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.plus}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Edit = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.edit}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Trash = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.trash}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Download = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.download}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Upload = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.upload}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Save = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.save}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Copy = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.copy}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const ExternalLink = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.external}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const MessageCircle = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.whatsapp}
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
-
-export const Mail = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.mail}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Phone = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.phone}
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
-
-export const Search = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.search}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Filter = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.filter}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Eye = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.eye}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const EyeOff = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.eyeOff}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Calendar = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.calendar}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Clock = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.clock}
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
-
-export const Bell = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.bell}
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
-
-export const Star = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.star}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Heart = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.heart}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Lock = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.lock}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Unlock = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.unlock}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Refresh = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.refresh}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const QrCode = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.qrcode}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const AlertCircle = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.alert}
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
-
-export const Info = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.info}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const X = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.close}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Menu = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.menu}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const ArrowLeft = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.arrowLeft}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const ArrowRight = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.arrowRight}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const TrendingUp = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.trendingUp}
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
-
-export const TrendingDown = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.trendingDown}
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
-
-export const DollarSign = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.dollar}
-    trigger="loop-on-hover"
-    {...props}
-  />
-)
-
-export const Image = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.image}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Folder = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.folder}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const File = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.file}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const User = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.user}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const UserPlus = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.userPlus}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Link2 = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.link}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Tag = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.tag}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const Sliders = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.sliders}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const CheckCircle = (props: IconProps) => (
-  <LordIcon
-    src={LordIcons.checkCircle}
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const XCircle = (props: IconProps) => (
-  <LordIcon
-    src="https://cdn.lordicon.com/nqtddedc.json"
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const ChevronLeft = (props: IconProps) => (
-  <LordIcon
-    src="https://cdn.lordicon.com/zmkotitn.json"
-    trigger="hover"
-    {...props}
-  />
-)
-
-export const ChevronUp = (props: IconProps) => (
-  <LordIcon
-    src="https://cdn.lordicon.com/pndvjfqy.json"
-    trigger="hover"
-    {...props}
-  />
-)
+// Other Icons
+export const QrCode = createIcon(LordIcons.qrcode, 24, 'hover')
+export const Tag = createIcon(LordIcons.tag, 24, 'hover')
+export const Sliders = createIcon(LordIcons.sliders, 24, 'hover')
+export const Image = createIcon(LordIcons.image, 24, 'hover')
+export const Folder = createIcon(LordIcons.folder, 24, 'hover')
+export const File = createIcon(LordIcons.file, 24, 'hover')
+export const User = createIcon(LordIcons.user, 24, 'hover')
+export const UserPlus = createIcon(LordIcons.userPlus, 24, 'hover')
+export const TrendingUp = createIcon(LordIcons.trendingUp, 24, 'loop-on-hover')
+export const TrendingDown = createIcon(LordIcons.trendingDown, 24, 'loop-on-hover')
+export const DollarSign = createIcon(LordIcons.dollar, 24, 'loop-on-hover')

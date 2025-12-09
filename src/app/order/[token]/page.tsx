@@ -474,16 +474,12 @@ export default function PublicOrderPage() {
               >
                 {submitting ? (
                   <>
-                    <div className="mr-2">
-                      <Loader2 size={20} trigger="loop" />
-                    </div>
+                    <Loader2 size={24} />
                     Placing Order...
                   </>
                 ) : (
                   <>
-                    <div className="mr-2">
-                      <ShoppingCart size={20} />
-                    </div>
+                    <ShoppingCart size={24} />
                     Place Order
                   </>
                 )}

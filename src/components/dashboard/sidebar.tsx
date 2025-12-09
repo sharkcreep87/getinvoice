@@ -170,9 +170,7 @@ export function Sidebar() {
                   : "text-gray-300 hover:bg-white/10 hover:text-white"
               )}
             >
-              <div className="mr-3">
-                <Icon size={20} />
-              </div>
+              <Icon size={24} />
               {item.name}
             </Link>
           )
@@ -195,16 +193,14 @@ export function Sidebar() {
                     : "text-gray-400 hover:text-white hover:bg-white/5"
                 )}
               >
-                <div className="flex items-center">
-                  <div className="mr-3">
-                    <CategoryIcon size={16} />
-                  </div>
+                <div className="flex items-center gap-3">
+                  <CategoryIcon size={20} />
                   {category.name}
                 </div>
                 {isExpanded ? (
-                  <ChevronDown size={16} />
+                  <ChevronDown size={20} />
                 ) : (
-                  <ChevronRight size={16} />
+                  <ChevronRight size={20} />
                 )}
               </button>
 
@@ -225,9 +221,7 @@ export function Sidebar() {
                             : "text-gray-300 hover:bg-white/10 hover:text-white"
                         )}
                       >
-                        <div className="mr-3">
-                          <Icon size={16} />
-                        </div>
+                        <Icon size={20} />
                         {item.name}
                       </Link>
                     )
@@ -256,9 +250,7 @@ export function Sidebar() {
                       : "text-gray-300 hover:bg-white/10 hover:text-white"
                   )}
                 >
-                  <div className="mr-3">
-                    <Icon size={20} />
-                  </div>
+                  <Icon size={24} />
                   {item.name}
                 </Link>
               )
@@ -270,12 +262,10 @@ export function Sidebar() {
       <div className="p-4 border-t border-primary/20 bg-black/20">
         <Button
           variant="ghost"
-          className="w-full justify-start text-gray-300 hover:bg-white/10 hover:text-white transition-all duration-200"
+          className="w-full justify-start gap-3 text-gray-300 hover:bg-white/10 hover:text-white transition-all duration-200"
           onClick={handleLogout}
         >
-          <div className="mr-3">
-            <LogOut size={20} />
-          </div>
+          <LogOut size={24} />
           Logout
         </Button>
       </div>
