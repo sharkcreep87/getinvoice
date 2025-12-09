@@ -228,7 +228,7 @@ export default function SubscriptionPage() {
             >
               {cancelingSubscription ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 size={16} className="mr-2" />
                   Canceling...
                 </>
               ) : (
@@ -299,7 +299,7 @@ export default function SubscriptionPage() {
                   >
                     {isProcessing ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 size={16} className="mr-2" />
                         Processing...
                       </>
                     ) : (
@@ -318,7 +318,7 @@ export default function SubscriptionPage() {
                   >
                     {isProcessing ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 size={16} className="mr-2" />
                         Processing...
                       </>
                     ) : (

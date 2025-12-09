@@ -199,7 +199,7 @@ export default function PublicOrderPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 size={32} trigger="loop" />
+        <Loader2 size={32} />
       </div>
     )
   }

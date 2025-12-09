@@ -408,7 +408,7 @@ export default function CostForecastPage() {
               {loading && (
                 <div className="flex justify-start">
                   <div className="bg-white border border-primary/20 rounded-lg p-4">
-                    <Loader2 className="h-5 w-5 text-primary animate-spin" />
+                    <Loader2 size={20} className="text-primary" />
                   </div>
                 </div>
               )}
@@ -429,7 +429,7 @@ export default function CostForecastPage() {
                 disabled={loading || !productName.trim()}
                 className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                {loading ? <Loader2 size={16} /> : <Send className="h-4 w-4" />}
               </Button>
               {messages.length > 0 && (
                 <Button
@@ -531,7 +531,7 @@ export default function CostForecastPage() {
                   >
                     {savingToProducts ? (
                       <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        <Loader2 size={16} className="mr-2" />
                         Saving...
                       </>
                     ) : (
