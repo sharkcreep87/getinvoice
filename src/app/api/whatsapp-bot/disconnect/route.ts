@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
         disconnected_at: new Date().toISOString(),
         qr_code: null,
         updated_at: new Date().toISOString(),
-      })
+      } as any)
       .eq('user_id', user.id)
 
     if (updateError) {

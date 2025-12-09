@@ -237,7 +237,7 @@ class WhatsAppBotClient {
         .upsert({
           user_id: this.config.userId,
           ...updateData,
-        }, {
+        } as any, {
           onConflict: 'user_id',
         })
 
@@ -270,7 +270,7 @@ class WhatsAppBotClient {
         .from('whatsapp_bot_sessions')
         .update({
           last_heartbeat: new Date().toISOString(),
-        })
+        } as any)
         .eq('user_id', this.config.userId)
     } catch (error) {
       console.error(`[Bot ${this.config.userId}] Heartbeat error:`, error)
