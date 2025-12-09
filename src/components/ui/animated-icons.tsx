@@ -1,7 +1,7 @@
 'use client'
 
 import { LordIcon, LordIcons, type LordIconProps } from './lordicon'
-import { LottieLoader } from './lottie-loader'
+import { PaperLoader } from './paper-loader'
 
 type IconProps = Omit<Partial<LordIconProps>, 'src'> & {
   className?: string
@@ -49,8 +49,8 @@ export const ChevronRight = createIcon('https://cdn.lordicon.com/wmlleaaf.json',
 export const ChevronLeft = createIcon(LordIcons.arrowLeft, 20, 'hover')
 export const ChevronUp = createIcon(LordIcons.chevronUp, 20, 'hover')
 
-// Loading & Status Icons - PAPER ANIMATION using Lottie
-export const Loader2 = (props: IconProps) => <LottieLoader size={props.size || 32} className={props.className} />
+// Loading & Status Icons - PAPER ANIMATION using CSS
+export const Loader2 = (props: IconProps) => <PaperLoader size={props.size || 32} className={props.className} />
 export const Check = createIcon(LordIcons.check, 24, 'hover')
 export const CheckCircle = createIcon(LordIcons.checkCircle, 24, 'hover')
 export const XCircle = createIcon('https://cdn.lordicon.com/nqtddedc.json', 24, 'hover')
