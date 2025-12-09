@@ -231,8 +231,10 @@ class WhatsAppBotClient {
         updateData.phone_number = phoneNumber
       }
 
+      console.log(`[Bot ${this.config.userId}] Upserting session with status: ${status}`)
+
       // Upsert session
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('whatsapp_bot_sessions')
         .upsert({
           user_id: this.config.userId,
@@ -240,12 +242,17 @@ class WhatsAppBotClient {
         } as any, {
           onConflict: 'user_id',
         })
+        .select()
 
       if (error) {
         console.error(`[Bot ${this.config.userId}] Failed to update session:`, error)
+        throw error
       }
+
+      console.log(`[Bot ${this.config.userId}] Session updated successfully:`, data)
     } catch (error) {
       console.error(`[Bot ${this.config.userId}] Error updating session status:`, error)
+      throw error
     }
   }
 

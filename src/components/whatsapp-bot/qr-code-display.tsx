@@ -34,12 +34,18 @@ export function QRCodeDisplay({ onScanSuccess }: QRCodeDisplayProps) {
     return () => clearInterval(interval)
   }, [status])
 
-  const fetchQRCode = async () => {
+  const fetchQRCode = async (retries = 3): Promise<void> => {
     try {
       const response = await fetch('/api/whatsapp-bot/qr')
       const data = await response.json()
 
       if (!response.ok) {
+        // If session not found and we have retries left, wait and try again
+        if (retries > 0 && data.error?.includes('No bot session found')) {
+          console.log(`Session not ready yet, retrying in 2 seconds... (${retries} retries left)`)
+          setTimeout(() => fetchQRCode(retries - 1), 2000)
+          return
+        }
         throw new Error(data.error || 'Failed to fetch QR code')
       }
 
@@ -52,7 +58,10 @@ export function QRCodeDisplay({ onScanSuccess }: QRCodeDisplayProps) {
         onScanSuccess?.()
       }
     } catch (err: any) {
-      setError(err.message)
+      // Only set error if we're out of retries
+      if (retries === 0) {
+        setError(err.message)
+      }
     }
   }
 
@@ -73,8 +82,8 @@ export function QRCodeDisplay({ onScanSuccess }: QRCodeDisplayProps) {
 
       setStatus(data.status)
 
-      // Start polling for QR code
-      setTimeout(() => fetchQRCode(), 2000)
+      // Start polling for QR code (with longer initial delay)
+      setTimeout(() => fetchQRCode(), 3000)
     } catch (err: any) {
       setError(err.message)
     } finally {
