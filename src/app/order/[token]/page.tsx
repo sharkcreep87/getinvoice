@@ -7,9 +7,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ShoppingCart, Check, Loader2, Package } from "lucide-react"
+import { ShoppingCart, Check, Loader2, Package, MessageCircle } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
+import { WhatsAppOrderButton } from "@/components/whatsapp/whatsapp-order-button"
+import { WhatsAppQRCode } from "@/components/whatsapp/whatsapp-qr-code"
+import type { OrderMessageData } from "@/lib/whatsapp/message-templates"
 
 type Product = {
   id: string
@@ -45,6 +48,11 @@ export default function PublicOrderPage() {
     quantity: '1',
     notes: '',
   })
+  const [whatsappSettings, setWhatsappSettings] = useState<{
+    enabled: boolean
+    number: string
+    companyName: string
+  } | null>(null)
   const { toast } = useToast()
   const supabase = createClient()
 
@@ -75,6 +83,21 @@ export default function PublicOrderPage() {
       }
 
       setLink(linkData)
+
+      // Fetch company WhatsApp settings
+      const { data: companyData } = await (supabase as any)
+        .from('company_settings')
+        .select('whatsapp_number, whatsapp_enabled, company_name')
+        .eq('user_id', linkData.user_id)
+        .single()
+
+      if (companyData?.whatsapp_enabled && companyData?.whatsapp_number) {
+        setWhatsappSettings({
+          enabled: true,
+          number: companyData.whatsapp_number,
+          companyName: companyData.company_name || ''
+        })
+      }
 
       // Load products based on link type
       if (linkData.link_type === 'product') {
@@ -233,6 +256,28 @@ export default function PublicOrderPage() {
             >
               Place Another Order
             </Button>
+
+            {/* WhatsApp Contact Button */}
+            {whatsappSettings && (
+              <div className="pt-4 border-t">
+                <p className="text-sm text-gray-600 text-center mb-3">
+                  Have questions about your order?
+                </p>
+                <Button
+                  onClick={() => {
+                    const product = products.find(p => p.id === selectedProduct)
+                    const message = `Hi! I just placed an order:\n\nOrder Details:\nProduct: ${product?.name}\nQuantity: ${formData.quantity}\nName: ${formData.customer_name}\n\nI would like to confirm my order.`
+                    const encodedMessage = encodeURIComponent(message)
+                    window.open(`https://wa.me/${whatsappSettings.number.replace(/\D/g, '')}?text=${encodedMessage}`, '_blank')
+                  }}
+                  variant="outline"
+                  className="w-full gap-2 border-green-600 text-green-700 hover:bg-green-50"
+                >
+                  <MessageCircle className="h-5 w-5" />
+                  Contact via WhatsApp
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -440,6 +485,87 @@ export default function PublicOrderPage() {
                 )}
               </Button>
             </form>
+
+            {/* WhatsApp Ordering Alternative */}
+            {whatsappSettings && selectedProduct && formData.customer_name && (
+              <>
+                <div className="relative my-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white px-2 text-muted-foreground">
+                      Or order via WhatsApp
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg">
+                    <div className="flex items-start gap-3 mb-3">
+                      <MessageCircle className="h-5 w-5 text-green-700 mt-0.5" />
+                      <div>
+                        <h3 className="font-semibold text-green-900">Quick Order via WhatsApp</h3>
+                        <p className="text-sm text-green-700 mt-1">
+                          Click the button below or scan the QR code to send your order directly via WhatsApp
+                        </p>
+                      </div>
+                    </div>
+
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        const product = selectedProductData
+                        if (!product) return
+
+                        const message = `Hi${whatsappSettings.companyName ? ` ${whatsappSettings.companyName}` : ''}! I would like to place an order:\n\n📋 *Order Details*\n\n*Product:* ${product.name}\n*Quantity:* ${formData.quantity}\n*Price per unit:* RM ${product.unit_price.toFixed(2)}\n*Total Amount:* RM ${totalAmount.toFixed(2)}\n\n*Customer Information:*\nName: ${formData.customer_name}\n${formData.customer_email ? `Email: ${formData.customer_email}\n` : ''}${formData.customer_phone ? `Phone: ${formData.customer_phone}\n` : ''}${formData.customer_address ? `Address: ${formData.customer_address}\n` : ''}${formData.notes ? `\nNotes: ${formData.notes}` : ''}\n\nThank you!`
+
+                        const encodedMessage = encodeURIComponent(message)
+                        const phoneNumber = whatsappSettings.number.replace(/\D/g, '')
+                        window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank', 'noopener,noreferrer')
+                      }}
+                      className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white shadow-lg"
+                      size="lg"
+                    >
+                      <MessageCircle className="h-5 w-5" />
+                      <span className="font-semibold">Order via WhatsApp</span>
+                    </Button>
+
+                    <div className="mt-4 pt-4 border-t border-green-200">
+                      <p className="text-xs text-center text-green-700 mb-3">
+                        Or scan this QR code with your phone
+                      </p>
+                      <div className="flex justify-center">
+                        <WhatsAppQRCode
+                          businessPhone={whatsappSettings.number}
+                          orderData={{
+                            orderId: link?.id || '',
+                            orderNumber: `ORD-${Date.now()}`,
+                            items: selectedProductData ? [{
+                              name: selectedProductData.name,
+                              quantity: parseInt(formData.quantity || '1'),
+                              amount: totalAmount,
+                              unit_price: selectedProductData.unit_price
+                            }] : [],
+                            subtotal: totalAmount,
+                            tax: 0,
+                            taxRate: 0,
+                            total: totalAmount,
+                            currency: 'RM',
+                            customerName: formData.customer_name,
+                            orderLink: window.location.href,
+                            companyName: whatsappSettings.companyName
+                          }}
+                          size={200}
+                          showDownload={false}
+                          showCard={false}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>

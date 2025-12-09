@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Upload, Building2, Save } from "lucide-react"
 import Image from "next/image"
 import { LoadingPage } from "@/components/ui/loading"
+import { WhatsAppSettings } from "@/components/whatsapp/whatsapp-settings"
 
 export default function CompanySettingsPage() {
   const supabase = createClient()
@@ -33,6 +34,18 @@ export default function CompanySettingsPage() {
     invoice_terms: "",
     invoice_footer: "",
     invoice_template: "classic",
+    whatsapp_number: "",
+    whatsapp_enabled: false,
+    whatsapp_order_template: `Hi! I would like to place an order:
+
+Order ID: {{order_id}}
+{{items}}
+
+Subtotal: {{subtotal}}
+Tax: {{tax}}
+Total: {{total}}
+
+Order Link: {{order_link}}`,
   })
 
   useEffect(() => {
@@ -46,7 +59,7 @@ export default function CompanySettingsPage() {
 
       const result = await supabase
         .from('company_settings')
-        .select('company_name, company_email, company_phone, company_address, company_city, company_state, company_zip, company_country, company_logo_url, tax_id, invoice_terms, invoice_footer, invoice_template')
+        .select('company_name, company_email, company_phone, company_address, company_city, company_state, company_zip, company_country, company_logo_url, tax_id, invoice_terms, invoice_footer, invoice_template, whatsapp_number, whatsapp_enabled, whatsapp_order_template')
         .eq('user_id', user.id)
         .single()
 
@@ -572,6 +585,18 @@ export default function CompanySettingsPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* WhatsApp Integration */}
+        <div className="md:col-span-2">
+          <WhatsAppSettings
+            whatsappNumber={companySettings.whatsapp_number || ""}
+            whatsappEnabled={companySettings.whatsapp_enabled || false}
+            whatsappOrderTemplate={companySettings.whatsapp_order_template || ""}
+            onNumberChange={(number) => handleChange('whatsapp_number', number)}
+            onEnabledChange={(enabled) => setCompanySettings(prev => ({ ...prev, whatsapp_enabled: enabled }))}
+            onTemplateChange={(template) => handleChange('whatsapp_order_template', template)}
+          />
+        </div>
       </div>
     </div>
   )

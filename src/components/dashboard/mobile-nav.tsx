@@ -77,7 +77,7 @@ const navigationCategories: NavCategory[] = [
     items: [
       { name: "Company", href: "/dashboard/company", icon: Building2 },
       { name: "Subscription", href: "/dashboard/subscription", icon: CreditCard },
-      { name: "Settings", href: "/dashboard/settings", icon: Settings },
+      { name: "Profile", href: "/dashboard/settings", icon: Settings },
     ]
   }
 ]
