@@ -27,22 +27,16 @@ export function LordIcon({
 }: LordIconProps) {
   const iconRef = useRef<any>(null)
 
-  useEffect(() => {
-    // Dynamically load lordicon script
-    if (typeof window !== 'undefined' && !window.customElements.get('lord-icon')) {
-      const script = document.createElement('script')
-      script.src = 'https://cdn.lordicon.com/lordicon.js'
-      script.async = true
-      document.body.appendChild(script)
-    }
-  }, [])
+  const colorString = colors
+    ? `primary:${colors.primary || '#121331'},secondary:${colors.secondary || '#121331'}`
+    : 'primary:#ffffff,secondary:#e0e0e0'
 
   return (
     <lord-icon
       ref={iconRef}
       src={src}
       trigger={trigger}
-      colors={colors ? `primary:${colors.primary || '#121331'},secondary:${colors.secondary || '#121331'}` : undefined}
+      colors={colorString}
       style={{ width: `${size}px`, height: `${size}px` }}
       delay={delay}
       className={className}

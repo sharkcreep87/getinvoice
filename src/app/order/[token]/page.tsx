@@ -271,7 +271,7 @@ export default function PublicOrderPage() {
                     window.open(`https://wa.me/${whatsappSettings.number.replace(/\D/g, '')}?text=${encodedMessage}`, '_blank')
                   }}
                   variant="outline"
-                  className="w-full gap-2 border-green-600 text-green-700 hover:bg-green-50"
+                  className="w-full gap-3 border-green-600 text-green-700 hover:bg-green-50"
                 >
                   <MessageCircle size={20} />
                   Contact via WhatsApp
@@ -469,7 +469,7 @@ export default function PublicOrderPage() {
               <Button
                 type="submit"
                 disabled={submitting || !selectedProduct}
-                className="w-full bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90"
+                className="w-full gap-3 bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90"
                 size="lg"
               >
                 {submitting ? (
@@ -524,10 +524,10 @@ export default function PublicOrderPage() {
                         const phoneNumber = whatsappSettings.number.replace(/\D/g, '')
                         window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank', 'noopener,noreferrer')
                       }}
-                      className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white shadow-lg"
+                      className="w-full gap-3 bg-green-600 hover:bg-green-700 text-white shadow-lg"
                       size="lg"
                     >
-                      <MessageCircle size={20} />
+                      <MessageCircle size={24} />
                       <span className="font-semibold">Order via WhatsApp</span>
                     </Button>
 
