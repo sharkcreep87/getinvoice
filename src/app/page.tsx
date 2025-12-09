@@ -105,28 +105,148 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-12 sm:py-16 md:py-20">
-        <div className="text-center max-w-3xl mx-auto">
-          <div className="relative">
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 bg-gradient-to-r from-primary/20 via-primary/20 to-secondary/20 rounded-full blur-3xl"></div>
-            <h1 className="relative text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent mb-4 sm:mb-6 px-2">
-              Modern CRM & Invoice Management
-            </h1>
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          {/* Left Column - Text Content */}
+          <div className="text-center lg:text-left">
+            <div className="relative">
+              <div className="absolute -top-10 left-1/2 lg:left-0 -translate-x-1/2 lg:translate-x-0 w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 bg-gradient-to-r from-primary/20 via-primary/20 to-secondary/20 rounded-full blur-3xl"></div>
+              <h1 className="relative text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-4 sm:mb-6 px-2 lg:px-0 leading-tight">
+                Modern CRM & Invoice Management
+              </h1>
+            </div>
+            <p className="text-base sm:text-lg md:text-xl text-slate-600 mb-8 px-4 lg:px-0">
+              Streamline your customer relationships and create professional invoices in minutes.
+              Built for modern businesses.
+            </p>
+            <div className="flex flex-col sm:flex-row lg:justify-start justify-center gap-3 sm:gap-4 px-4 lg:px-0">
+              <Link href="/register" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-lg shadow-primary/30">
+                  Start Free Trial <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+                </Button>
+              </Link>
+              <Link href="/login" className="w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg border-2 border-primary/30 hover:border-primary/50 hover:bg-primary/5">
+                  View Demo
+                </Button>
+              </Link>
+            </div>
+
+            {/* Trust Badges */}
+            <div className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-sm text-slate-600 px-4 lg:px-0">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-beez-500"></div>
+                <span>No credit card required</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-beez-500"></div>
+                <span>14-day free trial</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-beez-500"></div>
+                <span>Cancel anytime</span>
+              </div>
+            </div>
           </div>
-          <p className="text-base sm:text-lg md:text-xl text-gray-700 mb-8 px-4">
-            Streamline your customer relationships and create professional invoices in minutes.
-            Built for modern businesses.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 px-4">
-            <Link href="/register" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-lg shadow-primary/30">
-                Start Free Trial <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
-              </Button>
-            </Link>
-            <Link href="/login" className="w-full sm:w-auto">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg border-2 border-primary/30 hover:border-primary/50 hover:bg-primary/5">
-                View Demo
-              </Button>
-            </Link>
+
+          {/* Right Column - Mobile Mockup */}
+          <div className="relative flex items-center justify-center lg:justify-end">
+            {/* Decorative background elements */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-64 h-64 sm:w-80 sm:h-80 bg-gradient-to-br from-beez-400/30 to-beez-600/30 rounded-full blur-3xl"></div>
+            </div>
+
+            {/* Mobile Phone Mockup */}
+            <div className="relative z-10 transform hover:scale-105 transition-transform duration-500">
+              {/* Phone Frame */}
+              <div className="relative w-[280px] sm:w-[320px] h-[560px] sm:h-[640px] bg-slate-900 rounded-[3rem] p-3 shadow-2xl shadow-slate-900/50">
+                {/* Phone Notch */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-900 rounded-b-2xl z-20"></div>
+
+                {/* Phone Screen */}
+                <div className="relative w-full h-full bg-gradient-to-b from-slate-50 to-slate-100 rounded-[2.5rem] overflow-hidden">
+                  {/* App Screenshot/Demo */}
+                  <div className="w-full h-full bg-gradient-to-br from-white via-beez-50 to-honey/20 p-6 overflow-auto">
+                    {/* Status Bar */}
+                    <div className="flex items-center justify-between mb-6 text-xs text-slate-600">
+                      <span className="font-semibold">9:41</span>
+                      <div className="flex items-center gap-1">
+                        <div className="w-4 h-3 border border-slate-600 rounded-sm"></div>
+                      </div>
+                    </div>
+
+                    {/* App Header */}
+                    <div className="mb-6">
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-beez-500 to-beez-600 flex items-center justify-center">
+                          <FileText className="h-5 w-5 text-white" />
+                        </div>
+                        <span className="font-bold text-slate-900">GetInvoice</span>
+                      </div>
+                      <h2 className="text-xl font-bold text-slate-900 mb-1">Dashboard</h2>
+                      <p className="text-xs text-slate-600">Welcome back!</p>
+                    </div>
+
+                    {/* Stats Cards */}
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      <div className="bg-white rounded-xl p-3 shadow-sm border border-slate-200">
+                        <div className="text-xs text-slate-600 mb-1">Revenue</div>
+                        <div className="text-lg font-bold bg-gradient-to-r from-beez-600 to-beez-700 bg-clip-text text-transparent">RM 12.5k</div>
+                        <div className="text-xs text-green-600">+12.5%</div>
+                      </div>
+                      <div className="bg-white rounded-xl p-3 shadow-sm border border-slate-200">
+                        <div className="text-xs text-slate-600 mb-1">Invoices</div>
+                        <div className="text-lg font-bold text-slate-900">48</div>
+                        <div className="text-xs text-beez-600">This month</div>
+                      </div>
+                    </div>
+
+                    {/* Recent Activity */}
+                    <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+                      <div className="text-xs font-semibold text-slate-900 mb-3">Recent Invoices</div>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between text-xs">
+                          <div>
+                            <div className="font-medium text-slate-900">Invoice #001</div>
+                            <div className="text-slate-500">Acme Corp</div>
+                          </div>
+                          <div className="text-beez-600 font-semibold">RM 2,500</div>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <div>
+                            <div className="font-medium text-slate-900">Invoice #002</div>
+                            <div className="text-slate-500">Tech Solutions</div>
+                          </div>
+                          <div className="text-beez-600 font-semibold">RM 1,800</div>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <div>
+                            <div className="font-medium text-slate-900">Invoice #003</div>
+                            <div className="text-slate-500">Design Co</div>
+                          </div>
+                          <div className="text-beez-600 font-semibold">RM 3,200</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CTA Button */}
+                    <button className="w-full mt-4 bg-gradient-to-r from-beez-500 to-beez-600 text-white font-semibold py-3 rounded-xl text-sm shadow-lg shadow-beez-500/30">
+                      Create Invoice
+                    </button>
+                  </div>
+                </div>
+
+                {/* Phone Button */}
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-12 h-1 bg-slate-700 rounded-full"></div>
+              </div>
+
+              {/* Floating badges */}
+              <div className="absolute -top-6 -right-6 bg-white rounded-xl px-4 py-2 shadow-lg border border-beez-200 animate-bounce">
+                <div className="text-xs text-slate-600">✓ Easy to use</div>
+              </div>
+              <div className="absolute -bottom-6 -left-6 bg-white rounded-xl px-4 py-2 shadow-lg border border-beez-200 animate-bounce" style={{ animationDelay: '0.5s' }}>
+                <div className="text-xs text-slate-600">⚡ Super fast</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
