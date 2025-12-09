@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ShoppingCart, Check, Loader2, Package, MessageCircle } from "lucide-react"
+import { ShoppingCart, Check, Loader2, Package, MessageCircle } from "@/components/ui/animated-icons"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 import { WhatsAppOrderButton } from "@/components/whatsapp/whatsapp-order-button"
@@ -199,7 +199,7 @@ export default function PublicOrderPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 size={32} trigger="loop" />
       </div>
     )
   }
@@ -227,7 +227,7 @@ export default function PublicOrderPage() {
         <Card className="max-w-md w-full">
           <CardHeader>
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-              <Check className="h-8 w-8 text-green-600" />
+              <Check size={32} />
             </div>
             <CardTitle className="text-center">Order Placed Successfully!</CardTitle>
             <CardDescription className="text-center">
@@ -273,7 +273,7 @@ export default function PublicOrderPage() {
                   variant="outline"
                   className="w-full gap-2 border-green-600 text-green-700 hover:bg-green-50"
                 >
-                  <MessageCircle className="h-5 w-5" />
+                  <MessageCircle size={20} />
                   Contact via WhatsApp
                 </Button>
               </div>
@@ -296,7 +296,7 @@ export default function PublicOrderPage() {
           <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-primary rounded-lg">
-                <ShoppingCart className="h-6 w-6 text-white" />
+                <ShoppingCart size={24} />
               </div>
               <div>
                 <CardTitle>Place Your Order</CardTitle>
@@ -351,7 +351,7 @@ export default function PublicOrderPage() {
               {link.link_type === 'product' && selectedProductData && (
                 <div className="p-4 bg-gray-50 rounded-lg border">
                   <div className="flex items-center gap-3 mb-3">
-                    <Package className="h-5 w-5 text-primary" />
+                    <Package size={20} />
                     <h3 className="font-semibold text-gray-900">Product Details</h3>
                   </div>
                   <div className="space-y-2">
@@ -474,12 +474,16 @@ export default function PublicOrderPage() {
               >
                 {submitting ? (
                   <>
-                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    <div className="mr-2">
+                      <Loader2 size={20} trigger="loop" />
+                    </div>
                     Placing Order...
                   </>
                 ) : (
                   <>
-                    <ShoppingCart className="h-5 w-5 mr-2" />
+                    <div className="mr-2">
+                      <ShoppingCart size={20} />
+                    </div>
                     Place Order
                   </>
                 )}
@@ -503,7 +507,7 @@ export default function PublicOrderPage() {
                 <div className="space-y-4">
                   <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg">
                     <div className="flex items-start gap-3 mb-3">
-                      <MessageCircle className="h-5 w-5 text-green-700 mt-0.5" />
+                      <MessageCircle size={20} />
                       <div>
                         <h3 className="font-semibold text-green-900">Quick Order via WhatsApp</h3>
                         <p className="text-sm text-green-700 mt-1">
@@ -527,7 +531,7 @@ export default function PublicOrderPage() {
                       className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white shadow-lg"
                       size="lg"
                     >
-                      <MessageCircle className="h-5 w-5" />
+                      <MessageCircle size={20} />
                       <span className="font-semibold">Order via WhatsApp</span>
                     </Button>
 

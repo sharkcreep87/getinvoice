@@ -31,7 +31,7 @@ import {
   ShoppingBag,
   Wallet,
   BarChart3,
-} from "lucide-react"
+} from "@/components/ui/animated-icons"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -159,12 +159,12 @@ export function MobileNav() {
           <div className="flex items-center">
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 mr-2">
-                <Menu className="h-6 w-6" />
+                <Menu size={24} />
                 <span className="sr-only">Open menu</span>
               </Button>
             </SheetTrigger>
             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary">
-              <FileText className="h-5 w-5 text-white" />
+              <FileText size={20} />
             </div>
             <span className="ml-2 text-lg font-bold bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
               GetInvoice
@@ -174,7 +174,7 @@ export function MobileNav() {
             <SheetHeader className="p-6 border-b border-primary/20 bg-black/20">
               <SheetTitle className="flex items-center text-white">
                 <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary">
-                  <FileText className="h-6 w-6 text-white" />
+                  <FileText size={24} />
                 </div>
                 <span className="ml-3 text-xl font-bold bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
                   GetInvoice
@@ -199,7 +199,9 @@ export function MobileNav() {
                         : "text-gray-300 hover:bg-white/10 hover:text-white"
                     )}
                   >
-                    <Icon className={cn("mr-3 h-5 w-5", isActive && "animate-pulse")} />
+                    <div className="mr-3">
+                      <Icon size={20} />
+                    </div>
                     {item.name}
                   </Link>
                 )
@@ -223,13 +225,15 @@ export function MobileNav() {
                       )}
                     >
                       <div className="flex items-center">
-                        <CategoryIcon className="mr-3 h-4 w-4" />
+                        <div className="mr-3">
+                          <CategoryIcon size={16} />
+                        </div>
                         {category.name}
                       </div>
                       {isExpanded ? (
-                        <ChevronDown className="h-4 w-4" />
+                        <ChevronDown size={16} />
                       ) : (
-                        <ChevronRight className="h-4 w-4" />
+                        <ChevronRight size={16} />
                       )}
                     </button>
 
@@ -251,7 +255,9 @@ export function MobileNav() {
                                   : "text-gray-300 hover:bg-white/10 hover:text-white"
                               )}
                             >
-                              <Icon className={cn("mr-3 h-4 w-4", isActive && "animate-pulse")} />
+                              <div className="mr-3">
+                                <Icon size={16} />
+                              </div>
                               {item.name}
                             </Link>
                           )
@@ -281,7 +287,9 @@ export function MobileNav() {
                             : "text-gray-300 hover:bg-white/10 hover:text-white"
                         )}
                       >
-                        <Icon className={cn("mr-3 h-5 w-5", isActive && "animate-pulse")} />
+                        <div className="mr-3">
+                      <Icon size={20} />
+                    </div>
                         {item.name}
                       </Link>
                     )
@@ -296,7 +304,9 @@ export function MobileNav() {
                 className="w-full justify-start text-gray-300 hover:bg-white/10 hover:text-white transition-all duration-200"
                 onClick={handleLogout}
               >
-                <LogOut className="mr-3 h-5 w-5" />
+                <div className="mr-3">
+                  <LogOut size={20} />
+                </div>
                 Logout
               </Button>
             </div>
