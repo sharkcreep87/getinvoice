@@ -551,7 +551,7 @@ export default function PublicOrderPage() {
                             tax: 0,
                             taxRate: 0,
                             total: totalAmount,
-                            currency: 'RM',
+                            currency: 'MYR',
                             customerName: formData.customer_name,
                             orderLink: window.location.href,
                             companyName: whatsappSettings.companyName
