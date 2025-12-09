@@ -268,6 +268,7 @@ class WhatsAppBotClient {
       const supabase = await createServerClient()
       await supabase
         .from('whatsapp_bot_sessions')
+        // @ts-expect-error - Supabase type inference issue with strict mode
         .update({
           last_heartbeat: new Date().toISOString(),
         } as any)

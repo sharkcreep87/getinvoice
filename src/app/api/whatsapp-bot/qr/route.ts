@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       .from('whatsapp_bot_sessions')
       .select('*')
       .eq('user_id', user.id)
-      .single()
+      .single() as { data: any | null; error: any }
 
     if (error || !session) {
       return NextResponse.json(

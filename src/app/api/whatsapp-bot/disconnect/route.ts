@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase/server'
+import { Database } from '@/lib/supabase/database.types'
 import WhatsAppBotClient from '@/lib/whatsapp-bot/client'
 
 export async function POST(request: NextRequest) {
@@ -30,14 +31,17 @@ export async function POST(request: NextRequest) {
     await botClient.disconnect()
 
     // Update database
+    const updateData = {
+      status: 'disconnected',
+      disconnected_at: new Date().toISOString(),
+      qr_code: null,
+      updated_at: new Date().toISOString(),
+    } satisfies Database['public']['Tables']['whatsapp_bot_sessions']['Update']
+
     const { error: updateError } = await supabase
       .from('whatsapp_bot_sessions')
-      .update({
-        status: 'disconnected',
-        disconnected_at: new Date().toISOString(),
-        qr_code: null,
-        updated_at: new Date().toISOString(),
-      } as any)
+      // @ts-expect-error - Supabase type inference issue with strict mode
+      .update(updateData as any)
       .eq('user_id', user.id)
 
     if (updateError) {

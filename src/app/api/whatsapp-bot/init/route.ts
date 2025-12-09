@@ -25,11 +25,11 @@ export async function POST(request: NextRequest) {
     // Check if user has an active subscription
     const { data: profile } = await supabase
       .from('profiles')
-      .select('subscription_status')
+      .select('subscription_tier')
       .eq('id', user.id)
-      .single()
+      .single() as { data: { subscription_tier: string } | null }
 
-    if (!profile || profile.subscription_status !== 'active') {
+    if (!profile || profile.subscription_tier === 'free') {
       return NextResponse.json(
         { error: 'Active subscription required' },
         { status: 403 }
