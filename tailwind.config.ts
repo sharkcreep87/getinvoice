@@ -52,11 +52,57 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Beez honey gold theme colors
+        beez: {
+          DEFAULT: '#F8B400', // Honey Gold primary
+          50: '#FFF9E6',
+          100: '#FFF4CC',
+          200: '#FFE799',
+          300: '#FFD966',
+          400: '#FFCB33',
+          500: '#F8B400',
+          600: '#D29300',
+          700: '#A96F00',
+          800: '#7C4C00',
+          900: '#4E2900'
+        },
+        slate: {
+          DEFAULT: '#111827', // Dark slate for text / headers
+          50: '#F8FAFC',
+          100: '#F1F5F9',
+          200: '#E2E8F0',
+          300: '#CBD5E1',
+          400: '#94A3B8',
+          500: '#64748B',
+          600: '#475569',
+          700: '#334155',
+          800: '#1E293B',
+          900: '#0F1724'
+        },
+        honey: '#FFE9A8',
+        graphite: '#4B5563',
+        success: '#10B981'
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        sm: '6px',
+        DEFAULT: '8px',
+        md: 'calc(var(--radius) - 2px)',
+        lg: '12px',
+        full: '9999px'
+      },
+      boxShadow: {
+        sm: '0 1px 2px 0 rgba(16,24,40,0.05)',
+        md: '0 4px 12px rgba(16,24,40,0.08)',
+        beez: '0 6px 30px rgba(248,180,0,0.12)'
+      },
+      fontFamily: {
+        sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+        serif: ['Merriweather', 'serif']
+      },
+      spacing: {
+        '72': '18rem',
+        '84': '21rem',
+        '96': '24rem'
       },
       keyframes: {
         "accordion-down": {
