@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase/server'
 import WhatsAppBotClient from '@/lib/whatsapp-bot/client'
+import { routeMessage } from '@/lib/whatsapp-bot/message-router'
 
 export async function POST(request: NextRequest) {
   try {
@@ -78,8 +79,64 @@ export async function POST(request: NextRequest) {
         console.log(`[API] Bot ready for user ${user.id}: ${phoneNumber}`)
       },
       onMessage: async (message) => {
-        console.log(`[API] Message received for user ${user.id}`)
-        // Message handling will be implemented in Phase 2
+        try {
+          console.log(`[API] Message received for user ${user.id}`)
+
+          // Skip messages from self (bot's own messages)
+          if (message.fromMe) {
+            console.log(`[API] Skipping message from self`)
+            return
+          }
+
+          // Get customer info
+          const customerPhone = message.from.replace('@c.us', '')
+          let customerName = 'Customer'
+
+          try {
+            const contact = await message.getContact()
+            customerName = contact.pushname || contact.name || customerPhone
+          } catch (contactError) {
+            // If getContact fails, use phone number as name
+            console.log(`[API] Could not get contact info, using phone as name`)
+            customerName = customerPhone
+          }
+
+          console.log(`[API] Processing message from ${customerName} (${customerPhone})`)
+
+          // Route message and get response
+          const response = await routeMessage({
+            userId: user.id,
+            message,
+            customerPhone,
+            customerName,
+          })
+
+          // Send response if available
+          if (response) {
+            console.log(`[API] Sending response: "${response.substring(0, 50)}..."`)
+            await message.reply(response)
+
+            // Save outbound message to database
+            const supabase = await createServerClient()
+            await supabase
+              .from('whatsapp_messages')
+              .insert({
+                user_id: user.id,
+                customer_phone: customerPhone,
+                message_type: 'response',
+                message_content: response,
+                direction: 'outbound',
+                status: 'sent',
+                ai_processed: true,
+              } as any)
+
+            console.log(`[API] Response sent successfully`)
+          } else {
+            console.log(`[API] No response generated`)
+          }
+        } catch (error) {
+          console.error(`[API] Error processing message:`, error)
+        }
       },
       onDisconnected: (reason) => {
         console.log(`[API] Bot disconnected for user ${user.id}:`, reason)

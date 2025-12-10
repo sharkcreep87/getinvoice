@@ -90,6 +90,22 @@ class WhatsAppBotClient {
       console.log(`[Bot ${this.config.userId}] Creating WhatsApp client...`)
 
       // Create WhatsApp Web.js client with local auth
+      // Try to use system Chrome on macOS
+      const chromeExecutablePaths = [
+        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        '/Applications/Chromium.app/Contents/MacOS/Chromium',
+      ]
+
+      let executablePath: string | undefined
+      const fs = require('fs')
+      for (const path of chromeExecutablePaths) {
+        if (fs.existsSync(path)) {
+          executablePath = path
+          console.log(`[Bot ${this.config.userId}] Using Chrome at: ${path}`)
+          break
+        }
+      }
+
       this.client = new Client({
         authStrategy: new LocalAuth({
           clientId: `whatsapp-bot-${this.config.userId}`,
@@ -97,6 +113,7 @@ class WhatsAppBotClient {
         }),
         puppeteer: {
           headless: true,
+          executablePath, // Use system Chrome if found
           args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -198,6 +215,8 @@ class WhatsAppBotClient {
     // Message received
     this.client.on('message', async (message: Message) => {
       console.log(`[Bot ${this.config.userId}] Message from ${message.from}: ${message.body}`)
+
+      // Call the onMessage callback (which will handle routing)
       this.config.onMessage?.(message)
     })
 

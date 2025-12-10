@@ -1,15 +1,88 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { QRCodeDisplay } from '@/components/whatsapp-bot/qr-code-display'
 import { BotStatusBadge } from '@/components/whatsapp-bot/bot-status-badge'
 import { MessageSquare, Calendar, CreditCard, BookOpen, Settings, TrendingUp } from 'lucide-react'
+import { createBrowserClient } from '@supabase/ssr'
 
 export default function WhatsAppBotPage() {
   const [botStatus, setBotStatus] = useState<any>('disconnected')
+  const [todayStats, setTodayStats] = useState({
+    messages: 0,
+    conversations: 0,
+    aiUsage: 0,
+    aiLimit: 1000,
+  })
+
+  // Fetch today's activity stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      )
+
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      // Get today's date range
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const todayISO = today.toISOString()
+
+      // Fetch stats in parallel
+      const [messagesResult, conversationsResult, aiMessagesResult, profileResult] = await Promise.all([
+        supabase
+          .from('whatsapp_messages')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .gte('created_at', todayISO),
+        supabase
+          .from('whatsapp_conversations')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .gte('last_message_at', todayISO),
+        supabase
+          .from('whatsapp_messages')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('ai_processed', true)
+          .gte('created_at', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()),
+        supabase
+          .from('profiles')
+          .select('subscription_tier')
+          .eq('id', user.id)
+          .single(),
+      ])
+
+      // Determine AI limit based on subscription tier
+      const tier = (profileResult.data as any)?.subscription_tier || 'free'
+      const limits: Record<string, number> = {
+        free: 50,
+        basic: 500,
+        pro: Infinity,
+      }
+      const aiLimit = limits[tier] || 50
+
+      setTodayStats({
+        messages: messagesResult.count || 0,
+        conversations: conversationsResult.count || 0,
+        aiUsage: aiMessagesResult.count || 0,
+        aiLimit: aiLimit === Infinity ? 999999 : aiLimit,
+      })
+    }
+
+    if (botStatus === 'ready') {
+      fetchStats()
+      // Refresh stats every 30 seconds
+      const interval = setInterval(fetchStats, 30000)
+      return () => clearInterval(interval)
+    }
+  }, [botStatus])
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -90,37 +163,6 @@ export default function WhatsAppBotPage() {
             </Card>
           )}
 
-          {/* Coming Soon Features */}
-          {botStatus === 'ready' && (
-            <Card className="border-2 border-dashed border-slate-200">
-              <CardHeader>
-                <CardTitle className="text-slate-600">Phase 2 Features (Coming Soon)</CardTitle>
-                <CardDescription>
-                  These features will be available in the next update
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-slate-500">
-                    <Calendar className="h-5 w-5" />
-                    <span>Appointment Management Dashboard</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-slate-500">
-                    <BookOpen className="h-5 w-5" />
-                    <span>Knowledge Base Editor</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-slate-500">
-                    <MessageSquare className="h-5 w-5" />
-                    <span>Conversation History</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-slate-500">
-                    <Settings className="h-5 w-5" />
-                    <span>Bot Settings & Customization</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
         </div>
 
         {/* Right Column - Quick Stats & Info */}
@@ -135,19 +177,19 @@ export default function WhatsAppBotPage() {
                 <CardContent className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-slate-600">Messages</span>
-                    <span className="text-2xl font-bold text-slate-900">0</span>
+                    <span className="text-2xl font-bold text-slate-900">{todayStats.messages}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-slate-600">Conversations</span>
-                    <span className="text-2xl font-bold text-slate-900">0</span>
+                    <span className="text-2xl font-bold text-slate-900">{todayStats.conversations}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-600">Appointments</span>
-                    <span className="text-2xl font-bold text-slate-900">0</span>
+                    <span className="text-slate-600">AI Responses</span>
+                    <span className="text-2xl font-bold text-slate-900">{todayStats.aiUsage}</span>
                   </div>
                   <div className="pt-2 border-t">
                     <p className="text-xs text-slate-500">
-                      Statistics will update as customers interact with your bot
+                      Statistics update automatically every 30 seconds
                     </p>
                   </div>
                 </CardContent>
@@ -157,20 +199,27 @@ export default function WhatsAppBotPage() {
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <TrendingUp className="h-5 w-5 text-primary" />
-                    AI Usage
+                    AI Usage (This Month)
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-slate-600">OpenAI API Calls</span>
-                      <span className="font-semibold">0 / 1000</span>
+                      <span className="font-semibold">
+                        {todayStats.aiUsage} / {todayStats.aiLimit === 999999 ? '∞' : todayStats.aiLimit}
+                      </span>
                     </div>
                     <div className="h-2 bg-white rounded-full overflow-hidden">
-                      <div className="h-full bg-primary" style={{ width: '0%' }} />
+                      <div
+                        className="h-full bg-primary transition-all duration-500"
+                        style={{
+                          width: `${todayStats.aiLimit === 999999 ? 0 : Math.min((todayStats.aiUsage / todayStats.aiLimit) * 100, 100)}%`
+                        }}
+                      />
                     </div>
                     <p className="text-xs text-slate-600">
-                      Your AI quota resets monthly
+                      {todayStats.aiLimit === 999999 ? 'Unlimited AI quota (Pro plan)' : 'Your AI quota resets monthly'}
                     </p>
                   </div>
                 </CardContent>

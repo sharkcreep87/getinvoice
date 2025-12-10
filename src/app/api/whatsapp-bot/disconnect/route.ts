@@ -30,6 +30,20 @@ export async function POST(request: NextRequest) {
     // Disconnect bot
     await botClient.disconnect()
 
+    // Kill any lingering Chrome/Chromium processes
+    try {
+      const { exec } = require('child_process')
+      exec('pkill -9 -f "chrome|chromium"', (error: any) => {
+        if (error) {
+          console.log('[API] No Chrome processes to kill or kill failed')
+        } else {
+          console.log('[API] Chrome processes killed')
+        }
+      })
+    } catch (killError) {
+      console.log('[API] Error killing Chrome:', killError)
+    }
+
     // Update database
     const updateData = {
       status: 'disconnected',

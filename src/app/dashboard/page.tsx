@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { FileText, DollarSign, Users, TrendingUp, Clock, CheckCircle, AlertCircle, Receipt, BarChart3 } from "lucide-react"
+import { FileText, DollarSign, Users, TrendingUp, Clock, CheckCircle, AlertCircle, Receipt, BarChart3, MessageSquare, Bot } from "lucide-react"
 import { createServerClient } from "@/lib/supabase/server"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -10,10 +10,17 @@ export const dynamic = 'force-dynamic'
 async function getDashboardStats(userId: string, userCurrency: string) {
   const supabase = await createServerClient()
 
-  const [customersResult, invoicesResult, expensesResult] = await Promise.all([
+  // Get today's date range
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const todayISO = today.toISOString()
+
+  const [customersResult, invoicesResult, expensesResult, aiMessagesResult, conversationsResult] = await Promise.all([
     supabase.from('customers').select('id', { count: 'exact' }).eq('user_id', userId),
     supabase.from('invoices').select('id, invoice_number, status, issue_date, due_date, total, created_at').eq('user_id', userId).order('created_at', { ascending: false }),
     supabase.from('expenses').select('id, amount, expense_date').eq('user_id', userId),
+    supabase.from('whatsapp_messages').select('id', { count: 'exact' }).eq('user_id', userId).eq('ai_processed', true).gte('created_at', todayISO),
+    supabase.from('whatsapp_conversations').select('id', { count: 'exact' }).eq('user_id', userId).gte('last_message_at', todayISO),
   ])
 
   const customers = (customersResult.data || []) as any[]
@@ -72,6 +79,8 @@ async function getDashboardStats(userId: string, userCurrency: string) {
     monthlyNetProfit,
     recentInvoices: invoices.slice(0, 5),
     currency: userCurrency,
+    todayAIMessages: aiMessagesResult.count || 0,
+    todayConversations: conversationsResult.count || 0,
   }
 }
 
@@ -313,6 +322,59 @@ export default async function DashboardPage() {
                   </div>
                 </Link>
               ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Today's Activity - AI Usage */}
+      <Card className="border border-primary/20 shadow-md">
+        <CardHeader className="bg-gradient-to-r from-primary/5 to-secondary/5 border-b border-primary/10">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <Bot className="h-5 w-5 text-primary" />
+              Today's Activity
+            </CardTitle>
+            <Link href="/dashboard/whatsapp-bot" className="text-sm text-primary hover:text-secondary font-medium transition-colors">
+              View bot →
+            </Link>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-6">
+          {stats.todayAIMessages > 0 || stats.todayConversations > 0 ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="flex items-center gap-4 p-4 rounded-lg border border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+                <div className="p-3 bg-primary/10 rounded-lg">
+                  <MessageSquare className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-primary">{stats.todayAIMessages}</p>
+                  <p className="text-sm text-muted-foreground">AI Messages Processed</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4 p-4 rounded-lg border border-secondary/20 bg-gradient-to-br from-secondary/5 to-transparent">
+                <div className="p-3 bg-secondary/10 rounded-lg">
+                  <Users className="h-6 w-6 text-secondary" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-secondary">{stats.todayConversations}</p>
+                  <p className="text-sm text-muted-foreground">Active Conversations</p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <div className="p-4 bg-primary/5 rounded-full w-16 h-16 mx-auto mb-3 flex items-center justify-center">
+                <Bot className="h-8 w-8 text-primary/40" />
+              </div>
+              <p className="text-muted-foreground text-sm mb-3">
+                No AI activity today yet
+              </p>
+              <Link href="/dashboard/whatsapp-bot">
+                <button className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg text-sm hover:shadow-lg transition-all">
+                  Set Up WhatsApp Bot
+                </button>
+              </Link>
             </div>
           )}
         </CardContent>
